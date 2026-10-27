@@ -23,70 +23,98 @@ html,body{height:100%}
 body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#5b82b5;-webkit-font-smoothing:antialiased}
 
 /* ---------- Background ---------- */
-.bg{position:fixed;inset:0;z-index:0}
-.bg svg{position:absolute;inset:0;width:100%;height:100%}
-/* Taruh foto sendiri di assets/bg.jpg — otomatis menimpa ilustrasi SVG */
-.bg .photo{position:absolute;inset:0;background:url("assets/bg.jpg") center bottom/cover no-repeat}
+:root{--panel:rgba(246,248,253,.94)}
+html[data-theme=pagi]{--ink:#233a5c;--glass:rgba(255,255,255,.58);--glass2:rgba(255,255,255,.55);--scene-filter:brightness(1.07) saturate(.92) hue-rotate(-10deg)}
+html[data-theme=malam]{--ink:#e9eefc;--glass:rgba(18,26,48,.52);--glass2:rgba(18,26,48,.5);--glass-line:rgba(255,255,255,.16);--panel:rgba(20,28,50,.94);--scene-filter:brightness(.48) saturate(.85) hue-rotate(12deg)}
+body{overflow-x:hidden;overflow-y:auto}
+.bg{position:fixed;inset:0;z-index:0;background:#5a80b4}
+.stack{position:absolute;inset:0;filter:var(--scene-filter,none);transition:filter .5s}
+.stack svg{position:absolute;left:0;right:0;bottom:0;width:100%;height:100%}
+.stack .photo{position:absolute;inset:0;background:url("assets/bg.jpg") center bottom/cover no-repeat}
 .bg::after{content:"";position:absolute;inset:0;pointer-events:none;
-  background:linear-gradient(180deg,rgba(40,60,100,.18) 0,transparent 22%,transparent 70%,rgba(30,25,45,.22) 100%)}
+  background:linear-gradient(180deg,rgba(40,60,100,.16) 0,transparent 22%,transparent 70%,rgba(30,25,45,.22) 100%)}
+/* Layar tinggi (HP/tablet portrait): tampilkan seluruh pemandangan, tanpa zoom */
+@media (max-aspect-ratio:3/2){
+  .stack svg{height:calc(100vw * 1024 / 1536);-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 20%);mask-image:linear-gradient(180deg,transparent 0,#000 20%)}
+}
 
 /* ---------- Layout ---------- */
-.app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
-.top{display:flex;align-items:center;justify-content:space-between;padding:26px 40px 0;height:82px}
-.brand{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;font-family:var(--serif);font-size:19px;letter-spacing:.2px}
-.brand svg{width:26px;height:26px}
-.tools{display:flex;align-items:center;gap:22px;color:#fff}
-.tools button{background:none;border:0;color:inherit;cursor:pointer;position:relative;display:grid;place-items:center;padding:2px;opacity:.95;transition:opacity .2s,transform .2s}
+.app{position:relative;z-index:1;min-height:100dvh;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;justify-content:space-between;padding:20px 32px 0;height:62px}
+.brand{display:flex;align-items:center;gap:8px;color:#fff;text-decoration:none;font-family:var(--serif);font-size:17px;letter-spacing:.2px}
+.brand svg{width:22px;height:22px}
+.tools{display:flex;align-items:center;gap:16px;color:#fff}
+.tools button{background:none;border:0;color:inherit;cursor:pointer;position:relative;display:grid;place-items:center;padding:3px;opacity:.95;transition:opacity .2s,transform .2s}
 .tools button:hover{opacity:1;transform:translateY(-1px)}
-.tools .ic{width:21px;height:21px}
-.dot{position:absolute;top:0;right:1px;width:7px;height:7px;border-radius:50%;background:#ff6b6b;border:1px solid rgba(255,255,255,.8)}
-.avatar{display:flex;align-items:center;gap:5px}
-.avatar i{width:32px;height:32px;border-radius:50%;border:2px solid #fff;display:block;overflow:hidden;background:linear-gradient(160deg,#cdd6e6 0,#8c9bb5 45%,#2b2f3d 46%,#161922 100%)}
-.avatar svg{width:11px;height:11px}
+.tools .ic{width:18px;height:18px}
+.dot{position:absolute;top:1px;right:2px;width:6px;height:6px;border-radius:50%;background:#ff6b6b;border:1px solid rgba(255,255,255,.8)}
+.avatar{display:flex;align-items:center;gap:4px}
+.avatar i{width:27px;height:27px;border-radius:50%;border:2px solid #fff;display:block;overflow:hidden;background:linear-gradient(160deg,#cdd6e6 0,#8c9bb5 45%,#2b2f3d 46%,#161922 100%)}
+.avatar svg{width:10px;height:10px}
 
-/* ---------- Nav ---------- */
-.nav-wrap{display:flex;justify-content:center;padding:0 20px;margin-top:-4px}
-.nav{display:flex;align-items:flex-start;justify-content:center;gap:0;padding:15px 38px 0;height:88px;border-radius:44px;
+/* ---------- Nav (lebih ramping) ---------- */
+.nav-wrap{display:flex;justify-content:center;padding:8px 16px 0}
+.nav{display:flex;align-items:flex-start;justify-content:center;padding:11px 18px 9px;border-radius:30px;
   background:var(--glass);border:1px solid var(--glass-line);
   -webkit-backdrop-filter:blur(14px) saturate(1.1);backdrop-filter:blur(14px) saturate(1.1);
-  box-shadow:0 10px 40px rgba(40,60,110,.12), inset 0 1px 0 rgba(255,255,255,.5);
-  max-width:100%;overflow-x:auto;scrollbar-width:none}
-.nav::-webkit-scrollbar{display:none}
-.nav a{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);
-  font-size:11.5px;line-height:16px;text-align:center;padding:0 15px;flex:none;transition:transform .2s,opacity .2s;opacity:.92}
+  box-shadow:0 8px 30px rgba(40,60,110,.12), inset 0 1px 0 rgba(255,255,255,.45);max-width:100%}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:5px;text-decoration:none;color:var(--ink);
+  font-size:10.5px;line-height:13.5px;text-align:center;padding:0 10px;flex:none;transition:transform .2s,opacity .2s;opacity:.92}
 .nav a:hover{transform:translateY(-2px);opacity:1}
-.nav a .ic{width:20px;height:20px;stroke-width:1.5}
-.nav a:focus-visible,.tools button:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:12px}
+.nav a .ic{width:17px;height:17px;stroke-width:1.5}
+.nav a:focus-visible,.tools button:focus-visible,.chip:focus-visible,.wall:focus-visible{outline:2px solid #fff;outline-offset:3px;border-radius:12px}
 
-/* ---------- Hero ---------- */
-.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:0 20px;margin-top:118px}
+/* ---------- Hero (tepat di tengah) ---------- */
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:10px 20px 70px}
 .hero h1{font-family:var(--serif);font-weight:400;color:#fff;line-height:1.2;letter-spacing:.2px;
-  font-size:clamp(30px,3.45vw,53px);text-shadow:0 2px 24px rgba(40,60,110,.28)}
-.quote{margin-top:23px;color:rgba(255,255,255,.96);font-size:clamp(13px,1.05vw,16px);line-height:1.6;font-weight:300;text-shadow:0 1px 14px rgba(40,60,110,.35)}
-.info{margin-top:36px;display:flex;align-items:center;border-radius:26px;padding:0 24px;height:84px;min-width:494px;
-  background:rgba(235,238,248,.55);border:1px solid var(--glass-line);
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(40,60,110,.12)}
-.info>div{display:flex;align-items:center;gap:15px;text-align:left}
-.info>div:first-child{padding-right:44px;border-right:1px solid rgba(31,47,77,.22);height:44px}
-.info>div:last-child{padding-left:44px;flex:1}
-.info .ic{width:24px;height:24px;stroke-width:1.4;flex:none}
-.info b{display:block;font-weight:500;font-size:15px;line-height:20px}
-.info small{display:block;font-size:12.5px;line-height:19px;opacity:.9}
+  font-size:clamp(27px,3.2vw,48px);text-shadow:0 2px 24px rgba(40,60,110,.3)}
+.quote{margin-top:18px;color:rgba(255,255,255,.96);font-size:clamp(13px,1.05vw,15.5px);line-height:1.6;font-weight:300;text-shadow:0 1px 14px rgba(40,60,110,.4)}
+.info{margin:30px auto 0;display:grid;grid-template-columns:1fr 1px 1fr;align-items:center;width:min(470px,100%);height:76px;border-radius:24px;
+  background:var(--glass2);border:1px solid var(--glass-line);color:var(--ink);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 8px 30px rgba(40,60,110,.12)}
+.info .cell{display:flex;align-items:center;justify-content:center;gap:12px;text-align:left;padding:0 10px}
+.info .sep{width:1px;height:42px;background:currentColor;opacity:.22}
+.info .ic{width:22px;height:22px;stroke-width:1.4;flex:none}
+.info b{display:block;font-weight:500;font-size:14.5px;line-height:19px;font-variant-numeric:tabular-nums}
+.info small{display:block;font-size:12px;line-height:18px;opacity:.88}
 
 /* ---------- Footer ---------- */
-.foot-l{position:fixed;left:40px;bottom:43px;z-index:2;display:flex;align-items:center;gap:14px;color:#fff;font-size:12px;letter-spacing:.2px}
-.foot-l::before{content:"";width:32px;height:1px;background:rgba(255,255,255,.8)}
-.foot-l span{opacity:.6;margin:0 5px}
-.foot-r{position:fixed;right:42px;bottom:36px;z-index:2;color:#fff;font-family:var(--hand);font-size:22px;line-height:1.05;text-align:right;transform:rotate(-6deg);opacity:.95}
-.foot-r::after{content:"";display:block;height:1px;background:rgba(255,255,255,.8);margin-top:4px}
+.foot-l{position:fixed;left:32px;bottom:30px;z-index:2;display:flex;align-items:center;gap:12px;color:#fff;font-size:11.5px;letter-spacing:.2px}
+.foot-l::before{content:"";width:28px;height:1px;background:rgba(255,255,255,.8)}
+.foot-l span{opacity:.6;margin:0 4px}
 
-/* ---------- Responsive ---------- */
-@media (max-width:900px){
-  .top{padding:20px 20px 0}
-  .hero{margin-top:70px}
-  .info{min-width:0;width:100%;max-width:420px;padding:0 16px}
-  .info>div:first-child{padding-right:18px}.info>div:last-child{padding-left:18px}
-  .foot-l{left:20px;bottom:24px}.foot-r{right:20px;bottom:20px;font-size:18px}
+/* ---------- Panel tema & wallpaper ---------- */
+.panel{position:fixed;top:60px;right:24px;z-index:10;width:316px;max-width:calc(100vw - 24px);max-height:calc(100dvh - 80px);overflow:auto;
+  padding:16px;border-radius:20px;background:var(--panel);color:var(--ink);border:1px solid var(--glass-line);
+  -webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 20px 60px rgba(20,30,60,.32);display:none;font-size:13px}
+.panel.open{display:block;animation:pop .18s ease-out}
+@keyframes pop{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.panel h2{font-size:12px;font-weight:500;margin:0 0 8px;opacity:.72}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chip{border:1px solid rgba(127,140,170,.45);background:transparent;color:inherit;border-radius:999px;padding:6px 13px;font:inherit;font-size:12.5px;cursor:pointer}
+.chip[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:transparent}
+.walls{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wall{aspect-ratio:16/10;border-radius:10px;border:2px solid transparent;cursor:pointer;background:#889 center/cover;position:relative;overflow:hidden;padding:0;display:grid;place-items:center;color:#fff}
+.wall[aria-pressed=true]{border-color:var(--ink);box-shadow:0 0 0 1px var(--panel) inset}
+.wall span{position:absolute;left:6px;bottom:4px;font-size:10px;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.65)}
+.wall.up{border:2px dashed rgba(127,140,170,.6);color:var(--ink);background:rgba(127,140,170,.12)}
+.wall.up span{color:var(--ink);text-shadow:none;left:0;right:0;text-align:center;bottom:auto}
+.reset{margin-top:12px;background:none;border:0;color:inherit;opacity:.7;font:inherit;font-size:12px;text-decoration:underline;cursor:pointer;padding:0}
+
+/* ---------- Responsif ---------- */
+@media (max-width:1000px){.nav a{padding:0 7px}}
+@media (max-width:820px){
+  .top{padding:16px 18px 0;height:56px}
+  .nav{display:grid;grid-template-columns:repeat(4,1fr);gap:14px 0;width:100%;max-width:440px;padding:14px 8px 12px;border-radius:24px}
+  .nav a{padding:0 2px}
+  .hero{padding-bottom:90px}
+  .foot-l{left:18px;bottom:20px}
+  .panel{right:12px;top:54px}
+}
+@media (max-width:420px){
+  .tools{gap:12px}
+  .info{height:70px}.info .cell{gap:8px;padding:0 6px}.info b{font-size:13.5px}.info small{font-size:11px}
+  .quote br{display:none}
 }
 @media (prefers-reduced-motion:no-preference){
   .hero>*{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
@@ -113,13 +141,15 @@ body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#5b82b5
     <symbol id="i-set" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></symbol>
+    <symbol id="i-palette" viewBox="0 0 24 24"><circle cx="13.5" cy="6.5" r=".6"/><circle cx="17.5" cy="10.5" r=".6"/><circle cx="8.5" cy="7.5" r=".6"/><circle cx="6.5" cy="12.5" r=".6"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.93 0 1.65-.75 1.65-1.69 0-.44-.18-.83-.44-1.12-.29-.29-.44-.65-.44-1.13a1.64 1.64 0 0 1 1.67-1.67h2c3.05 0 5.55-2.5 5.55-5.55C21.97 6.01 17.46 2 12 2z"/></symbol>
     <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M12 2v2M4.93 4.93l1.41 1.41M20 12h2M19.07 4.93l-1.41 1.41M15.95 12.65a4 4 0 0 0-5.93-4.13"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/></symbol>
   </defs>
 </svg>
 
 <!-- Background: ilustrasi SVG + (opsional) foto assets/bg.jpg -->
-<div class="bg" aria-hidden="true">
-<svg viewBox="0 0 1536 1024" preserveAspectRatio="xMidYMid slice">
+<div class="bg" aria-hidden="true"><div class="stack">
+<svg id="scene" viewBox="0 0 1536 1024" preserveAspectRatio="xMidYMax slice">
   <defs>
     <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#5a80b4"/><stop offset=".3" stop-color="#7d9bc6"/>
@@ -249,8 +279,8 @@ body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#5b82b5
     <path d="M262 818 L268 872" stroke="#fff" stroke-opacity=".12" stroke-width="6"/>
   </g>
 </svg>
-<div class="photo"></div>
-</div>
+<div class="photo" id="photo"></div>
+</div></div>
 
 <div class="app">
   <header class="top">
@@ -267,6 +297,7 @@ body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#5b82b5
     </a>
     <div class="tools">
       <button aria-label="Cari"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-search"/></svg></button>
+      <button id="themeBtn" aria-label="Tema dan wallpaper" aria-expanded="false" aria-controls="panel"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-palette"/></svg></button>
       <button aria-label="Notifikasi"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bell"/></svg><span class="dot"></span></button>
       <button class="avatar" aria-label="Akun"><i></i><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 4.5 3.5 3.5 3.5-3.5"/></svg></button>
     </div>
@@ -284,7 +315,7 @@ body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#5b82b5
       <a href="#goal"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-goal"/></svg><span>Goal</span></a>
       <a href="#documents"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-doc"/></svg><span>Document<br>Center</span></a>
       <a href="#analytics"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chart"/></svg><span>Analytics</span></a>
-      <a href="#settings"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-set"/></svg><span>Settings</span></a>
+      <a href="#settings" id="navSettings"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-set"/></svg><span>Settings</span></a>
     </nav>
   </div>
 
@@ -292,35 +323,131 @@ body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#5b82b5
     <h1>Assalamu’alaikum,<br>Semangat hari ini!</h1>
     <p class="quote">“Setiap langkah kecil yang kamu lakukan hari ini,<br>adalah bagian dari impian besar yang sedang kamu bangun.”</p>
     <div class="info">
-      <div>
+      <div class="cell">
         <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cal"/></svg>
         <span><b id="masehi">Rabu, 29 Oktober 2025</b><small id="hijriah">4 Jumadil Akhir 1447 H</small></span>
       </div>
-      <div>
-        <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cloud"/></svg>
-        <span><b>28°C</b><small>Cerah Berawan</small></span>
+      <i class="sep"></i>
+      <div class="cell">
+        <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clock"/></svg>
+        <span><b id="clock">00:00:00</b><small id="zone">WIB</small></span>
       </div>
     </div>
   </main>
 </div>
 
 <div class="foot-l">Plan <span>·</span> Execute <span>·</span> Achieve</div>
-<div class="foot-r">Big dreams<br>need a good plan</div>
+<aside class="panel" id="panel" aria-label="Tema dan wallpaper">
+  <h2>Tema</h2>
+  <div class="chips" id="themes">
+    <button class="chip" data-v="senja">Senja</button><button class="chip" data-v="pagi">Pagi</button><button class="chip" data-v="malam">Malam</button>
+  </div>
+  <h2>Wallpaper</h2>
+  <div class="walls" id="walls">
+    <button class="wall" data-v="scene" style="background-image:linear-gradient(180deg,#5a80b4,#e5c4b4 70%,#4a6a8a)"><span>Danau Senja</span></button>
+    <button class="wall" data-v="aurora"><span>Aurora</span></button>
+    <button class="wall" data-v="laut"><span>Laut</span></button>
+    <button class="wall" data-v="hutan"><span>Hutan</span></button>
+    <button class="wall" data-v="fajar"><span>Fajar</span></button>
+    <button class="wall up" data-v="custom" id="customTile"><span>+ Foto sendiri</span></button>
+  </div>
+  <input type="file" id="file" accept="image/*" hidden>
+  <button class="reset" id="reset">Kembalikan ke bawaan</button>
+</aside>
 
 <script>
-// Tanggal Masehi & Hijriah otomatis (zona waktu perangkat)
 (function(){
-  var d=new Date();
-  document.getElementById('masehi').textContent=
-    d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
-  try{
-    var bulan=['Muharram','Safar','Rabiul Awal','Rabiul Akhir','Jumadil Awal','Jumadil Akhir','Rajab','Syaban','Ramadan','Syawal','Dzulkaidah','Dzulhijjah'];
-    var p={};
-    new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'})
-      .formatToParts(d).forEach(function(x){p[x.type]=x.value});
-    var y=parseInt(p.relatedYear||p.year,10);
-    document.getElementById('hijriah').textContent=p.day+' '+bulan[parseInt(p.month,10)-1]+' '+y+' H';
-  }catch(e){}
+  var root=document.documentElement,$=function(i){return document.getElementById(i)};
+  var S={get:function(k){try{return localStorage.getItem(k)}catch(e){return null}},
+         set:function(k,v){try{localStorage.setItem(k,v);return true}catch(e){return false}},
+         del:function(k){try{localStorage.removeItem(k)}catch(e){}}};
+
+  /* ---------- Tanggal & jam real-time ---------- */
+  var bulan=['Muharram','Safar','Rabiul Awal','Rabiul Akhir','Jumadil Awal','Jumadil Akhir','Rajab','Syaban','Ramadan','Syawal','Dzulkaidah','Dzulhijjah'];
+  var tz='';try{tz=Intl.DateTimeFormat().resolvedOptions().timeZone||''}catch(e){}
+  var zmap={'Asia/Jakarta':'WIB','Asia/Pontianak':'WIB','Asia/Makassar':'WITA','Asia/Jayapura':'WIT'};
+  function zone(d){
+    if(zmap[tz])return zmap[tz];
+    try{var t=new Intl.DateTimeFormat('id-ID',{timeZoneName:'short'}).formatToParts(d).filter(function(x){return x.type==='timeZoneName'})[0];return t?t.value:tz}catch(e){return tz}
+  }
+  function pad(n){return n<10?'0'+n:''+n}
+  var lastDay=-1;
+  function tick(){
+    var d=new Date();
+    $('clock').textContent=pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+    if(d.getDate()!==lastDay){
+      lastDay=d.getDate();
+      $('zone').textContent=zone(d);
+      $('masehi').textContent=d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+      try{
+        var p={};
+        new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'}).formatToParts(d).forEach(function(x){p[x.type]=x.value});
+        $('hijriah').textContent=p.day+' '+bulan[parseInt(p.month,10)-1]+' '+parseInt(p.relatedYear||p.year,10)+' H';
+      }catch(e){}
+    }
+  }
+  tick();setInterval(tick,1000);
+
+  /* ---------- Tema & wallpaper ---------- */
+  var G={aurora:'linear-gradient(160deg,#1d2b64,#5b3f8c 45%,#f093a0)',
+         laut:'linear-gradient(180deg,#0f4c75,#3282b8 50%,#bbe1fa)',
+         hutan:'linear-gradient(170deg,#12372a,#436850 55%,#adbc9f)',
+         fajar:'linear-gradient(180deg,#ff9a8b,#ff6a88 40%,#a18cd1)'};
+  var scene=$('scene'),photo=$('photo'),custom=S.get('mo-custom');
+  document.querySelectorAll('.wall').forEach(function(w){if(G[w.dataset.v])w.style.backgroundImage=G[w.dataset.v]});
+
+  function press(box,v){box.querySelectorAll('[data-v]').forEach(function(b){b.setAttribute('aria-pressed',b.dataset.v===v)})}
+  function setTheme(v){root.dataset.theme=v;press($('themes'),v);S.set('mo-theme',v)}
+  function setWall(v){
+    if(v==='custom'&&!custom)v='scene';
+    if(v==='scene'){scene.style.display='';photo.style.backgroundImage='url("assets/bg.jpg")'}
+    else{scene.style.display='none';photo.style.backgroundImage=v==='custom'?'url("'+custom+'")':G[v]}
+    press($('walls'),v);S.set('mo-wall',v);
+  }
+  function showCustomTile(){
+    if(!custom)return;var t=$('customTile');
+    t.classList.remove('up');t.style.backgroundImage='url("'+custom+'")';t.firstChild.textContent='Foto saya';
+  }
+  $('themes').addEventListener('click',function(e){var b=e.target.closest('[data-v]');if(b)setTheme(b.dataset.v)});
+  $('walls').addEventListener('click',function(e){
+    var b=e.target.closest('[data-v]');if(!b)return;
+    if(b.dataset.v==='custom'&&!custom){$('file').click();return}
+    setWall(b.dataset.v);
+  });
+  $('customTile').addEventListener('dblclick',function(){$('file').click()});
+  $('file').addEventListener('change',function(e){
+    var f=e.target.files&&e.target.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(){
+      var im=new Image();
+      im.onload=function(){
+        var m=1920,k=Math.min(1,m/Math.max(im.width,im.height)),c=document.createElement('canvas');
+        c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);
+        c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+        custom=c.toDataURL('image/jpeg',.82);S.set('mo-custom',custom);
+        showCustomTile();setWall('custom');
+      };
+      im.src=r.result;
+    };
+    r.readAsDataURL(f);e.target.value='';
+  });
+  $('reset').addEventListener('click',function(){
+    S.del('mo-custom');S.del('mo-theme');S.del('mo-wall');custom=null;
+    var t=$('customTile');t.classList.add('up');t.style.backgroundImage='';t.firstChild.textContent='+ Foto sendiri';
+    setTheme('senja');setWall('scene');
+  });
+  setTheme(S.get('mo-theme')||'senja');showCustomTile();setWall(S.get('mo-wall')||'scene');
+
+  /* ---------- Panel ---------- */
+  var panel=$('panel'),btn=$('themeBtn');
+  function toggle(open){
+    var o=open===undefined?!panel.classList.contains('open'):open;
+    panel.classList.toggle('open',o);btn.setAttribute('aria-expanded',o);
+  }
+  btn.addEventListener('click',function(e){e.stopPropagation();toggle()});
+  $('navSettings').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();toggle()});
+  document.addEventListener('click',function(e){if(!panel.contains(e.target))toggle(false)});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')toggle(false)});
 })();
 </script>
 </body>
