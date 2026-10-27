@@ -122,6 +122,7 @@ body{overflow-x:hidden;overflow-y:auto}
   @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 }
 </style>
+<link rel="stylesheet" href="academic.css">
 </head>
 <body>
 
@@ -445,10 +446,10 @@ body{overflow-x:hidden;overflow-y:auto}
     panel.classList.toggle('open',o);btn.setAttribute('aria-expanded',o);
   }
   btn.addEventListener('click',function(e){e.stopPropagation();toggle()});
-  $('navSettings').addEventListener('click',function(e){e.preventDefault();e.stopPropagation();toggle()});
   document.addEventListener('click',function(e){if(!panel.contains(e.target))toggle(false)});
   document.addEventListener('keydown',function(e){if(e.key==='Escape')toggle(false)});
 })();
 </script>
+<script src="academic.js"></script>
 </body>
 </html>

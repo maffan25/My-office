@@ -1,0 +1,103 @@
+/* Academic Management window — memakai variabel tema dari index.html */
+html[data-theme=malam]{color-scheme:dark}
+.ac-ov{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;
+  background:rgba(20,30,55,.38);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);animation:acfade .2s ease-out}
+.ac-ov[hidden]{display:none}
+.ac-ov2{z-index:60;background:rgba(10,15,30,.45)}
+@keyframes acfade{from{opacity:0}to{opacity:1}}
+.ac-win{width:min(1060px,100%);height:min(760px,calc(100dvh - 32px));display:flex;flex-direction:column;overflow:hidden;
+  background:var(--panel);color:var(--ink);border:1px solid var(--glass-line);border-radius:24px;
+  box-shadow:0 30px 90px rgba(10,20,50,.4);font-family:var(--sans);font-size:13.5px}
+.ac-win header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;padding:20px 24px 8px}
+.ac-win h2{font-family:var(--serif);font-weight:400;font-size:26px;line-height:1.15}
+.ac-win header p{opacity:.7;font-size:12.5px;margin-top:3px}
+.ac-x{border:0;background:rgba(127,140,170,.18);color:inherit;width:32px;height:32px;border-radius:50%;font-size:20px;line-height:1;cursor:pointer;flex:none}
+.ac-x:hover{background:rgba(127,140,170,.32)}
+.ac-tabs{display:flex;gap:6px;padding:8px 24px 12px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid rgba(127,140,170,.22)}
+.ac-tabs::-webkit-scrollbar{display:none}
+.ac-tab,.ac-chip{flex:none;border:1px solid rgba(127,140,170,.4);background:transparent;color:inherit;border-radius:999px;padding:7px 14px;font:inherit;font-size:12.5px;cursor:pointer;white-space:nowrap}
+.ac-tab[aria-selected=true],.ac-chip[aria-pressed=true]{background:var(--ink);color:var(--panel);border-color:transparent}
+.ac-body{flex:1;overflow:auto;padding:18px 24px 26px}
+.ac-bar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.ac-hint{opacity:.7;font-size:12.5px;max-width:60ch}
+.ac-btn{border:1px solid rgba(127,140,170,.45);background:transparent;color:inherit;border-radius:10px;padding:8px 14px;font:inherit;font-size:12.5px;cursor:pointer}
+.ac-btn:hover{background:rgba(127,140,170,.16)}
+.ac-btn.pri{background:var(--ink);color:var(--panel);border-color:transparent}
+.ac-btn.pri:hover{opacity:.9}
+.ac-btn.sm{padding:5px 10px;font-size:12px}
+.ac-btn.danger{color:#d0443e}
+.ac-card{border:1px solid rgba(127,140,170,.3);background:rgba(127,140,170,.09);border-radius:16px;padding:16px;margin-bottom:14px}
+.ac-card h3{font-size:15px;font-weight:500}
+.ac-row{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap}
+.ac-acts{display:flex;gap:6px;flex-wrap:wrap}
+.ac-meta{display:flex;gap:18px;flex-wrap:wrap;margin:10px 0;font-size:12.5px;opacity:.9}
+.ac-meta b{font-weight:500}
+.ac-notes{white-space:pre-wrap;opacity:.8;font-size:12.5px;margin:6px 0 10px}
+.ac-badge{display:inline-block;border-radius:999px;padding:2px 9px;font-size:11px;border:1px solid rgba(127,140,170,.45);margin-left:6px;vertical-align:middle;background:transparent;color:inherit;font-family:inherit}
+.ac-badge.on{background:#2f9e6b;color:#fff;border-color:transparent}
+.ac-badge.hi{background:#d0443e;color:#fff;border-color:transparent}
+.ac-badge.mid{background:#d99a2b;color:#fff;border-color:transparent}
+.ac-badge.late{color:#d0443e;border-color:#d0443e}
+button.ac-badge{cursor:pointer}
+.ac-tbl{width:100%;border-collapse:collapse;font-size:12.5px;margin-top:6px}
+.ac-tbl th{text-align:left;font-weight:500;opacity:.65;padding:6px 8px;border-bottom:1px solid rgba(127,140,170,.3)}
+.ac-tbl td{padding:8px;border-bottom:1px solid rgba(127,140,170,.16);vertical-align:top}
+.ac-tbl tr.ac-click{cursor:pointer}.ac-tbl tr.ac-click:hover{background:rgba(127,140,170,.12)}
+.ac-tblwrap{overflow-x:auto}
+.ac-empty{text-align:center;opacity:.65;padding:36px 12px;border:1px dashed rgba(127,140,170,.4);border-radius:16px}
+.ac-chips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.ac-item{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(127,140,170,.3);background:rgba(127,140,170,.09);border-radius:14px;padding:12px 14px;margin-bottom:10px}
+.ac-item>div{flex:1;min-width:0}
+.ac-item .t{font-size:14px;font-weight:500;text-align:left;background:none;border:0;color:inherit;font-family:inherit;padding:0;cursor:pointer}
+.ac-item .t:hover{text-decoration:underline}
+.ac-item.done .t{opacity:.55;text-decoration:line-through}
+.ac-item small{display:block;opacity:.72;font-size:12px;margin-top:3px;line-height:1.5}
+.ac-item input[type=checkbox]{width:18px;height:18px;margin-top:2px;accent-color:var(--ink);cursor:pointer}
+.ac-item a,.ac-card a{color:inherit}
+.ac-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:18px}
+.ac-stat{border:1px solid rgba(127,140,170,.3);background:rgba(127,140,170,.09);border-radius:16px;padding:14px 16px}
+.ac-stat b{display:block;font-family:var(--serif);font-weight:400;font-size:32px;line-height:1.1}
+.ac-stat span{font-size:12px;opacity:.72}
+.ac-h{font-size:14px;font-weight:500;margin:18px 0 10px}
+.ac-bars{display:grid;gap:10px}
+.ac-bar2{display:grid;grid-template-columns:minmax(80px,170px) 1fr auto;gap:10px;align-items:center;font-size:12.5px}
+.ac-track{height:10px;border-radius:99px;background:rgba(127,140,170,.2);overflow:hidden;position:relative}
+.ac-track i{display:block;height:100%;border-radius:99px;background:var(--ink)}
+.ac-track i.alt{background:#d99a2b}
+.ac-pair{display:grid;gap:4px}
+.ac-legend{display:flex;gap:14px;font-size:12px;opacity:.8;margin-bottom:8px}
+.ac-legend i{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;background:var(--ink)}
+.ac-legend i.alt{background:#d99a2b}
+.ac-warn{border:1px solid #d99a2b;background:rgba(217,154,43,.14);border-radius:12px;padding:10px 14px;margin-bottom:14px;font-size:12.5px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+/* Form */
+.ac-form{width:min(560px,100%);height:auto;max-height:calc(100dvh - 32px)}
+.ac-fields{padding:6px 24px 4px;overflow:auto;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.ac-fields label{display:grid;gap:5px;font-size:12px;opacity:.95}
+.ac-fields label span{opacity:.72}
+.ac-fields .full{grid-column:1/-1}
+.ac-form footer,.ac-foot{display:flex;justify-content:flex-end;gap:8px;padding:14px 24px 20px}
+.ac-win input:not([type=checkbox]),.ac-win select,.ac-win textarea{width:100%;font:inherit;font-size:13.5px;color:inherit;background:rgba(127,140,170,.13);border:1px solid rgba(127,140,170,.4);border-radius:10px;padding:8px 10px;min-width:0}
+.ac-win textarea{resize:vertical}
+.ac-win input:focus,.ac-win select:focus,.ac-win textarea:focus{outline:2px solid var(--ink);outline-offset:1px}
+.ac-win button:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+.ac-cfg{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:16px}
+.ac-cfg table input{padding:6px 8px}
+.ac-cfg td{padding:4px 4px 4px 0;border:0}
+.ac-sum{font-size:12px;opacity:.75;margin-top:8px}
+/* Coming soon */
+.ac-soon{position:fixed;inset:0;z-index:80;display:flex;align-items:center;justify-content:center;background:rgba(20,30,55,.3);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);animation:acfade .2s ease-out;padding:16px}
+.ac-soon[hidden]{display:none}
+.ac-soon>div{background:var(--panel);color:var(--ink);border:1px solid var(--glass-line);border-radius:22px;padding:30px 44px;text-align:center;box-shadow:0 24px 70px rgba(10,20,50,.35)}
+.ac-soon small{display:block;font-size:12px;opacity:.65;margin-bottom:6px}
+.ac-soon b{font-family:var(--serif);font-weight:400;font-size:30px;letter-spacing:.5px}
+@media (max-width:700px){
+  .ac-ov{padding:0}
+  .ac-win{height:100dvh;border-radius:0;border:0}
+  .ac-form{height:auto;max-height:100dvh;border-radius:20px 20px 0 0;align-self:flex-end}
+  .ac-ov2{align-items:flex-end}
+  .ac-win header{padding:16px 16px 6px}.ac-win h2{font-size:22px}
+  .ac-tabs{padding:6px 16px 10px}.ac-body{padding:14px 16px 24px}
+  .ac-fields{grid-template-columns:1fr;padding:6px 16px}
+  .ac-form footer{padding:12px 16px 18px}
+  .ac-bar2{grid-template-columns:1fr auto}.ac-bar2 .ac-track{grid-column:1/-1;order:3}
+}
