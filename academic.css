@@ -101,3 +101,22 @@ button.ac-badge{cursor:pointer}
   .ac-form footer{padding:12px 16px 18px}
   .ac-bar2{grid-template-columns:1fr auto}.ac-bar2 .ac-track{grid-column:1/-1;order:3}
 }
+
+/* Kanban & timeline (Project Management) */
+.kb{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.kb>div{background:rgba(127,140,170,.09);border:1px solid rgba(127,140,170,.3);border-radius:14px;padding:10px;min-height:120px}
+.kb h4{font-size:12.5px;font-weight:500;margin:0 0 8px;opacity:.8}
+.kc{background:var(--panel);border:1px solid rgba(127,140,170,.3);border-radius:10px;padding:9px 10px;margin-bottom:8px}
+.kc .t{font-size:13px;font-weight:500;text-align:left;background:none;border:0;color:inherit;font-family:inherit;padding:0;cursor:pointer}
+.kc small{display:block;opacity:.7;font-size:11.5px;margin-top:3px}
+.kc .ac-acts{margin-top:7px}
+.tl-row{display:grid;grid-template-columns:130px 1fr;gap:10px;align-items:center;margin-bottom:8px;font-size:12px}
+.tl-row>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tl-track{position:relative;height:22px;border-radius:99px;background:rgba(127,140,170,.16)}
+.tl-bar{position:absolute;top:0;bottom:0;border-radius:99px;background:var(--ink);opacity:.85}
+.tl-dot{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:#d99a2b;transform:translate(-50%,-50%)}
+.tl-dot.d{border-radius:2px;background:var(--ink);transform:translate(-50%,-50%) rotate(45deg)}
+.tl-dot.ok{background:#2f9e6b}
+.tl-now{position:absolute;top:-3px;bottom:-3px;width:2px;background:#d0443e}
+.ac-back{margin-bottom:12px}
+@media (max-width:700px){.kb{grid-template-columns:1fr}.tl-row{grid-template-columns:90px 1fr}}

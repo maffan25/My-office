@@ -370,12 +370,14 @@
   }
 
   /* ---------- Dialog singkat & Coming soon ---------- */
+  var MO = window.MyOffice = window.MyOffice || {}; MO.routes = MO.routes || {};
   var dlg, tm;
   function msg(title, text) {
     if (!dlg) { dlg = el('ac-soon', '<div><small></small><b></b></div>'); dlg.hidden = true; document.body.appendChild(dlg); dlg.addEventListener('click', function () { dlg.hidden = true; }); }
     dlg.querySelector('small').textContent = title; dlg.querySelector('b').textContent = text;
     dlg.hidden = false; clearTimeout(tm); tm = setTimeout(function () { dlg.hidden = true; }, 2200);
   }
+  MO.msg = function (t, x) { msg(t, x); };
   function soon(label) {
     if (!dlg) msg('', '');
     msg(label || '', 'Coming s0000000n');
@@ -386,7 +388,9 @@
     var a = e.target.closest('.nav a');
     if (a) {
       e.preventDefault(); e.stopPropagation();
-      if (a.getAttribute('href') === '#academic') return open();
+      var h = a.getAttribute('href');
+      if (h === '#academic') return open();
+      if (MO.routes[h]) return MO.routes[h]();
       return soon(a.textContent.replace(/\s+/g, ' ').trim());
     }
     var t = e.target.closest('.tools button');
