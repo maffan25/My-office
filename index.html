@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MyOffice</title>
+<meta name="description" content="MyOffice — Plan · Execute · Achieve">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Inter:wght@300;400;500&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1f2f4d;
+  --glass:rgba(232,236,246,.62);
+  --glass-line:rgba(255,255,255,.55);
+  --serif:'EB Garamond','Cormorant Garamond',Georgia,serif;
+  --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --hand:'Caveat','Segoe Script',cursive;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#5b82b5;-webkit-font-smoothing:antialiased}
+
+/* ---------- Background ---------- */
+.bg{position:fixed;inset:0;z-index:0}
+.bg svg{position:absolute;inset:0;width:100%;height:100%}
+/* Taruh foto sendiri di assets/bg.jpg — otomatis menimpa ilustrasi SVG */
+.bg .photo{position:absolute;inset:0;background:url("assets/bg.jpg") center bottom/cover no-repeat}
+.bg::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(180deg,rgba(40,60,100,.18) 0,transparent 22%,transparent 70%,rgba(30,25,45,.22) 100%)}
+
+/* ---------- Layout ---------- */
+.app{position:relative;z-index:1;height:100%;display:flex;flex-direction:column}
+.top{display:flex;align-items:center;justify-content:space-between;padding:26px 40px 0;height:82px}
+.brand{display:flex;align-items:center;gap:9px;color:#fff;text-decoration:none;font-family:var(--serif);font-size:19px;letter-spacing:.2px}
+.brand svg{width:26px;height:26px}
+.tools{display:flex;align-items:center;gap:22px;color:#fff}
+.tools button{background:none;border:0;color:inherit;cursor:pointer;position:relative;display:grid;place-items:center;padding:2px;opacity:.95;transition:opacity .2s,transform .2s}
+.tools button:hover{opacity:1;transform:translateY(-1px)}
+.tools .ic{width:21px;height:21px}
+.dot{position:absolute;top:0;right:1px;width:7px;height:7px;border-radius:50%;background:#ff6b6b;border:1px solid rgba(255,255,255,.8)}
+.avatar{display:flex;align-items:center;gap:5px}
+.avatar i{width:32px;height:32px;border-radius:50%;border:2px solid #fff;display:block;overflow:hidden;background:linear-gradient(160deg,#cdd6e6 0,#8c9bb5 45%,#2b2f3d 46%,#161922 100%)}
+.avatar svg{width:11px;height:11px}
+
+/* ---------- Nav ---------- */
+.nav-wrap{display:flex;justify-content:center;padding:0 20px;margin-top:-4px}
+.nav{display:flex;align-items:flex-start;justify-content:center;gap:0;padding:15px 38px 0;height:88px;border-radius:44px;
+  background:var(--glass);border:1px solid var(--glass-line);
+  -webkit-backdrop-filter:blur(14px) saturate(1.1);backdrop-filter:blur(14px) saturate(1.1);
+  box-shadow:0 10px 40px rgba(40,60,110,.12), inset 0 1px 0 rgba(255,255,255,.5);
+  max-width:100%;overflow-x:auto;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav a{display:flex;flex-direction:column;align-items:center;gap:6px;text-decoration:none;color:var(--ink);
+  font-size:11.5px;line-height:16px;text-align:center;padding:0 15px;flex:none;transition:transform .2s,opacity .2s;opacity:.92}
+.nav a:hover{transform:translateY(-2px);opacity:1}
+.nav a .ic{width:20px;height:20px;stroke-width:1.5}
+.nav a:focus-visible,.tools button:focus-visible{outline:2px solid #fff;outline-offset:4px;border-radius:12px}
+
+/* ---------- Hero ---------- */
+.hero{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;text-align:center;padding:0 20px;margin-top:118px}
+.hero h1{font-family:var(--serif);font-weight:400;color:#fff;line-height:1.2;letter-spacing:.2px;
+  font-size:clamp(30px,3.45vw,53px);text-shadow:0 2px 24px rgba(40,60,110,.28)}
+.quote{margin-top:23px;color:rgba(255,255,255,.96);font-size:clamp(13px,1.05vw,16px);line-height:1.6;font-weight:300;text-shadow:0 1px 14px rgba(40,60,110,.35)}
+.info{margin-top:36px;display:flex;align-items:center;border-radius:26px;padding:0 24px;height:84px;min-width:494px;
+  background:rgba(235,238,248,.55);border:1px solid var(--glass-line);
+  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);box-shadow:0 10px 40px rgba(40,60,110,.12)}
+.info>div{display:flex;align-items:center;gap:15px;text-align:left}
+.info>div:first-child{padding-right:44px;border-right:1px solid rgba(31,47,77,.22);height:44px}
+.info>div:last-child{padding-left:44px;flex:1}
+.info .ic{width:24px;height:24px;stroke-width:1.4;flex:none}
+.info b{display:block;font-weight:500;font-size:15px;line-height:20px}
+.info small{display:block;font-size:12.5px;line-height:19px;opacity:.9}
+
+/* ---------- Footer ---------- */
+.foot-l{position:fixed;left:40px;bottom:43px;z-index:2;display:flex;align-items:center;gap:14px;color:#fff;font-size:12px;letter-spacing:.2px}
+.foot-l::before{content:"";width:32px;height:1px;background:rgba(255,255,255,.8)}
+.foot-l span{opacity:.6;margin:0 5px}
+.foot-r{position:fixed;right:42px;bottom:36px;z-index:2;color:#fff;font-family:var(--hand);font-size:22px;line-height:1.05;text-align:right;transform:rotate(-6deg);opacity:.95}
+.foot-r::after{content:"";display:block;height:1px;background:rgba(255,255,255,.8);margin-top:4px}
+
+/* ---------- Responsive ---------- */
+@media (max-width:900px){
+  .top{padding:20px 20px 0}
+  .hero{margin-top:70px}
+  .info{min-width:0;width:100%;max-width:420px;padding:0 16px}
+  .info>div:first-child{padding-right:18px}.info>div:last-child{padding-left:18px}
+  .foot-l{left:20px;bottom:24px}.foot-r{right:20px;bottom:20px;font-size:18px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .hero>*{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+  .hero .quote{animation-delay:.12s}.hero .info{animation-delay:.24s}
+  @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+
+<!-- Ikon (Lucide-style) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-academic" viewBox="0 0 24 24"><path d="M21.42 10.92a1 1 0 0 0-.02-1.84L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.83l8.57 3.91a2 2 0 0 0 1.66 0z"/><path d="M22 10v6"/><path d="M6 12.5V16a6 3 0 0 0 12 0v-3.5"/></symbol>
+    <symbol id="i-work" viewBox="0 0 24 24"><path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/><rect width="20" height="14" x="2" y="6" rx="2"/></symbol>
+    <symbol id="i-org" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+    <symbol id="i-project" viewBox="0 0 24 24"><path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/></symbol>
+    <symbol id="i-task" viewBox="0 0 24 24"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/></symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4"/><rect width="18" height="18" x="3" y="4" rx="2"/><path d="M3 10h18M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/></symbol>
+    <symbol id="i-fin" viewBox="0 0 24 24"><path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/></symbol>
+    <symbol id="i-goal" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></symbol>
+    <symbol id="i-doc" viewBox="0 0 24 24"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4M10 9H8M16 13H8M16 17H8"/></symbol>
+    <symbol id="i-chart" viewBox="0 0 24 24"><path d="M3 3v16a2 2 0 0 0 2 2h16"/><path d="M18 17V9M13 17V5M8 17v-3"/></symbol>
+    <symbol id="i-set" viewBox="0 0 24 24"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/></symbol>
+    <symbol id="i-cloud" viewBox="0 0 24 24"><path d="M12 2v2M4.93 4.93l1.41 1.41M20 12h2M19.07 4.93l-1.41 1.41M15.95 12.65a4 4 0 0 0-5.93-4.13"/><path d="M13 22H7a5 5 0 1 1 4.9-6H13a3 3 0 0 1 0 6Z"/></symbol>
+  </defs>
+</svg>
+
+<!-- Background: ilustrasi SVG + (opsional) foto assets/bg.jpg -->
+<div class="bg" aria-hidden="true">
+<svg viewBox="0 0 1536 1024" preserveAspectRatio="xMidYMid slice">
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#5a80b4"/><stop offset=".3" stop-color="#7d9bc6"/>
+      <stop offset=".52" stop-color="#b3b3cc"/><stop offset=".64" stop-color="#e5c4b4"/><stop offset=".74" stop-color="#f3cfa6"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="1" cy=".68" r=".55">
+      <stop offset="0" stop-color="#ffd9a6" stop-opacity=".95"/><stop offset=".4" stop-color="#ffc58f" stop-opacity=".45"/><stop offset="1" stop-color="#ffc58f" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="water" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#a7b0c8"/><stop offset=".35" stop-color="#7f95b9"/><stop offset="1" stop-color="#3f5a85"/></linearGradient>
+    <linearGradient id="far" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7c93b8"/><stop offset="1" stop-color="#b9bfd6"/></linearGradient>
+    <linearGradient id="mid" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5f7aa2"/><stop offset="1" stop-color="#a3adc9"/></linearGradient>
+    <linearGradient id="ter" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8b7a85"/><stop offset=".6" stop-color="#6c5d6c"/><stop offset="1" stop-color="#4e4354"/></linearGradient>
+    <linearGradient id="dome" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#d6cbd8"/><stop offset="1" stop-color="#a99bb4"/></linearGradient>
+    <filter id="b6"><feGaussianBlur stdDeviation="6"/></filter>
+    <filter id="b14"><feGaussianBlur stdDeviation="14"/></filter>
+    <filter id="b26"><feGaussianBlur stdDeviation="26"/></filter>
+    <radialGradient id="glow"><stop offset="0" stop-color="#ffcf8a"/><stop offset="1" stop-color="#ffcf8a" stop-opacity="0"/></radialGradient>
+  </defs>
+
+  <rect width="1536" height="1024" fill="url(#sky)"/>
+  <rect width="1536" height="1024" fill="url(#sun)"/>
+
+  <!-- Awan -->
+  <g filter="url(#b14)" fill="#fbe3d0">
+    <ellipse cx="40" cy="205" rx="120" ry="38" opacity=".9"/><ellipse cx="90" cy="180" rx="70" ry="30" fill="#fff" opacity=".8"/>
+    <ellipse cx="110" cy="370" rx="130" ry="70" opacity=".9"/><ellipse cx="170" cy="330" rx="70" ry="40" fill="#fff" opacity=".7"/>
+    <ellipse cx="330" cy="500" rx="150" ry="55" opacity=".85"/><ellipse cx="250" cy="300" rx="50" ry="25" fill="#fff" opacity=".5"/>
+    <ellipse cx="1470" cy="340" rx="200" ry="50" opacity=".9"/><ellipse cx="1380" cy="300" rx="110" ry="24" fill="#fff" opacity=".6"/>
+    <ellipse cx="1300" cy="520" rx="260" ry="30" opacity=".75"/><ellipse cx="1000" cy="560" rx="260" ry="24" opacity=".5"/>
+    <ellipse cx="1480" cy="440" rx="120" ry="30" fill="#ffd9b8" opacity=".8"/>
+  </g>
+  <g filter="url(#b6)" fill="#fff" opacity=".55"><ellipse cx="230" cy="310" rx="46" ry="12"/><ellipse cx="410" cy="410" rx="32" ry="8"/><ellipse cx="1260" cy="380" rx="60" ry="9"/></g>
+
+  <!-- Pegunungan -->
+  <path d="M0 640 L120 600 L230 612 L330 588 L440 600 L540 586 L632 585 L700 618 L790 640 L900 660 L1020 640 L1100 650 L1180 626 L1260 650 L1400 640 L1536 650 L1536 780 L0 780Z" fill="url(#far)"/>
+  <path d="M0 700 L90 662 L200 650 L300 668 L420 655 L520 640 L630 586 L660 592 L720 640 L820 690 L900 720 L1000 735 L1000 800 L0 800Z" fill="url(#mid)"/>
+  <path d="M1000 735 L1100 690 L1170 625 L1200 632 L1270 680 L1380 700 L1536 690 L1536 800 L1000 800Z" fill="#8397bb" opacity=".9"/>
+  <path d="M628 590 L596 640 L650 628 L690 640 Z" fill="#c9cfe4" opacity=".4"/>
+  <path d="M0 760 L140 730 L330 746 L540 722 L760 756 L900 780 L900 840 L0 840Z" fill="#6c84a8" opacity=".9"/>
+  <g filter="url(#b14)" fill="#fff" opacity=".6"><ellipse cx="500" cy="770" rx="420" ry="20"/><ellipse cx="1100" cy="800" rx="340" ry="14"/><ellipse cx="300" cy="810" rx="300" ry="16"/></g>
+  <path d="M0 790 Q200 770 400 790 T800 800 L800 880 L0 880Z" fill="#4f6a86" opacity=".75"/>
+
+  <!-- Air -->
+  <rect y="812" width="1536" height="212" fill="url(#water)"/>
+  <g filter="url(#b6)" opacity=".55" fill="#ffc98a">
+    <rect x="1000" y="842" width="360" height="5"/><rect x="1060" y="858" width="280" height="4"/><rect x="1130" y="876" width="200" height="4"/>
+  </g>
+  <g opacity=".4" fill="#f9c58f">
+    <rect x="1160" y="840" width="3" height="46"/><rect x="1252" y="840" width="3" height="40"/><rect x="1100" y="842" width="3" height="30"/><rect x="1330" y="842" width="3" height="34"/><rect x="1400" y="840" width="3" height="28"/>
+  </g>
+  <path d="M780 940 Q1150 900 1536 930 L1536 1024 L780 1024Z" fill="#fff" opacity=".07"/>
+
+  <!-- Masjid -->
+  <g>
+    <rect x="800" y="780" width="680" height="44" fill="#a99bb3"/>
+    <rect x="830" y="770" width="620" height="22" fill="#c5b9c9"/>
+    <rect x="1070" y="765" width="150" height="40" fill="#d5cadb"/>
+    <rect x="1290" y="770" width="110" height="36" fill="#cdc2d3"/>
+    <path d="M1076 766 a38 38 0 0 1 76 0z" fill="url(#dome)"/><path d="M1130 770 a28 28 0 0 1 56 0z" transform="translate(30 -2)" fill="url(#dome)"/>
+    <path d="M1296 772 a24 24 0 0 1 48 0z" fill="url(#dome)"/><path d="M1344 774 a22 22 0 0 1 44 0z" fill="url(#dome)"/>
+    <path d="M1000 782 a22 22 0 0 1 44 0z" fill="url(#dome)"/><path d="M880 780 a18 18 0 0 1 36 0z" fill="url(#dome)"/>
+    <g fill="#d3c7d8">
+      <path d="M1160 690 l4 -4 l4 4 v80 h-8z"/><path d="M1163.4 686 L1163.4 676" stroke="#cfc4d6" stroke-width="1.2"/>
+      <path d="M1249 745 l3 -3 l3 3 v28 h-6z"/><path d="M1358 735 l3 -3 l3 3 v36 h-6z"/><path d="M1399 748 l3 -3 l3 3 v26 h-6z"/>
+      <path d="M826 755 l3 -3 l3 3 v24 h-6z"/><path d="M926 764 l3 -3 l3 3 v20 h-6z"/><path d="M984 758 l3 -3 l3 3 v24 h-6z"/>
+    </g>
+    <g fill="#6f6585"><rect x="1152" y="705" width="22" height="3"/><rect x="1152" y="730" width="22" height="3"/><rect x="1245" y="755" width="14" height="2"/><rect x="1355" y="748" width="14" height="2"/></g>
+    <g fill="#ffcc80" opacity=".95">
+      <g id="wins">
+        <rect x="840" y="790" width="3" height="6"/><rect x="858" y="790" width="3" height="6"/><rect x="882" y="790" width="3" height="6"/><rect x="904" y="790" width="3" height="6"/>
+        <rect x="940" y="792" width="3" height="6"/><rect x="962" y="792" width="3" height="6"/><rect x="1004" y="792" width="3" height="6"/><rect x="1026" y="792" width="3" height="6"/>
+        <rect x="1082" y="780" width="3" height="10"/><rect x="1098" y="780" width="3" height="10"/><rect x="1114" y="780" width="3" height="10"/><rect x="1130" y="780" width="3" height="10"/>
+        <rect x="1146" y="780" width="3" height="10"/><rect x="1162" y="780" width="3" height="10"/><rect x="1178" y="780" width="3" height="10"/><rect x="1194" y="780" width="3" height="10"/>
+        <rect x="1210" y="780" width="3" height="10"/><rect x="1300" y="784" width="3" height="8"/><rect x="1318" y="784" width="3" height="8"/><rect x="1336" y="784" width="3" height="8"/>
+        <rect x="1360" y="788" width="3" height="8"/><rect x="1380" y="788" width="3" height="8"/><rect x="1410" y="792" width="3" height="6"/><rect x="1432" y="792" width="3" height="6"/>
+        <rect x="1060" y="800" width="3" height="6"/><rect x="1240" y="800" width="3" height="6"/><rect x="1270" y="800" width="3" height="6"/>
+      </g>
+    </g>
+    <ellipse cx="1160" cy="800" rx="260" ry="30" fill="url(#glow)" opacity=".45"/>
+  </g>
+  <!-- Pohon tepi danau -->
+  <path d="M760 830 Q900 800 1010 835 Q1100 860 1250 838 Q1400 820 1536 842 L1536 860 L760 860Z" fill="#53664f" opacity=".85"/>
+  <path d="M790 835 Q860 815 930 836 Q990 852 1040 838 L1040 860 L790 860Z" fill="#3e5642"/>
+
+  <!-- Pohon tengah -->
+  <g>
+    <circle cx="700" cy="860" r="62" fill="#2f4a38"/><circle cx="745" cy="830" r="62" fill="#3a5a40"/><circle cx="790" cy="860" r="55" fill="#2b4535"/>
+    <circle cx="690" cy="905" r="55" fill="#33503c"/><circle cx="760" cy="900" r="60" fill="#27402f"/><circle cx="878" cy="918" r="34" fill="#2f4a38"/>
+    <circle cx="838" cy="905" r="22" fill="#3a5a40"/>
+  </g>
+  <!-- Pepohonan kiri -->
+  <path d="M0 760 Q90 700 180 730 Q260 700 340 760 Q430 740 470 800 Q400 860 300 880 L0 900Z" fill="#2c4a3a"/>
+  <path d="M120 780 Q200 760 290 790 Q330 830 250 860 L100 870Z" fill="#3b5d45"/>
+  <path d="M0 800 Q80 780 140 810 Q220 830 200 880 L0 900Z" fill="#274034"/>
+  <path d="M0 862 Q120 842 250 868 Q320 890 300 920 L0 940Z" fill="#324f3b"/>
+
+  <!-- Teras -->
+  <path d="M0 892 L720 904 L1000 940 L1300 1024 L0 1024Z" fill="url(#ter)"/>
+  <path d="M0 892 L720 904 L1000 940 L1010 946 L720 910 L0 898Z" fill="#c8b9bd" opacity=".45"/>
+  <path d="M0 960 L600 975 L1100 1024 L0 1024Z" fill="#3e3446" opacity=".4"/>
+
+  <!-- Tanaman besar kiri -->
+  <g>
+    <path d="M0 780 L72 760 L74 830 L0 840Z" fill="#8e8a8c"/><rect x="0" y="760" width="72" height="10" fill="#b4b0b0"/>
+    <g fill="#2a4a2e">
+      <path d="M30 770 Q18 640 70 530 Q60 650 76 770Z"/><path d="M40 770 Q80 660 150 610 Q110 700 80 780Z"/>
+      <path d="M55 760 Q120 740 190 640 Q150 740 90 780Z" fill="#325a36"/><path d="M0 700 Q40 640 70 580 Q40 700 40 770Z" fill="#3d6a40"/>
+      <path d="M50 640 Q110 560 100 480 Q80 560 50 640Z" fill="#3a6a3d"/><path d="M0 560 Q40 500 40 440 Q0 480 0 560Z" fill="#2a4a2e"/>
+      <path d="M60 710 Q160 690 170 610 Q130 680 60 710Z" fill="#3d6a40"/><path d="M0 620 Q30 540 20 490 Q-10 560 0 620Z" fill="#355f38"/>
+    </g>
+    <g fill="#4d8a50" opacity=".7"><path d="M70 600 Q120 580 140 540 Q110 600 70 600Z"/><path d="M40 700 Q100 690 130 650 Q90 700 40 700Z"/></g>
+  </g>
+
+  <!-- Buku, mug, lentera -->
+  <g>
+    <path d="M0 826 L242 818 L244 850 L0 860Z" fill="#42424e"/><path d="M0 862 L246 850 L246 876 L0 886Z" fill="#4a4a58"/>
+    <path d="M0 826 L242 818 L242 823 L0 831Z" fill="#7d7d8a"/>
+    <text x="104" y="868" font-family="Georgia,serif" font-size="12" fill="#b9b9c4" transform="rotate(-3 104 868)" opacity=".8">Better Every Day</text>
+    <rect x="148" y="716" width="60" height="100" rx="5" fill="#34323a"/>
+    <path d="M154 726 L202 726 L196 806 L160 806Z" fill="#ffb454"/><path d="M164 740 L192 740 L190 790 L166 790Z" fill="#fff1b8"/>
+    <rect x="142" y="706" width="72" height="12" rx="3" fill="#2b2931"/><path d="M162 706 L194 706 L186 690 L170 690Z" fill="#2b2931"/><circle cx="178" cy="684" r="5" fill="none" stroke="#2b2931" stroke-width="3"/>
+    <rect x="142" y="810" width="72" height="12" rx="3" fill="#2b2931"/>
+    <ellipse cx="178" cy="768" rx="70" ry="70" fill="url(#glow)" opacity=".4"/>
+    <rect x="254" y="812" width="76" height="68" rx="9" fill="#25252b"/>
+    <ellipse cx="292" cy="812" rx="38" ry="7" fill="#3a3a42"/>
+    <path d="M330 826 Q362 828 346 858 Q338 864 328 862" fill="none" stroke="#25252b" stroke-width="7"/>
+    <path d="M262 818 L268 872" stroke="#fff" stroke-opacity=".12" stroke-width="6"/>
+  </g>
+</svg>
+<div class="photo"></div>
+</div>
+
+<div class="app">
+  <header class="top">
+    <a class="brand" href="#" aria-label="MyOffice">
+      <svg viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
+        <g transform="translate(16 16)">
+          <path id="petal" d="M0 -3 C-4 -6 -4 -11 0 -14 C4 -11 4 -6 0 -3Z"/>
+          <use href="#petal" transform="rotate(60)"/><use href="#petal" transform="rotate(120)"/>
+          <use href="#petal" transform="rotate(180)"/><use href="#petal" transform="rotate(240)"/><use href="#petal" transform="rotate(300)"/>
+          <circle r="1.4" fill="#fff" stroke="none"/>
+        </g>
+      </svg>
+      MyOffice
+    </a>
+    <div class="tools">
+      <button aria-label="Cari"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-search"/></svg></button>
+      <button aria-label="Notifikasi"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bell"/></svg><span class="dot"></span></button>
+      <button class="avatar" aria-label="Akun"><i></i><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 4.5 3.5 3.5 3.5-3.5"/></svg></button>
+    </div>
+  </header>
+
+  <div class="nav-wrap">
+    <nav class="nav" aria-label="Menu utama">
+      <a href="#academic"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-academic"/></svg><span>Academic<br>Management</span></a>
+      <a href="#work"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-work"/></svg><span>Work<br>Office</span></a>
+      <a href="#organization"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-org"/></svg><span>Organization</span></a>
+      <a href="#project"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-project"/></svg><span>Project<br>Management</span></a>
+      <a href="#task"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-task"/></svg><span>Task</span></a>
+      <a href="#calendar"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cal"/></svg><span>Calendar</span></a>
+      <a href="#finance"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-fin"/></svg><span>Finance<br>Management</span></a>
+      <a href="#goal"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-goal"/></svg><span>Goal</span></a>
+      <a href="#documents"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-doc"/></svg><span>Document<br>Center</span></a>
+      <a href="#analytics"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chart"/></svg><span>Analytics</span></a>
+      <a href="#settings"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-set"/></svg><span>Settings</span></a>
+    </nav>
+  </div>
+
+  <main class="hero">
+    <h1>Assalamu’alaikum,<br>Semangat hari ini!</h1>
+    <p class="quote">“Setiap langkah kecil yang kamu lakukan hari ini,<br>adalah bagian dari impian besar yang sedang kamu bangun.”</p>
+    <div class="info">
+      <div>
+        <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cal"/></svg>
+        <span><b id="masehi">Rabu, 29 Oktober 2025</b><small id="hijriah">4 Jumadil Akhir 1447 H</small></span>
+      </div>
+      <div>
+        <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cloud"/></svg>
+        <span><b>28°C</b><small>Cerah Berawan</small></span>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="foot-l">Plan <span>·</span> Execute <span>·</span> Achieve</div>
+<div class="foot-r">Big dreams<br>need a good plan</div>
+
+<script>
+// Tanggal Masehi & Hijriah otomatis (zona waktu perangkat)
+(function(){
+  var d=new Date();
+  document.getElementById('masehi').textContent=
+    d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  try{
+    var bulan=['Muharram','Safar','Rabiul Awal','Rabiul Akhir','Jumadil Awal','Jumadil Akhir','Rajab','Syaban','Ramadan','Syawal','Dzulkaidah','Dzulhijjah'];
+    var p={};
+    new Intl.DateTimeFormat('en-u-ca-islamic-umalqura',{day:'numeric',month:'numeric',year:'numeric'})
+      .formatToParts(d).forEach(function(x){p[x.type]=x.value});
+    var y=parseInt(p.relatedYear||p.year,10);
+    document.getElementById('hijriah').textContent=p.day+' '+bulan[parseInt(p.month,10)-1]+' '+y+' H';
+  }catch(e){}
+})();
+</script>
+</body>
+</html>
