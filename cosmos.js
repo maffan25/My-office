@@ -1,6 +1,7 @@
 /* =====================================================================
-   COSMOS — bintang bergerak + bintang jatuh, sapaan glitch bergantian,
-   percikan & cincin saat klik. Tanpa dependensi.
+   COSMOS v2 — manajer latar (Angkasa / Pixel), sapaan glitch, bounce klik.
+   Ringan: sprite dipra-render, 30 fps (20 fps di mode hemat), berhenti
+   saat tab tersembunyi atau jendela modul terbuka. Tanpa dependensi.
    ===================================================================== */
 (function () {
   'use strict';
@@ -9,164 +10,175 @@
   var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   var rand = function (a, b) { return a + Math.random() * (b - a); };
   var TAU = Math.PI * 2;
+  var S = {
+    get: function (k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
+    set: function (k, v) { try { localStorage.setItem(k, v); } catch (e) { } }
+  };
+  var MO = window.MyOffice = window.MyOffice || {};
 
-  /* ================= 1. LATAR BINTANG ================= */
+  /* ================= Mode hemat ================= */
+  var lite = S.get('mo-lite');
+  if (lite === null) lite = ((navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 4) ? '1' : '0';
+  function setLite(v, save) {
+    lite = v ? '1' : '0'; root.dataset.lite = lite;
+    if (save) S.set('mo-lite', lite);
+    var b = $('liteBtn'); if (b) b.setAttribute('aria-checked', lite === '1');
+    if (cur && cur.resize) cur.resize();          // jumlah bintang menyesuaikan
+  }
+  root.dataset.lite = lite;
+
+  /* ================= Manajer engine ================= */
   var cv = $('cosmos'), ctx = cv && cv.getContext('2d');
-  var W = 0, H = 0, dpr = 1, layers = [], meteors = [], flares = [];
-  var px = 0, py = 0, tx = 0, ty = 0;       // parallax pointer (smoothed / target)
-  var last = 0, nextMeteor = 0, raf = 0;
-  var COLORS = ['255,255,255', '255,255,255', '190,212,255', '160,190,255', '255,226,196'];
+  var engines = {}, cur = null, curName = '', raf = 0, last = 0, slow = 0, nFrames = 0;
+  MO.cosmos = {
+    register: function (name, eng) { engines[name] = eng; if (root.dataset.wall === name) select(); },
+    cv: cv, ctx: ctx, reduce: reduce, rand: rand, TAU: TAU,
+    isLite: function () { return lite === '1'; },
+    setLite: setLite
+  };
 
-  function isOn() { return root.dataset.wall === 'angkasa'; }
+  function paused() { return document.hidden || document.body.style.overflow === 'hidden'; }
 
-  function seed() {
-    var area = W * H, k = Math.min(1.4, Math.max(.5, area / 1.3e6));
-    // depth: makin besar = makin dekat (bergerak lebih cepat & lebih besar)
-    var spec = [
-      { n: 520 * k, s: [.35, .9],  v: 2.2, depth: .25, a: [.25, .7] },
-      { n: 190 * k, s: [.7, 1.4],  v: 5.5, depth: .6,  a: [.4, .9] },
-      { n: 55 * k,  s: [1.2, 2.2], v: 11,  depth: 1.1, a: [.6, 1]  }
-    ];
-    layers = spec.map(function (L, li) {
-      var stars = [];
-      for (var i = 0; i < L.n; i++) {
-        stars.push({
-          x: Math.random() * W, y: Math.random() * H,
-          r: rand(L.s[0], L.s[1]), a: rand(L.a[0], L.a[1]),
-          c: COLORS[(Math.random() * COLORS.length) | 0],
-          p: rand(0, TAU), f: rand(.6, 2.4),
-          flare: li === 2 && Math.random() < .22
-        });
-      }
-      return { stars: stars, v: L.v, depth: L.depth };
-    });
+  function loop(now) {
+    raf = requestAnimationFrame(loop);
+    if (!cur || paused()) { last = now; return; }
+    var step = lite === '1' ? 50 : 33;
+    if (now - last < step - 2) return;
+    var dt = Math.min(.06, (now - last) / 1000); last = now;
+    var t0 = performance.now();
+    cur.frame(now, dt);
+    // pengaman: jika perangkat lambat, otomatis pindah ke mode hemat
+    if (lite !== '1') {
+      var cost = performance.now() - t0;
+      slow += cost > 14 ? 1 : -1; if (slow < 0) slow = 0;
+      if (++nFrames > 90 && slow > 60) setLite(true, false);
+    }
   }
 
-  function resize() {
+  function select() {
+    var name = root.dataset.wall, e = engines[name] || null;
+    if (e === cur) return;
+    if (cur && cur.stop) cur.stop();
+    cur = e; curName = name;
     if (!cv) return;
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    W = window.innerWidth; H = window.innerHeight;
-    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    seed();
-    if (reduce) drawStatic();
+    cv.classList.remove('ready', 'px');
+    if (cur) {
+      cur.start();
+      if (reduce) cur.frame(performance.now(), 0);
+      requestAnimationFrame(function () { cv.classList.add('ready'); });
+    }
   }
-
-  function spawnMeteor(big) {
-    // muncul dari sisi atas/kanan, melesat diagonal ke kiri-bawah
-    var ang = rand(.42, .78);                      // sudut turun (rad) dari horizontal
-    var fromTop = Math.random() < .6;
-    var x = fromTop ? rand(W * .25, W * 1.05) : W + 40;
-    var y = fromTop ? -30 : rand(0, H * .45);
-    var sp = big ? rand(1100, 1500) : rand(750, 1250);
-    meteors.push({
-      x: x, y: y, vx: -Math.cos(ang) * sp, vy: Math.sin(ang) * sp,
-      len: big ? rand(260, 380) : rand(110, 240),
-      w: big ? rand(2.2, 3) : rand(1.1, 1.9),
-      life: 0, max: big ? 1.5 : rand(.9, 1.4),
-      hue: Math.random() < .5 ? '170,235,255' : '255,255,255'
+  if (cv) {
+    new MutationObserver(select).observe(root, { attributes: true, attributeFilter: ['data-wall'] });
+    var rt; window.addEventListener('resize', function () {
+      clearTimeout(rt); rt = setTimeout(function () { if (cur && cur.resize) { cur.resize(); if (reduce) cur.frame(performance.now(), 0); } }, 160);
     });
+    if (!reduce) raf = requestAnimationFrame(loop);
   }
 
-  function drawStar(s, ox, oy, t, L) {
-    var x = s.x + ox, y = s.y + oy;
-    var tw = .62 + .38 * Math.sin(t * s.f + s.p);
-    var al = s.a * tw;
-    if (s.r < 1) {
-      ctx.fillStyle = 'rgba(' + s.c + ',' + al.toFixed(3) + ')';
-      ctx.fillRect(x, y, s.r * 1.6, s.r * 1.6);
-      return;
+  /* ================= Engine: Angkasa ================= */
+  var Stars = (function () {
+    var W = 0, H = 0, far, mid, sprites = [], near = [], twink = [], meteors = [], flares = [];
+    var ox = [0, 0], oy = [0, 0], px = 0, py = 0, tx = 0, ty = 0, nextMeteor = 0, tm = 0;
+    var COLORS = ['255,255,255', '255,255,255', '190,212,255', '160,190,255', '255,226,196'];
+
+    function glow(c, r) {                         // sprite halo bintang, dibuat sekali
+      var d = Math.ceil(r * 8), o = document.createElement('canvas'); o.width = o.height = d;
+      var x = o.getContext('2d'), g = x.createRadialGradient(d / 2, d / 2, 0, d / 2, d / 2, d / 2);
+      g.addColorStop(0, 'rgba(' + c + ',1)'); g.addColorStop(.22, 'rgba(' + c + ',.4)'); g.addColorStop(1, 'rgba(' + c + ',0)');
+      x.fillStyle = g; x.fillRect(0, 0, d, d); return o;
     }
-    // halo lembut + inti
-    var g = ctx.createRadialGradient(x, y, 0, x, y, s.r * 4.2);
-    g.addColorStop(0, 'rgba(' + s.c + ',' + al.toFixed(3) + ')');
-    g.addColorStop(.25, 'rgba(' + s.c + ',' + (al * .35).toFixed(3) + ')');
-    g.addColorStop(1, 'rgba(' + s.c + ',0)');
-    ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(x, y, s.r * 4.2, 0, TAU); ctx.fill();
-    if (s.flare) {
-      var l = s.r * (6 + 3 * tw);
-      ctx.strokeStyle = 'rgba(' + s.c + ',' + (al * .55).toFixed(3) + ')';
-      ctx.lineWidth = .8;
-      ctx.beginPath();
-      ctx.moveTo(x - l, y); ctx.lineTo(x + l, y);
-      ctx.moveTo(x, y - l); ctx.lineTo(x, y + l);
-      ctx.stroke();
+    function layer(n, rmin, rmax, aMin, aMax) {   // satu kanvas penuh berisi bintang statis
+      var o = document.createElement('canvas'); o.width = W; o.height = H; var x = o.getContext('2d');
+      for (var i = 0; i < n; i++) {
+        var r = rand(rmin, rmax);
+        x.fillStyle = 'rgba(' + COLORS[(Math.random() * COLORS.length) | 0] + ',' + rand(aMin, aMax).toFixed(2) + ')';
+        x.fillRect((Math.random() * W) | 0, (Math.random() * H) | 0, r, r);
+      }
+      return o;
     }
-  }
+    function build() {
+      var k = Math.min(1.4, Math.max(.5, W * H / 1.3e6)) * (lite === '1' ? .55 : 1);
+      far = layer(520 * k, .8, 1.1, .25, .7);
+      mid = layer(150 * k, 1, 2, .4, .9);
+      sprites = COLORS.slice(0, 5).map(function (c) { return glow(c, 3); });
+      near = []; twink = [];
+      var nn = Math.round(36 * k), nt = Math.round(26 * k), i;
+      for (i = 0; i < nn; i++) near.push({ x: Math.random() * W, y: Math.random() * H, s: sprites[(Math.random() * 5) | 0], z: rand(.5, 1.1), p: rand(0, TAU), f: rand(.6, 2), flare: Math.random() < .25 });
+      for (i = 0; i < nt; i++) twink.push({ x: Math.random() * W, y: Math.random() * H, s: sprites[(Math.random() * 5) | 0], z: rand(.3, .55), p: rand(0, TAU), f: rand(.8, 2.4) });
+    }
+    function size() {
+      W = window.innerWidth; H = window.innerHeight; cv.width = W; cv.height = H;
+      cv.style.cssText = 'left:0;top:0;width:100%;height:100%;transform:none';
+      build();
+    }
+    function tile(o, x, y) {                       // geser + bungkus layer statis
+      x = ((x % W) + W) % W; y = ((y % H) + H) % H;
+      ctx.drawImage(o, -x, -y); ctx.drawImage(o, W - x, -y); ctx.drawImage(o, -x, H - y); ctx.drawImage(o, W - x, H - y);
+    }
+    function spawn(big) {
+      var ang = rand(.42, .78), top = Math.random() < .6, sp = big ? rand(1100, 1500) : rand(750, 1250);
+      meteors.push({ x: top ? rand(W * .25, W * 1.05) : W + 40, y: top ? -30 : rand(0, H * .45),
+        vx: -Math.cos(ang) * sp, vy: Math.sin(ang) * sp, len: big ? rand(260, 380) : rand(110, 240),
+        w: big ? rand(2.2, 3) : rand(1.1, 1.9), life: 0, max: big ? 1.5 : rand(.9, 1.4),
+        hue: Math.random() < .5 ? '170,235,255' : '255,255,255' });
+    }
+    function onMove(e) { tx = (e.clientX / W - .5) * 2; ty = (e.clientY / H - .5) * 2; }
 
-  function wrap(v, max) { return v < 0 ? v + max : v >= max ? v - max : v; }
-
-  function frame(now) {
-    raf = requestAnimationFrame(frame);
-    if (!isOn() || document.hidden) { last = now; return; }
-    var dt = Math.min(.05, (now - last) / 1000 || .016); last = now;
-    var t = now / 1000;
-    px += (tx - px) * Math.min(1, dt * 3); py += (ty - py) * Math.min(1, dt * 3);
-
-    ctx.clearRect(0, 0, W, H);
-    for (var li = 0; li < layers.length; li++) {
-      var L = layers[li], sx = px * L.depth * -22, sy = py * L.depth * -14;
-      for (var i = 0; i < L.stars.length; i++) {
-        var s = L.stars[i];
-        // drift perlahan: ke kiri dan sedikit turun, lapis dekat lebih cepat
-        s.x = wrap(s.x - L.v * dt, W); s.y = wrap(s.y + L.v * .22 * dt, H);
-        drawStar(s, sx, sy, t, L);
+    function frame(now, dt) {
+      px += (tx - px) * Math.min(1, dt * 3); py += (ty - py) * Math.min(1, dt * 3);
+      tm = now / 1000;
+      ctx.clearRect(0, 0, W, H);
+      ox[0] += 2.2 * dt; oy[0] -= .5 * dt; ox[1] += 5.5 * dt; oy[1] -= 1.2 * dt;
+      tile(far, ox[0] + px * 5, oy[0] + py * 3);
+      tile(mid, ox[1] + px * 13, oy[1] + py * 8);
+      var i, s, a, x, y;
+      for (i = 0; i < twink.length; i++) {
+        s = twink[i]; a = .35 + .65 * Math.abs(Math.sin(tm * s.f + s.p));
+        x = ((s.x - ox[1] - px * 13 * s.z) % W + W) % W; y = ((s.y + oy[1] * -1 - py * 8 * s.z) % H + H) % H;
+        ctx.globalAlpha = a * .8; ctx.drawImage(s.s, x - 12, y - 12, 24, 24);
+      }
+      for (i = 0; i < near.length; i++) {
+        s = near[i]; a = .55 + .45 * Math.sin(tm * s.f + s.p);
+        x = ((s.x - ox[1] * 1.8 * s.z - px * 24 * s.z) % W + W) % W; y = ((s.y + oy[1] * -1.8 * s.z - py * 14 * s.z) % H + H) % H;
+        ctx.globalAlpha = a; ctx.drawImage(s.s, x - 12 * s.z * 1.4, y - 12 * s.z * 1.4, 24 * s.z * 1.4, 24 * s.z * 1.4);
+        if (s.flare) {
+          var l = 5 + 4 * a; ctx.globalAlpha = a * .5; ctx.strokeStyle = '#fff'; ctx.lineWidth = .8;
+          ctx.beginPath(); ctx.moveTo(x - l, y); ctx.lineTo(x + l, y); ctx.moveTo(x, y - l); ctx.lineTo(x, y + l); ctx.stroke();
+        }
+      }
+      ctx.globalAlpha = 1;
+      // bintang jatuh
+      if (now > nextMeteor) {
+        spawn(Math.random() < .22);
+        if (Math.random() < .18 && lite !== '1') setTimeout(function () { spawn(false); }, rand(120, 380));
+        nextMeteor = now + rand(1800, 5200) * (lite === '1' ? 1.5 : 1);
+      }
+      for (var m = meteors.length - 1; m >= 0; m--) {
+        var o = meteors[m]; o.life += dt; o.x += o.vx * dt; o.y += o.vy * dt;
+        var k = o.life / o.max;
+        if (k >= 1 || o.x < -o.len || o.y > H + o.len) { meteors.splice(m, 1); continue; }
+        var f = k < .12 ? k / .12 : 1 - Math.pow((k - .12) / .88, 1.6), sp = Math.hypot(o.vx, o.vy);
+        var x2 = o.x - o.vx / sp * o.len, y2 = o.y - o.vy / sp * o.len;
+        var g = ctx.createLinearGradient(o.x, o.y, x2, y2);
+        g.addColorStop(0, 'rgba(' + o.hue + ',' + f.toFixed(2) + ')'); g.addColorStop(.35, 'rgba(120,170,255,' + (f * .45).toFixed(2) + ')'); g.addColorStop(1, 'rgba(120,120,255,0)');
+        ctx.lineCap = 'round'; ctx.strokeStyle = g; ctx.lineWidth = o.w;
+        ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(x2, y2); ctx.stroke();
+        ctx.globalAlpha = f; ctx.fillStyle = '#fff'; ctx.beginPath(); ctx.arc(o.x, o.y, o.w * 1.3, 0, TAU); ctx.fill(); ctx.globalAlpha = 1;
       }
     }
+    return {
+      start: function () { size(); meteors = []; nextMeteor = performance.now() + 1400; window.addEventListener('pointermove', onMove, { passive: true }); },
+      stop: function () { window.removeEventListener('pointermove', onMove); meteors = []; },
+      resize: size, frame: frame
+    };
+  })();
+  MO.cosmos.register('angkasa', Stars);
 
-    // bintang jatuh
-    if (now > nextMeteor) {
-      var burst = Math.random() < .18;
-      spawnMeteor(Math.random() < .22);
-      if (burst) setTimeout(function () { if (isOn()) spawnMeteor(false); }, rand(120, 380));
-      nextMeteor = now + rand(1800, 5200);
-    }
-    for (var m = meteors.length - 1; m >= 0; m--) {
-      var o = meteors[m];
-      o.life += dt; o.x += o.vx * dt; o.y += o.vy * dt;
-      var k = o.life / o.max;
-      if (k >= 1 || o.x < -o.len || o.y > H + o.len) { meteors.splice(m, 1); continue; }
-      var fade = k < .12 ? k / .12 : 1 - Math.pow((k - .12) / .88, 1.6);
-      var sp = Math.hypot(o.vx, o.vy), ux = o.vx / sp, uy = o.vy / sp;
-      var tx2 = o.x - ux * o.len, ty2 = o.y - uy * o.len;
-      var gr = ctx.createLinearGradient(o.x, o.y, tx2, ty2);
-      gr.addColorStop(0, 'rgba(' + o.hue + ',' + (fade).toFixed(3) + ')');
-      gr.addColorStop(.35, 'rgba(120,170,255,' + (fade * .45).toFixed(3) + ')');
-      gr.addColorStop(1, 'rgba(120,120,255,0)');
-      ctx.lineCap = 'round'; ctx.strokeStyle = gr; ctx.lineWidth = o.w;
-      ctx.beginPath(); ctx.moveTo(o.x, o.y); ctx.lineTo(tx2, ty2); ctx.stroke();
-      // kepala bercahaya
-      var hg = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.w * 7);
-      hg.addColorStop(0, 'rgba(255,255,255,' + fade.toFixed(3) + ')');
-      hg.addColorStop(.4, 'rgba(' + o.hue + ',' + (fade * .35).toFixed(3) + ')');
-      hg.addColorStop(1, 'rgba(' + o.hue + ',0)');
-      ctx.fillStyle = hg; ctx.beginPath(); ctx.arc(o.x, o.y, o.w * 7, 0, TAU); ctx.fill();
-    }
-  }
-
-  function drawStatic() {
-    ctx.clearRect(0, 0, W, H);
-    layers.forEach(function (L) { L.stars.forEach(function (s) { drawStar(s, 0, 0, 0, L); }); });
-  }
-
-  if (cv) {
-    resize();
-    var rt; window.addEventListener('resize', function () { clearTimeout(rt); rt = setTimeout(resize, 150); });
-    if (!reduce) {
-      window.addEventListener('pointermove', function (e) {
-        tx = (e.clientX / W - .5) * 2; ty = (e.clientY / H - .5) * 2;
-      }, { passive: true });
-      nextMeteor = performance.now() + 1400;   // bintang jatuh pertama muncul cepat
-      raf = requestAnimationFrame(frame);
-    }
-    requestAnimationFrame(function () { cv.classList.add('ready'); });
-  }
-
-  /* ================= 2. SAPAAN GLITCH ================= */
+  /* ================= Sapaan glitch ================= */
   var gl = $('glitch'), greet = $('greet'), src = $('hiName'), dotsBox = $('greetDots');
   var GLYPH = '!<>-_\\/[]{}=+*^?#%&01';
-  var idx = -1, current = '', busy = false, holdTimer = 0, microTimer = 0, dots = [];
+  var idx = -1, current = '', busy = false, holdTimer = 0, dots = [];
 
   function dayWord() {
     var h = new Date().getHours();
@@ -174,140 +186,65 @@
   }
   function phrases() {
     var raw = (src && src.textContent || 'Assalamu’alaikum,').trim().replace(/,\s*$/, '');
-    var m = raw.match(/^Assalamu’alaikum,?\s*(.*)$/);
-    var name = m ? m[1].trim() : '';
-    return [
-      raw,
-      'Semangat hari ini!',
-      dayWord() + (name ? ', ' + name : ''),
-      'Siap meluncur?',
-      'Selamat datang di MyOffice',
-      'Plan · Execute · Achieve'
-    ];
+    var m = raw.match(/^Assalamu’alaikum,?\s*(.*)$/), name = m ? m[1].trim() : '';
+    var pix = root.dataset.wall === 'pixel';
+    return [raw, 'Semangat hari ini!', dayWord() + (name ? ', ' + name : ''),
+      pix ? 'Ayo lari, jangan lompat sendiri' : 'Siap meluncur?', 'Selamat datang di MyOffice', 'Plan · Execute · Achieve'];
   }
-
   function setText(t) { gl.textContent = t; gl.setAttribute('data-text', t); }
 
   function scramble(to, done) {
     if (reduce) { setText(to); current = to; return done && done(); }
     busy = true;
-    var from = current, len = Math.max(from.length, to.length), t0 = performance.now(), dur = 650 + len * 9;
+    var from = current, len = Math.max(from.length, to.length), t0 = performance.now(), dur = 600 + len * 8, lastDraw = 0;
     gl.classList.add('on'); greet.classList.remove('scan'); void greet.offsetWidth; greet.classList.add('scan');
     (function step(now) {
+      if (now - lastDraw < 42 && now - t0 < dur) return requestAnimationFrame(step);   // ±24 gambar/detik cukup
+      lastDraw = now;
       var p = Math.min(1, (now - t0) / dur), out = '';
       for (var i = 0; i < len; i++) {
-        var a = from.charAt(i), b = to.charAt(i);
-        var lock = (i / len) * .8 + .1;              // huruf kiri selesai lebih dulu
+        var b = to.charAt(i), lock = (i / len) * .8 + .1;
         if (p >= lock + .12) out += b;
-        else if (b === ' ' && a === ' ') out += ' ';
+        else if (b === ' ' && from.charAt(i) === ' ') out += ' ';
         else out += GLYPH.charAt((Math.random() * GLYPH.length) | 0);
       }
-      // jangan biarkan panjang string melebihi target saat hampir selesai
       if (p > .9) out = out.slice(0, to.length);
       setText(out);
       if (p < 1) requestAnimationFrame(step);
-      else {
-        setText(to); current = to; busy = false;
-        setTimeout(function () { gl.classList.remove('on'); }, 160);
-        done && done();
-      }
+      else { setText(to); current = to; busy = false; setTimeout(function () { gl.classList.remove('on'); }, 140); done && done(); }
     })(t0);
   }
-
   function mark(i) { dots.forEach(function (d, k) { d.classList.toggle('on', k === i); }); }
-
   function next() {
     clearTimeout(holdTimer);
     var list = phrases();
     if (dots.length !== list.length && dotsBox) {
       dotsBox.innerHTML = ''; dots = list.map(function () { var d = document.createElement('i'); dotsBox.appendChild(d); return d; });
     }
-    idx = (idx + 1) % list.length;
-    mark(idx);
-    scramble(list[idx], function () { holdTimer = setTimeout(next, 3600); });
+    idx = (idx + 1) % list.length; mark(idx);
+    scramble(list[idx], function () { holdTimer = setTimeout(next, 3800); });
   }
-
-  // glitch mikro acak saat teks sedang ditahan
-  function micro() {
-    microTimer = setTimeout(micro, rand(1400, 3400));
-    if (reduce || busy || document.hidden) return;
-    gl.classList.add('on');
-    setTimeout(function () { if (!busy) gl.classList.remove('on'); }, rand(130, 260));
+  function micro() {                               // glitch kilat sesekali saat teks ditahan
+    setTimeout(micro, rand(4000, 8000));
+    if (reduce || lite === '1' || busy || document.hidden || paused()) return;
+    gl.classList.add('on'); setTimeout(function () { if (!busy) gl.classList.remove('on'); }, 180);
   }
-
   if (gl && greet) {
-    // sinkronkan sapaan bila Settings mengubah nama panggilan
-    if (src && window.MutationObserver) new MutationObserver(function () { /* diambil saat giliran berikutnya */ })
-      .observe(src, { childList: true, characterData: true, subtree: true });
     greet.addEventListener('click', function () { if (!busy) next(); });
-    setTimeout(function () {
-      current = '';
-      next();
-      if (!reduce) microTimer = setTimeout(micro, 2600);
-    }, 380);                                        // beri waktu settings.js menerapkan nama
+    setTimeout(function () { current = ''; next(); setTimeout(micro, 3000); }, 380);
   }
 
-  /* ================= 3. KLIK: CINCIN + PERCIKAN ================= */
-  var fx = $('fx'), fctx = fx && fx.getContext('2d'), sparks = [], fxOn = false, fw = 0, fh = 0, fdpr = 1;
-  function fxResize() {
-    fdpr = Math.min(window.devicePixelRatio || 1, 2); fw = innerWidth; fh = innerHeight;
-    fx.width = fw * fdpr; fx.height = fh * fdpr; fctx.setTransform(fdpr, 0, 0, fdpr, 0, 0);
-  }
-  if (fx) { fxResize(); window.addEventListener('resize', fxResize); }
-
-  var SPARK_COLORS = ['75,232,255', '255,79,216', '155,123,255', '255,255,255'];
-  function burst(x, y) {
-    if (reduce || !fx) return;
-    var n = 26;
-    for (var i = 0; i < n; i++) {
-      var a = (i / n) * TAU + rand(-.2, .2), v = rand(90, 330);
-      sparks.push({ x: x, y: y, vx: Math.cos(a) * v, vy: Math.sin(a) * v, life: 0, max: rand(.45, .95),
-        r: rand(1, 2.8), c: SPARK_COLORS[(Math.random() * SPARK_COLORS.length) | 0], star: Math.random() < .4 });
-    }
-    for (var r = 0; r < 2; r++) {
-      var ring = document.createElement('i'); ring.className = 'ring' + (r ? ' b' : '');
-      ring.style.left = x + 'px'; ring.style.top = y + 'px';
-      document.body.appendChild(ring);
-      setTimeout(function (el) { el.remove(); }.bind(null, ring), 1100);
-    }
-    if (!fxOn) { fxOn = true; lastFx = performance.now(); requestAnimationFrame(fxFrame); }
-  }
-  var lastFx = 0;
-  function fxFrame(now) {
-    var dt = Math.min(.05, (now - lastFx) / 1000); lastFx = now;
-    fctx.clearRect(0, 0, fw, fh);
-    for (var i = sparks.length - 1; i >= 0; i--) {
-      var s = sparks[i]; s.life += dt;
-      if (s.life >= s.max) { sparks.splice(i, 1); continue; }
-      var k = s.life / s.max, drag = Math.pow(.02, dt);
-      s.vx *= drag; s.vy = s.vy * drag + 60 * dt; s.x += s.vx * dt; s.y += s.vy * dt;
-      var al = 1 - k, r = s.r * (1 - k * .5);
-      fctx.fillStyle = 'rgba(' + s.c + ',' + al.toFixed(3) + ')';
-      fctx.shadowColor = 'rgba(' + s.c + ',.9)'; fctx.shadowBlur = 8;
-      if (s.star) {
-        fctx.beginPath();
-        fctx.moveTo(s.x, s.y - r * 3); fctx.lineTo(s.x + r * .7, s.y - r * .7); fctx.lineTo(s.x + r * 3, s.y);
-        fctx.lineTo(s.x + r * .7, s.y + r * .7); fctx.lineTo(s.x, s.y + r * 3); fctx.lineTo(s.x - r * .7, s.y + r * .7);
-        fctx.lineTo(s.x - r * 3, s.y); fctx.lineTo(s.x - r * .7, s.y - r * .7); fctx.closePath(); fctx.fill();
-      } else { fctx.beginPath(); fctx.arc(s.x, s.y, r, 0, TAU); fctx.fill(); }
-    }
-    fctx.shadowBlur = 0;
-    if (sparks.length) requestAnimationFrame(fxFrame);
-    else { fxOn = false; fctx.clearRect(0, 0, fw, fh); }
-  }
-
-  var HIT = 'button,.nav a,.chip,.wall,.ac-btn,.ac-tab,.ac-x,[role=button],[role=tab]';
-  // capture: tetap jalan walau handler modul memanggil stopPropagation()
+  /* ================= Bounce ringan saat diklik ================= */
+  var HIT = 'button,.nav a,.chip,.wall,.ac-btn,.ac-tab,.ac-x,[role=button],[role=tab],[role=switch]';
   document.addEventListener('click', function (e) {
     var t = e.target.closest && e.target.closest(HIT);
-    if (!t) return;
-    var x = e.clientX, y = e.clientY;
-    if (!x && !y) { var b = t.getBoundingClientRect(); x = b.left + b.width / 2; y = b.top + b.height / 2; } // klik via keyboard
-    burst(x, y);
-    var cls = t.matches('.nav a') || t.matches('.tools button') || t.matches('.chip,.wall,.ac-btn,.ac-tab') ? 'fire' : '';
-    if (cls) {
-      t.classList.remove(cls); void t.offsetWidth; t.classList.add(cls);
-      setTimeout(function () { t.classList.remove(cls); }, 700);
-    }
+    if (!t || reduce) return;
+    t.classList.remove('bnc'); void t.offsetWidth; t.classList.add('bnc');
+    setTimeout(function () { t.classList.remove('bnc'); }, 460);
   }, true);
+
+  var lb = $('liteBtn');
+  if (lb) { lb.setAttribute('aria-checked', lite === '1'); lb.addEventListener('click', function () { setLite(lite !== '1', true); }); }
+
+  select();
 })();

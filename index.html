@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Inter:wght@300;400;500&family=Caveat:wght@400;500&family=Chakra+Petch:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Inter:wght@300;400;500&family=Caveat:wght@400;500&family=Chakra+Petch:wght@400;500;600&family=Pixelify+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#1f2f4d;
@@ -124,6 +124,7 @@ body{overflow-x:hidden;overflow-y:auto}
 </style>
 <link rel="stylesheet" href="academic.css">
 <link rel="stylesheet" href="cosmos.css">
+<link rel="stylesheet" href="hud.css">
 </head>
 <body>
 
@@ -340,22 +341,29 @@ body{overflow-x:hidden;overflow-y:auto}
 </div>
 
 <div class="foot-l">Plan <span>·</span> Execute <span>·</span> Achieve</div>
-<aside class="panel" id="panel" aria-label="Tema dan wallpaper">
-  <h2>Tema</h2>
-  <div class="chips" id="themes">
-    <button class="chip" data-v="senja">Senja</button><button class="chip" data-v="pagi">Pagi</button><button class="chip" data-v="malam">Malam</button>
+<aside class="panel" id="panel" aria-label="Tampilan">
+  <div class="p-head"><b>Tampilan</b><small>Pilih suasana kerja yang kamu suka</small></div>
+  <div class="p-sec" id="themeSec">
+    <h2>Tema</h2>
+    <div class="chips" id="themes">
+      <button class="chip" data-v="senja">Senja</button><button class="chip" data-v="pagi">Pagi</button><button class="chip" data-v="malam">Malam</button>
+    </div>
   </div>
-  <h2>Wallpaper</h2>
-  <div class="walls" id="walls">
-    <button class="wall" data-v="angkasa"><span>Angkasa</span></button>
-    <button class="wall" data-v="scene" style="background-image:linear-gradient(180deg,#5a80b4,#e5c4b4 70%,#4a6a8a)"><span>Danau Senja</span></button>
-    <button class="wall" data-v="aurora"><span>Aurora</span></button>
-    <button class="wall" data-v="laut"><span>Laut</span></button>
-    <button class="wall" data-v="hutan"><span>Hutan</span></button>
-    <button class="wall" data-v="fajar"><span>Fajar</span></button>
-    <button class="wall up" data-v="custom" id="customTile"><span>+ Foto sendiri</span></button>
+  <div class="p-sec">
+    <h2>Latar</h2>
+    <div class="walls" id="walls">
+      <button class="wall" data-v="angkasa"><span>Angkasa</span></button>
+      <button class="wall" data-v="pixel"><span>Pixel</span></button>
+      <button class="wall" data-v="scene" style="background-image:linear-gradient(180deg,#5a80b4,#e5c4b4 70%,#4a6a8a)"><span>Danau Senja</span></button>
+      <button class="wall" data-v="aurora"><span>Aurora</span></button>
+      <button class="wall" data-v="laut"><span>Laut</span></button>
+      <button class="wall" data-v="hutan"><span>Hutan</span></button>
+      <button class="wall" data-v="fajar"><span>Fajar</span></button>
+      <button class="wall up" data-v="custom" id="customTile"><span>+ Foto sendiri</span></button>
+    </div>
   </div>
   <input type="file" id="file" accept="image/*" hidden>
+  <div class="p-row"><span><b>Mode hemat</b><small>Kurangi animasi latar agar ringan di perangkat lawas</small></span><button type="button" class="sw" id="liteBtn" role="switch" aria-checked="false" aria-label="Mode hemat"></button></div>
   <button class="reset" id="reset">Kembalikan ke bawaan</button>
 </aside>
 
@@ -393,7 +401,7 @@ body{overflow-x:hidden;overflow-y:auto}
   tick();setInterval(tick,1000);
 
   /* ---------- Tema & wallpaper ---------- */
-  var G={angkasa:'radial-gradient(90% 70% at 70% 20%,#2a1d6e,#0a0c2b 55%,#03040c)',aurora:'linear-gradient(160deg,#1d2b64,#5b3f8c 45%,#f093a0)',
+  var G={pixel:'linear-gradient(180deg,#36227a,#b44d80 55%,#ffb868)',angkasa:'radial-gradient(90% 70% at 70% 20%,#2a1d6e,#0a0c2b 55%,#03040c)',aurora:'linear-gradient(160deg,#1d2b64,#5b3f8c 45%,#f093a0)',
          laut:'linear-gradient(180deg,#0f4c75,#3282b8 50%,#bbe1fa)',
          hutan:'linear-gradient(170deg,#12372a,#436850 55%,#adbc9f)',
          fajar:'linear-gradient(180deg,#ff9a8b,#ff6a88 40%,#a18cd1)'};
@@ -454,8 +462,9 @@ body{overflow-x:hidden;overflow-y:auto}
   document.addEventListener('keydown',function(e){if(e.key==='Escape')toggle(false)});
 })();
 </script>
-<canvas id="fx" aria-hidden="true"></canvas>
 <script src="cosmos.js"></script>
+<script src="pixel.js"></script>
+<script src="hud.js"></script>
 <script src="academic.js"></script>
 <script src="office.js"></script>
 <script src="tasks.js"></script>
