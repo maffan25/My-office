@@ -1,0 +1,126 @@
+/* =====================================================================
+   MyOffice — ELITE layer (dimuat paling akhir)
+   Dashboard gelap bergaya bento: kartu gradien, donat, grafik arus kas,
+   kartu akun. Berlaku di semua menu; Keuangan punya tata letak khusus.
+   ===================================================================== */
+html .ac-ov{--disp:'Sora',var(--sans);--lime:#c7f26b;--mint:#7be0b0;--lilac:#b7a6ff;--coral:#ff7a6b;--good:#7be0b0;--bad:#ff7a8a;--r:26px}
+html:not([data-theme=pagi]) .ac-ov{--ink:#eaf0ff;--panel:rgba(13,15,27,.97);--glass-line:rgba(255,255,255,.1);color-scheme:dark}
+html[data-theme=pagi] .ac-ov{--good:#0f9d6a;--bad:#d9364b}
+
+/* jendela & judul */
+html .ac-ov .ac-win:not(.ac-form):not(.vw){border-radius:34px}
+html .ac-ov .ac-win:not(.ac-form):not(.vw)>header h2{font-family:var(--disp);font-weight:600;font-size:30px;letter-spacing:-.8px}
+html .ac-ov .ac-stat b,html .ac-ov .ac-card h3,html .ac-ov .ac-brand b{font-family:var(--disp);font-weight:600;letter-spacing:-.6px}
+html .ac-ov .ac-stat b{font-size:30px}
+.pos{color:var(--good)}.neg{color:var(--bad)}
+
+/* tab sidebar: lebih lapang, indikator menyala */
+.ac-win .ac-tab{border-radius:16px;padding:12px 16px;font-weight:500}
+.ac-ind{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--ac) 45%,transparent),0 14px 30px -12px color-mix(in srgb,var(--ac) 80%,transparent)}
+
+/* statistik di semua menu: kartu pertama jadi kartu utama bergradien */
+.ac-win .ac-grid{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.ac-win .ac-grid>.ac-stat:first-child{color:#0d1a12;background:linear-gradient(135deg,var(--mint),var(--lime));box-shadow:0 24px 44px -22px color-mix(in srgb,var(--lime) 70%,transparent)}
+.ac-win .ac-grid>.ac-stat:first-child span{color:rgba(13,26,18,.72)}
+.ac-win .ac-grid>.ac-stat:first-child::before{width:170px;height:170px;right:-50px;top:-60px;background:radial-gradient(closest-side,rgba(255,255,255,.55),transparent)}
+.ac-win .ac-grid>.ac-stat:first-child::after{background:#0d1a12;opacity:.5}
+.ac-win .ac-stat{border-radius:var(--r)}
+.ac-win .ac-card,.ac-win .ac-item,.ac-win .kb>div{border-radius:var(--r)}
+.ac-win .ac-card{background:linear-gradient(160deg,var(--soft2),var(--soft) 60%)}
+
+/* satu momen masuk: kartu muncul berurutan saat menu/tab dibuka */
+@media (prefers-reduced-motion:no-preference){
+  .ac-enter .ac-grid>*,.ac-enter .fx-b>*,.ac-enter .fx-cards>*{animation:fxPop .7s var(--ease) both}
+  .ac-enter .ac-grid>*:nth-child(2),.ac-enter .fx-b>*:nth-child(2),.ac-enter .fx-cards>*:nth-child(2){animation-delay:.07s}
+  .ac-enter .ac-grid>*:nth-child(3),.ac-enter .fx-b>*:nth-child(3),.ac-enter .fx-cards>*:nth-child(3){animation-delay:.14s}
+  .ac-enter .ac-grid>*:nth-child(n+4),.ac-enter .fx-b>*:nth-child(n+4),.ac-enter .fx-cards>*:nth-child(n+4){animation-delay:.21s}
+  @keyframes fxPop{from{opacity:0;transform:translateY(18px) scale(.97)}to{opacity:1;transform:none}}
+  .ac-enter .fx-cols i{transform-origin:bottom;animation:acRise .9s var(--ease) both .25s}
+}
+
+/* ---------- KEUANGAN: bento ---------- */
+.fx-bar{background:none;box-shadow:none;padding:0;margin-bottom:14px}
+.fx-b{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:14px}
+.fx-b>section{border-radius:var(--r);min-width:0;position:relative;overflow:hidden}
+.fx-hero{grid-column:span 7;min-height:230px;padding:26px 28px;display:flex;flex-direction:column;color:#0d1a12;
+  background:linear-gradient(135deg,#6fdcc0 0%,#a6ec7f 52%,#dcf56a 100%);box-shadow:0 30px 60px -30px rgba(160,240,110,.55)}
+.fx-hero::before{content:"";position:absolute;right:-60px;bottom:-90px;width:340px;height:340px;border-radius:50%;background:rgba(255,255,255,.22);pointer-events:none}
+.fx-hero::after{content:"";position:absolute;right:70px;top:-120px;width:240px;height:240px;border-radius:50%;background:rgba(255,255,255,.18);pointer-events:none}
+.fx-hero small{font-size:13.5px;font-weight:500;opacity:.75;position:relative}
+.fx-hero b{font-family:var(--disp);font-size:clamp(30px,4.4vw,50px);font-weight:600;letter-spacing:-2px;line-height:1.1;margin-top:8px;position:relative;font-variant-numeric:tabular-nums}
+.fx-hero p{font-size:12.5px;margin-top:8px;opacity:.75;position:relative}
+.fx-hb{display:flex;gap:10px;margin-top:auto;padding-top:22px;position:relative;flex-wrap:wrap}
+.fx-hb .ac-btn{border-radius:999px;padding:11px 22px;background:#fff;color:#0d1a12;box-shadow:none;font-weight:600}
+.fx-hb .ac-btn:first-child{background:#0d1a12;color:#fff}
+.fx-hb .ac-btn:hover{background:#fff;color:#0d1a12;transform:translateY(-2px)}
+.fx-hb .ac-btn:first-child:hover{background:#1c2b22;color:#fff}
+.fx-t{grid-column:span 5;padding:20px 22px;display:grid;align-content:center;gap:4px;background:var(--soft2);box-shadow:inset 0 0 0 1px var(--line)}
+.fx-t small{font-size:13px;color:var(--mute);font-weight:500}
+.fx-t b{font-family:var(--disp);font-size:clamp(20px,2.4vw,27px);font-weight:600;letter-spacing:-.8px;font-variant-numeric:tabular-nums}
+.fx-t span{font-size:12px;color:var(--mute)}
+.fx-t em,.fx-chip{position:absolute;right:18px;top:18px;font-style:normal;font-size:11.5px;font-weight:700;padding:4px 10px;border-radius:999px}
+.fx-chip.g{background:var(--lime);color:#14210a}.fx-chip.b{background:#ff6b7d;color:#fff}
+.fx-in::before,.fx-out::before{content:"";position:absolute;left:0;top:22%;bottom:22%;width:4px;border-radius:0 4px 4px 0}
+.fx-in::before{background:var(--lime)}.fx-out::before{background:var(--lilac)}
+.fx-p{padding:20px 22px;background:var(--soft);box-shadow:inset 0 0 0 1px var(--line2)}
+.fx-w6{grid-column:span 6}.fx-w5{grid-column:span 6}.fx-w12{grid-column:1/-1}
+.fx-p h4{display:flex;justify-content:space-between;align-items:center;gap:10px;font-family:var(--disp);font-size:15px;font-weight:600;margin-bottom:16px}
+.fx-p h4 span{font:500 12px var(--sans);color:var(--mute);display:flex;align-items:center;gap:6px}
+.fx-p h4 span i{width:8px;height:8px;border-radius:50%;margin-left:6px}
+.fx-lnk{border:0;background:var(--soft2);color:inherit;font:500 12px var(--sans);padding:6px 14px;border-radius:999px;cursor:pointer}
+.fx-lnk:hover{background:var(--ac-tint2)}
+.in{background:linear-gradient(180deg,var(--lime),#7fc84a)}.ex{background:linear-gradient(180deg,#cbbcff,#8f78f0)}
+/* grafik arus kas */
+.fx-flow{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;height:190px;align-items:end}
+.fx-flow>div{display:flex;flex-direction:column;height:100%;gap:8px;align-items:center;opacity:.55;transition:opacity .25s}
+.fx-flow>div.on,.fx-flow>div:hover{opacity:1}
+.fx-cols{flex:1;width:100%;display:flex;align-items:flex-end;justify-content:center;gap:5px}
+.fx-cols i{position:relative;width:38%;max-width:26px;border-radius:9px 9px 4px 4px;display:block}
+.fx-cols u{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);text-decoration:none;font:600 11px var(--sans);padding:5px 9px;border-radius:9px;background:#fff;color:#14131f;white-space:nowrap;box-shadow:0 8px 18px -8px rgba(0,0,0,.6)}
+.fx-flow span{font-size:12px;color:var(--mute)}
+/* donat */
+.fx-split{display:flex;align-items:center;gap:26px;flex-wrap:wrap}
+.fx-donut{width:176px;height:176px;border-radius:50%;flex:none;background:var(--g);display:grid;place-items:center;-webkit-mask:radial-gradient(circle,transparent 56%,#000 57%);mask:radial-gradient(circle,transparent 56%,#000 57%);position:relative}
+.fx-donut>div{display:none}
+.fx-split{position:relative}
+.fx-leg{list-style:none;display:grid;gap:11px;flex:1;min-width:150px}
+.fx-leg li{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:center;font-size:13px}
+.fx-leg i{width:12px;height:12px;border-radius:5px}.fx-leg b{font-weight:600;font-variant-numeric:tabular-nums}
+.fx-none{color:var(--mute);font-size:13px;line-height:1.6;padding:18px 4px}
+/* anggaran & tabungan */
+.fx-m{display:grid;grid-template-columns:1fr 90px 40px;gap:14px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line2)}
+.fx-m:last-child{border-bottom:0}
+.fx-m b{display:block;font-size:13.5px;font-weight:600}.fx-m small{color:var(--mute);font-size:12px}
+.fx-m em{font:600 12px var(--sans);font-style:normal;text-align:right;color:var(--mute)}
+/* transaksi terbaru */
+.fx-feed{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:10px}
+.fx-tx{display:grid;grid-template-columns:44px 1fr auto;gap:14px;align-items:center;padding:12px 14px;border-radius:18px;background:var(--soft);cursor:pointer;transition:background .2s,transform .3s var(--ease)}
+.fx-tx:hover{background:var(--ac-tint2);transform:translateY(-2px)}
+.fx-tx i{width:44px;height:44px;border-radius:15px;display:grid;place-items:center;font:600 16px var(--disp);font-style:normal;color:#fff;background:linear-gradient(140deg,hsl(var(--h) 80% 60%),hsl(calc(var(--h) + 50) 75% 48%))}
+.fx-tx b{display:block;font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fx-tx small{color:var(--mute);font-size:12px}.fx-tx strong{font:600 14px var(--disp);font-variant-numeric:tabular-nums;white-space:nowrap}
+.fx-qa{margin-top:18px;border-radius:22px;background:var(--soft);box-shadow:inset 0 0 0 1px var(--line2);padding:4px 18px 18px}
+.fx-qa summary{cursor:pointer;font-weight:600;padding:14px 0;list-style:none}.fx-qa summary::before{content:"+";display:inline-block;width:22px;color:var(--ac)}
+.fx-qa[open] summary::before{content:"−"}.fx-qa .qa{margin-bottom:14px}
+/* kartu akun */
+.fx-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px}
+.fx-card{position:relative;overflow:hidden;border-radius:26px;padding:22px;min-height:210px;display:flex;flex-direction:column;color:#fff;
+  background:linear-gradient(145deg,hsl(var(--h) 70% 58%),hsl(calc(var(--h) + 45) 65% 34%));box-shadow:0 26px 50px -28px hsl(var(--h) 80% 45%),inset 0 1px 0 rgba(255,255,255,.35);transition:transform .45s var(--ease)}
+.fx-card:hover{transform:translateY(-6px) rotate(-.6deg)}
+.fx-card::before{content:"";position:absolute;right:-70px;top:-80px;width:230px;height:230px;border-radius:50%;background:rgba(255,255,255,.16)}
+.fx-card.off{filter:grayscale(.85);opacity:.7}
+.fx-ct{display:flex;justify-content:space-between;align-items:center;font-size:12.5px;font-weight:500;opacity:.9;position:relative}
+.fx-chipic{width:36px;height:27px;border-radius:7px;background:linear-gradient(135deg,#ffe9a8,#e0b45a);box-shadow:inset 0 0 0 1px rgba(0,0,0,.2)}
+.fx-card b{font:600 26px var(--disp);letter-spacing:-1px;margin-top:24px;position:relative;font-variant-numeric:tabular-nums}
+.fx-card b.neg{color:#fff;text-shadow:0 0 14px #ff2a4a}
+.fx-card p{font-size:14px;font-weight:500;margin-top:4px;position:relative}.fx-card small{opacity:.8;font-size:11.5px;position:relative}
+.fx-card .ac-acts{margin-top:auto;padding-top:16px;position:relative}
+.fx-card .ac-btn{background:rgba(255,255,255,.2);color:#fff;box-shadow:none;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.fx-card .ac-btn:hover{background:rgba(255,255,255,.34);color:#fff}
+.fx-card .ac-btn.danger{color:#fff;background:rgba(190,20,50,.5)}
+/* tabel transaksi lebih lapang */
+.ac-win .ac-tbl td{padding:15px 18px}
+.ac-win .ac-tbl tr.ac-click:hover td{background:var(--ac-tint2)}
+
+@media (max-width:820px){.fx-hero,.fx-t,.fx-w5,.fx-w6{grid-column:1/-1}.fx-hero{min-height:200px}.fx-feed{grid-template-columns:1fr}}
+@media (max-width:420px){.fx-donut{width:150px;height:150px}.fx-m{grid-template-columns:1fr 70px 36px}}

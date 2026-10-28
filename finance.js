@@ -60,45 +60,67 @@
     /* ---------- Ringkasan & analitik ---------- */
     function vSum() {
       var m = ym(), pm = addM(m, -1), sc = st.sc || 'Semua';
-      var inc = incSc(m), exp = sum('Expense', m, scoped), expP = sum('Expense', pm, scoped), incP = sum('Income', m, function (t) { return t.scope !== 'Pekerjaan'; }), incW = sum('Income', m, function (t) { return t.scope === 'Pekerjaan'; });
-      var total = D.acc.filter(function (a) { return a.active; }).reduce(function (a, x) { return a + bal(x); }, 0);
+      var inc = incSc(m), exp = sum('Expense', m, scoped), expP = sum('Expense', pm, scoped), incP = incSc(pm), net = inc - exp;
+      var iPers = sum('Income', m, function (t) { return t.scope !== 'Pekerjaan'; }), iWork = sum('Income', m, function (t) { return t.scope === 'Pekerjaan'; });
+      var act = D.acc.filter(function (a) { return a.active; }), total = act.reduce(function (a, x) { return a + bal(x); }, 0);
       var eb = expBy(m), ids = Object.keys(eb).sort(function (a, b) { return eb[b] - eb[a]; });
       var bl = [], bLim = 0, bSpent = 0;
       D.cat.filter(function (c) { return c.kind === 'Pengeluaran'; }).forEach(function (c) { var b = budFor(c.id, m); if (b) { var sp = eb[c.id] || 0; bLim += +b.limit || 0; bSpent += sp; bl.push({ c: c, b: b, sp: sp, p: pc(sp, +b.limit) }); } });
       var gs = D.goal.filter(function (g) { return g.status === 'Aktif'; }), gT = gs.reduce(function (a, g) { return a + (+g.target || 0); }, 0), gC = gs.reduce(function (a, g) { return a + collected(g); }, 0);
-      var delta = expP > 0 ? (exp - expP) / expP * 100 : null;
+      var short = function (n) { n = Math.abs(n); return n >= 1e9 ? (n / 1e9).toFixed(1).replace('.0', '') + ' M' : n >= 1e6 ? (n / 1e6).toFixed(1).replace('.0', '') + ' jt' : n >= 1e3 ? Math.round(n / 1e3) + ' rb' : String(Math.round(n)); };
+      var chg = function (a, b) { return b > 0 ? Math.round((a - b) / b * 100) : null; };
+      var chip = function (v, upGood) { if (v == null) return ''; var up = v >= 0; return '<em class="fx-chip ' + (up === upGood ? 'g' : 'b') + '">' + (up ? '+' : '−') + Math.abs(v) + '%</em>'; };
+      var PAL = ['#c7f26b', '#b7a6ff', '#ff9f6b', '#6bd5ff', '#ff6b8b', '#8a93ad'];
+      var hue = function (s) { var h = 0; String(s).split('').forEach(function (c) { h = (h * 31 + c.charCodeAt(0)) % 360; }); return h; };
       var months = []; for (var i = 5; i >= 0; i--) months.push(addM(m, -i));
-      var h = '<div class="ac-bar"><div class="ac-chips" style="margin:0">' + ['Semua', 'Pribadi', 'Pekerjaan'].map(function (x) { return '<button class="ac-chip" aria-pressed="' + (x === sc) + '" data-act="filt" data-f="sc" data-v="' + x + '">' + x + '</button>'; }).join('') + '</div><input type="month" data-in="m" value="' + m + '" style="width:auto" aria-label="Bulan"></div>' +
-        '<p class="ac-hint" style="margin-bottom:12px">Pendapatan pekerjaan dan pemasukan pribadi dipisah lewat kolom "sumber" pada transaksi. Transfer antar akun tidak dihitung sebagai pemasukan maupun pengeluaran.</p>' +
-        '<div class="qa">' +
-        '<div><b>Berapa saldo yang kumiliki?</b><br>' + rp(total) + ' <small style="opacity:.7">di ' + D.acc.filter(function (a) { return a.active; }).length + ' akun aktif</small></div>' +
-        '<div><b>Berapa uang yang masuk bulan ini?</b><br>' + rp(inc) + ' <small style="opacity:.7">(' + sc + ') · pribadi ' + rp(incP) + ' · pekerjaan ' + rp(incW) + '</small></div>' +
-        '<div><b>Berapa uang yang keluar?</b><br>' + rp(exp) + ' <small style="opacity:.7">(' + sc + ')</small></div>' +
-        '<div><b>Pengeluaran terbesar berasal dari mana?</b><br>' + (ids.length ? esc(cn(ids[0])) + ' — ' + rp(eb[ids[0]]) + ' (' + Math.round(pc(eb[ids[0]], exp)) + '% dari pengeluaran)' : 'Belum ada pengeluaran bulan ini') + '</div>' +
-        '<div><b>Berapa anggaran yang tersisa?</b><br>' + (bl.length ? rp(bLim - bSpent) + ' <small style="opacity:.7">dari ' + rp(bLim) + ' (' + bl.length + ' pos anggaran)</small>' : 'Belum ada anggaran untuk bulan ini') + '</div>' +
-        '<div><b>Berapa target tabunganku?</b><br>' + (gs.length ? rp(gC) + ' terkumpul dari ' + rp(gT) + ' (' + Math.round(pc(gC, gT)) + '%) · ' + gs.length + ' target aktif' : 'Belum ada target aktif') + '</div>' +
-        '<div><b>Apakah pengeluaranku meningkat dibanding bulan lalu?</b><br>' + (delta == null ? 'Belum ada pembanding (pengeluaran ' + mfull(pm) + ' ' + rp(expP) + ')' : (delta > 0 ? 'Naik ' : delta < 0 ? 'Turun ' : 'Sama ') + Math.abs(Math.round(delta)) + '% <small style="opacity:.7">(' + rp(expP) + ' → ' + rp(exp) + ')</small>') + '</div></div>';
-      h += '<div class="ac-grid">' + stat(rp(total), 'Total saldo akun aktif') + stat(rp(inc), 'Pemasukan ' + mfull(m)) + stat(rp(exp), 'Pengeluaran ' + mfull(m)) + stat('<span class="' + (inc - exp < 0 ? 'neg' : 'pos') + '">' + (inc - exp < 0 ? '−' : '') + rp(Math.abs(inc - exp)) + '</span>', 'Arus kas bersih (' + sc + ')') + '</div>';
-      var mx = 1, ex = months.map(function (x) { var v = sum('Expense', x, scoped); mx = Math.max(mx, v); return v; });
-      h += '<div class="ac-h">Tren pengeluaran 6 bulan</div><div class="ac-bars">' + months.map(function (x, i) { return '<div class="ac-bar2"><span>' + mlab(x) + '</span><div class="ac-track"><i style="width:' + ex[i] / mx * 100 + '%"></i></div><span>' + rp(ex[i]) + '</span></div>'; }).join('') + '</div>';
-      h += '<div class="ac-h">Pengeluaran berdasarkan kategori · ' + mfull(m) + '</div>' + (ids.length ? '<div class="ac-bars">' + ids.map(function (id) { return '<div class="ac-bar2"><span>' + esc(cn(id)) + '</span><div class="ac-track"><i style="width:' + pc(eb[id], eb[ids[0]]) + '%"></i></div><span>' + rp(eb[id]) + ' · ' + Math.round(pc(eb[id], exp)) + '%</span></div>'; }).join('') + '</div>' : '<p class="ac-hint">Belum ada data.</p>');
-      var near = bl.filter(function (x) { return x.p >= 80; });
-      h += '<div class="ac-h">Anggaran hampir habis / terlampaui</div>' + (near.length ? '<div class="ac-bars">' + near.map(function (x) { return '<div class="ac-bar2"><span>' + esc(x.c.name) + '</span>' + meter(x.p) + '<span>' + Math.round(x.p) + '% · sisa ' + rp((+x.b.limit) - x.sp) + '</span></div>'; }).join('') + '</div>' : '<p class="ac-hint">Tidak ada anggaran yang mendekati batas.</p>');
-      h += '<div class="ac-h">Perkembangan tabungan</div>' + (gs.length ? '<div class="ac-bars">' + gs.map(function (g) { var p = pc(collected(g), +g.target); return '<div class="ac-bar2"><span>' + esc(g.name) + '</span>' + meter(Math.min(p, 99.9)) + '<span>' + Math.round(p) + '% · ' + rp(collected(g)) + '</span></div>'; }).join('') + '</div>' : '<p class="ac-hint">Belum ada target aktif.</p>');
-      h += '<div class="ac-h">Perbandingan bulanan</div><div class="ac-tblwrap"><table class="ac-tbl"><tr><th>Bulan</th><th class="num">Pemasukan pribadi</th><th class="num">Pendapatan pekerjaan</th><th class="num">Pengeluaran (' + sc + ')</th><th class="num">Arus bersih (' + sc + ')</th></tr>' + months.slice().reverse().map(function (x) {
-        var a = sum('Income', x, function (t) { return t.scope !== 'Pekerjaan'; }), b = sum('Income', x, function (t) { return t.scope === 'Pekerjaan'; }), e = sum('Expense', x, scoped), n = incSc(x) - e;
-        return '<tr><td>' + mfull(x) + '</td><td class="num">' + rp(a) + '</td><td class="num">' + rp(b) + '</td><td class="num">' + rp(e) + '</td><td class="num ' + (n < 0 ? 'neg' : 'pos') + '">' + (n < 0 ? '−' : '') + rp(Math.abs(n)) + '</td></tr>';
-      }).join('') + '</table></div>';
+      var mi = months.map(function (x) { return incSc(x); }), me = months.map(function (x) { return sum('Expense', x, scoped); }), mx = Math.max.apply(null, mi.concat(me, [1]));
+
+      /* donut */
+      var top = ids.slice(0, 5), rest = ids.slice(5).reduce(function (a, id) { return a + eb[id]; }, 0), seg = top.map(function (id, k) { return { n: cn(id), v: eb[id], c: PAL[k] }; });
+      if (rest > 0) seg.push({ n: 'Lainnya', v: rest, c: PAL[5] });
+      var acc0 = 0, stops = seg.map(function (s) { var a = acc0, b = acc0 + pc(s.v, exp); acc0 = b; return s.c + ' ' + a + '% ' + b + '%'; }).join(',');
+      var donut = seg.length ? '<div class="fx-donut" style="--g:conic-gradient(' + stops + ')"><div><small>Total</small><b>' + short(exp) + '</b></div></div><ul class="fx-leg">' + seg.map(function (s) { return '<li><i style="background:' + s.c + '"></i><span>' + esc(s.n) + '</span><b>' + Math.round(pc(s.v, exp)) + '%</b></li>'; }).join('') + '</ul>' : '<div class="fx-none">Belum ada pengeluaran bulan ini. Catat transaksi pertama untuk melihat pembagiannya.</div>';
+
+      /* arus kas */
+      var flow = '<div class="fx-flow">' + months.map(function (x, k) { var on = x === m; return '<div class="' + (on ? 'on' : '') + '"><div class="fx-cols"><i class="in" style="height:' + Math.max(3, mi[k] / mx * 100) + '%"></i><i class="ex" style="height:' + Math.max(3, me[k] / mx * 100) + '%">' + (on ? '<u>' + short(me[k]) + '</u>' : '') + '</i></div><span>' + mlab(x) + '</span></div>'; }).join('') + '</div>';
+
+      /* transaksi terbaru */
+      var rec = D.tx.filter(function (t) { return t.type === 'Transfer' || scoped(t); }).sort(function (a, b) { return b.date.localeCompare(a.date); }).slice(0, 6);
+      var feed = rec.length ? rec.map(function (t) {
+        var tr = t.type === 'Transfer', nm = t.desc || (tr ? 'Transfer' : cn(t.catId));
+        return '<div class="fx-tx" data-act="edit" data-e="tx" data-id="' + t.id + '"><i style="--h:' + hue(nm) + '">' + esc(nm.charAt(0).toUpperCase()) + '</i><div><b>' + esc(nm) + '</b><small>' + (tr ? esc(an(t.accId)) + ' → ' + esc(an(t.toAccId)) : esc(cn(t.catId)) + ' · ' + esc(an(t.accId))) + ' · ' + fd(t.date) + '</small></div><strong class="' + (tr ? '' : t.type === 'Income' ? 'pos' : 'neg') + '">' + (tr ? '' : t.type === 'Income' ? '+' : '−') + rp(t.amount) + '</strong></div>';
+      }).join('') : '<div class="fx-none">Belum ada transaksi.</div>';
+
+      var h = '<div class="ac-bar fx-bar"><div class="ac-chips" style="margin:0">' + ['Semua', 'Pribadi', 'Pekerjaan'].map(function (x) { return '<button class="ac-chip" aria-pressed="' + (x === sc) + '" data-act="filt" data-f="sc" data-v="' + x + '">' + x + '</button>'; }).join('') + '</div><input type="month" data-in="m" value="' + m + '" style="width:auto" aria-label="Bulan"></div>';
+      h += '<div class="fx-b">' +
+        '<section class="fx-hero"><small>Total saldo · ' + act.length + ' akun aktif</small><b>' + rp(total) + '</b><p>' + (net < 0 ? '−' : '+') + rp(Math.abs(net)) + ' arus kas bersih ' + mfull(m) + '</p><div class="fx-hb"><button class="ac-btn" data-act="add" data-e="tx">Catat transaksi</button><button class="ac-btn" data-act="tab" data-t="acc">Kelola akun</button></div></section>' +
+        '<section class="fx-t fx-in"><small>Pemasukan</small><b>' + rp(inc) + '</b>' + chip(chg(inc, incP), true) + '<span>pribadi ' + short(iPers) + ' · kerja ' + short(iWork) + '</span></section>' +
+        '<section class="fx-t fx-out"><small>Pengeluaran</small><b>' + rp(exp) + '</b>' + chip(chg(exp, expP), false) + '<span>bulan lalu ' + short(expP) + '</span></section>' +
+        '<section class="fx-p fx-w6"><h4>Arus kas 6 bulan<span><i class="in"></i>Masuk<i class="ex"></i>Keluar</span></h4>' + flow + '</section>' +
+        '<section class="fx-p fx-w6"><h4>Pembagian pengeluaran<span>' + mfull(m) + '</span></h4><div class="fx-split">' + donut + '</div></section>' +
+        '<section class="fx-p fx-w5"><h4>Anggaran<span>' + (bl.length ? 'sisa ' + rp(bLim - bSpent) : '') + '</span></h4>' + (bl.length ? bl.slice(0, 5).map(function (x) { return '<div class="fx-m"><div><b>' + esc(x.c.name) + '</b><small>' + rp(x.sp) + ' / ' + rp(x.b.limit) + '</small></div>' + meter(x.p) + '<em>' + Math.round(x.p) + '%</em></div>'; }).join('') : '<div class="fx-none">Belum ada anggaran bulan ini.</div>') + '</section>' +
+        '<section class="fx-p fx-w5"><h4>Target tabungan<span>' + (gs.length ? Math.round(pc(gC, gT)) + '% terkumpul' : '') + '</span></h4>' + (gs.length ? gs.slice(0, 5).map(function (g) { var p = pc(collected(g), +g.target); return '<div class="fx-m"><div><b>' + esc(g.name) + '</b><small>' + rp(collected(g)) + ' / ' + rp(g.target) + '</small></div>' + meter(Math.min(p, 99.9)) + '<em>' + Math.round(p) + '%</em></div>'; }).join('') : '<div class="fx-none">Belum ada target aktif.</div>') + '</section>' +
+        '<section class="fx-p fx-w12"><h4>Transaksi terbaru<button class="fx-lnk" data-act="tab" data-t="tx">Lihat semua</button></h4><div class="fx-feed">' + feed + '</div></section></div>';
+      var qa = [['Berapa saldo yang kumiliki?', rp(total)], ['Berapa uang yang masuk bulan ini?', rp(inc) + ' (' + sc + ')'], ['Berapa uang yang keluar?', rp(exp) + ' (' + sc + ')'],
+        ['Pengeluaran terbesar berasal dari mana?', ids.length ? esc(cn(ids[0])) + ' — ' + rp(eb[ids[0]]) + ' (' + Math.round(pc(eb[ids[0]], exp)) + '%)' : 'Belum ada pengeluaran'],
+        ['Berapa anggaran yang tersisa?', bl.length ? rp(bLim - bSpent) + ' dari ' + rp(bLim) : 'Belum ada anggaran'],
+        ['Berapa target tabunganku?', gs.length ? rp(gC) + ' dari ' + rp(gT) + ' (' + Math.round(pc(gC, gT)) + '%)' : 'Belum ada target aktif'],
+        ['Apakah pengeluaranku meningkat?', expP > 0 ? (exp > expP ? 'Naik ' : exp < expP ? 'Turun ' : 'Sama ') + Math.abs(chg(exp, expP)) + '% dari ' + mfull(pm) : 'Belum ada pembanding']];
+      h += '<details class="fx-qa"><summary>Jawaban cepat &amp; perbandingan bulanan</summary><div class="qa">' + qa.map(function (q) { return '<div><b>' + q[0] + '</b><br>' + q[1] + '</div>'; }).join('') + '</div>' +
+        '<div class="ac-tblwrap"><table class="ac-tbl"><tr><th>Bulan</th><th class="num">Pemasukan pribadi</th><th class="num">Pendapatan pekerjaan</th><th class="num">Pengeluaran</th><th class="num">Arus bersih</th></tr>' + months.slice().reverse().map(function (x) {
+          var a = sum('Income', x, function (t) { return t.scope !== 'Pekerjaan'; }), b = sum('Income', x, function (t) { return t.scope === 'Pekerjaan'; }), e = sum('Expense', x, scoped), n = incSc(x) - e;
+          return '<tr><td>' + mfull(x) + '</td><td class="num">' + rp(a) + '</td><td class="num">' + rp(b) + '</td><td class="num">' + rp(e) + '</td><td class="num ' + (n < 0 ? 'neg' : 'pos') + '">' + (n < 0 ? '−' : '') + rp(Math.abs(n)) + '</td></tr>'; }).join('') + '</table></div></details>';
       return h;
     }
     function vAcc() {
       var act = D.acc.filter(function (a) { return a.active; }), total = act.reduce(function (a, x) { return a + bal(x); }, 0);
       var h = bar('Saldo = saldo awal + pemasukan − pengeluaran ± transfer. Hanya akun aktif yang masuk total.', add('acc', 'Akun'));
       if (!D.acc.length) return h + empty('Belum ada akun. Tambahkan Cash, Bank, E-wallet, atau Tabungan.');
-      return h + '<div class="ac-grid">' + stat(rp(total), 'Total saldo (akun aktif)') + stat(act.length, 'Akun aktif') + '</div>' + D.acc.map(function (a) {
+      return h + '<div class="ac-grid">' + stat(rp(total), 'Total saldo (akun aktif)') + stat(act.length, 'Akun aktif') + '</div><div class="fx-cards">' + D.acc.map(function (a) {
         var used = D.tx.some(function (t) { return t.accId === a.id || t.toAccId === a.id; });
-        return '<article class="ac-card"><div class="ac-row"><div><h3>' + esc(a.name) + badge(a.type) + badge(a.active ? 'Aktif' : 'Nonaktif', a.active ? 'on' : '') + '</h3><small style="opacity:.7">' + esc(a.currency || 'IDR') + ' · saldo awal ' + rp(a.opening) + '</small></div><div class="ac-acts"><button class="ac-btn sm" data-act="edit" data-e="acc" data-id="' + a.id + '">Edit</button><button class="ac-btn sm" data-act="tgacc" data-id="' + a.id + '">' + (a.active ? 'Nonaktifkan' : 'Aktifkan') + '</button>' + (used ? '' : '<button class="ac-btn sm danger" data-act="del" data-e="acc" data-id="' + a.id + '">Hapus</button>') + '</div></div><div class="ac-meta"><span>Saldo saat ini: <b class="' + (bal(a) < 0 ? 'neg' : '') + '">' + rp(bal(a)) + '</b></span></div></article>';
-      }).join('');
+        var k = Math.abs(a.name.split('').reduce(function (h, c) { return (h * 31 + c.charCodeAt(0)) | 0; }, 7)), v = bal(a);
+        return '<article class="fx-card' + (a.active ? '' : ' off') + '" style="--h:' + (k % 360) + '"><div class="fx-ct"><span>' + esc(a.type) + '</span><i class="fx-chipic"></i></div><b class="' + (v < 0 ? 'neg' : '') + '">' + rp(v) + '</b><p>' + esc(a.name) + '</p><small>' + esc(a.currency || 'IDR') + ' · saldo awal ' + rp(a.opening) + ' · ' + (a.active ? 'Aktif' : 'Nonaktif') + '</small><div class="ac-acts"><button class="ac-btn sm" data-act="edit" data-e="acc" data-id="' + a.id + '">Edit</button><button class="ac-btn sm" data-act="tgacc" data-id="' + a.id + '">' + (a.active ? 'Nonaktifkan' : 'Aktifkan') + '</button>' + (used ? '' : '<button class="ac-btn sm danger" data-act="del" data-e="acc" data-id="' + a.id + '">Hapus</button>') + '</div></article>';
+      }).join('') + '</div>';
     }
     function vTx() {
       var q = (st.tq || '').toLowerCase(), m = ym();
