@@ -8,7 +8,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Inter:wght@300;400;500&family=Caveat:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Inter:wght@300;400;500&family=Caveat:wght@400;500&family=Chakra+Petch:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
   --ink:#1f2f4d;
@@ -123,6 +123,7 @@ body{overflow-x:hidden;overflow-y:auto}
 }
 </style>
 <link rel="stylesheet" href="academic.css">
+<link rel="stylesheet" href="cosmos.css">
 </head>
 <body>
 
@@ -281,7 +282,7 @@ body{overflow-x:hidden;overflow-y:auto}
   </g>
 </svg>
 <div class="photo" id="photo"></div>
-</div></div>
+</div><div id="nebula"></div><canvas id="cosmos"></canvas></div>
 
 <div class="app">
   <header class="top">
@@ -321,8 +322,9 @@ body{overflow-x:hidden;overflow-y:auto}
   </div>
 
   <main class="hero">
-    <h1><span id="hiName">Assalamu’alaikum,</span><br>Semangat hari ini!</h1>
-    <p class="quote">“Setiap langkah kecil yang kamu lakukan hari ini,<br>adalah bagian dari impian besar yang sedang kamu bangun.”</p>
+    <h1 class="greet" id="greet"><span id="hiName" class="sr-only">Assalamu’alaikum,</span><span class="glitch" id="glitch" aria-hidden="true" data-text=""></span></h1>
+    <div class="greet-dots" id="greetDots" aria-hidden="true"></div>
+    <p class="quote">“Setiap langkah kecil yang kamu lakukan hari ini, <br>adalah bagian dari impian besar yang sedang kamu bangun.”</p>
     <div class="info">
       <div class="cell">
         <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cal"/></svg>
@@ -345,6 +347,7 @@ body{overflow-x:hidden;overflow-y:auto}
   </div>
   <h2>Wallpaper</h2>
   <div class="walls" id="walls">
+    <button class="wall" data-v="angkasa"><span>Angkasa</span></button>
     <button class="wall" data-v="scene" style="background-image:linear-gradient(180deg,#5a80b4,#e5c4b4 70%,#4a6a8a)"><span>Danau Senja</span></button>
     <button class="wall" data-v="aurora"><span>Aurora</span></button>
     <button class="wall" data-v="laut"><span>Laut</span></button>
@@ -390,7 +393,7 @@ body{overflow-x:hidden;overflow-y:auto}
   tick();setInterval(tick,1000);
 
   /* ---------- Tema & wallpaper ---------- */
-  var G={aurora:'linear-gradient(160deg,#1d2b64,#5b3f8c 45%,#f093a0)',
+  var G={angkasa:'radial-gradient(90% 70% at 70% 20%,#2a1d6e,#0a0c2b 55%,#03040c)',aurora:'linear-gradient(160deg,#1d2b64,#5b3f8c 45%,#f093a0)',
          laut:'linear-gradient(180deg,#0f4c75,#3282b8 50%,#bbe1fa)',
          hutan:'linear-gradient(170deg,#12372a,#436850 55%,#adbc9f)',
          fajar:'linear-gradient(180deg,#ff9a8b,#ff6a88 40%,#a18cd1)'};
@@ -401,6 +404,7 @@ body{overflow-x:hidden;overflow-y:auto}
   function setTheme(v){root.dataset.theme=v;press($('themes'),v);S.set('mo-theme',v)}
   function setWall(v){
     if(v==='custom'&&!custom)v='scene';
+    root.dataset.wall=v;
     if(v==='scene'){scene.style.display='';photo.style.backgroundImage='url("assets/bg.jpg")'}
     else{scene.style.display='none';photo.style.backgroundImage=v==='custom'?'url("'+custom+'")':G[v]}
     press($('walls'),v);S.set('mo-wall',v);
@@ -435,9 +439,9 @@ body{overflow-x:hidden;overflow-y:auto}
   $('reset').addEventListener('click',function(){
     S.del('mo-custom');S.del('mo-theme');S.del('mo-wall');custom=null;
     var t=$('customTile');t.classList.add('up');t.style.backgroundImage='';t.firstChild.textContent='+ Foto sendiri';
-    setTheme('senja');setWall('scene');
+    setTheme('senja');setWall('angkasa');
   });
-  setTheme(S.get('mo-theme')||'senja');showCustomTile();setWall(S.get('mo-wall')||'scene');
+  setTheme(S.get('mo-theme')||'senja');showCustomTile();setWall(S.get('mo-wall')||'angkasa');
 
   /* ---------- Panel ---------- */
   var panel=$('panel'),btn=$('themeBtn');
@@ -450,6 +454,8 @@ body{overflow-x:hidden;overflow-y:auto}
   document.addEventListener('keydown',function(e){if(e.key==='Escape')toggle(false)});
 })();
 </script>
+<canvas id="fx" aria-hidden="true"></canvas>
+<script src="cosmos.js"></script>
 <script src="academic.js"></script>
 <script src="office.js"></script>
 <script src="tasks.js"></script>
