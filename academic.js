@@ -371,6 +371,7 @@
 
   /* ---------- Dialog singkat & Coming soon ---------- */
   var MO = window.MyOffice = window.MyOffice || {}; MO.routes = MO.routes || {};
+  MO.routes['#academic'] = function () { open(); };
   var dlg, tm;
   function msg(title, text) {
     if (!dlg) { dlg = el('ac-soon', '<div><small></small><b></b></div>'); dlg.hidden = true; document.body.appendChild(dlg); dlg.addEventListener('click', function () { dlg.hidden = true; }); }
@@ -394,7 +395,10 @@
       return soon(a.textContent.replace(/\s+/g, ' ').trim());
     }
     var t = e.target.closest('.tools button');
-    if (t && t.id !== 'themeBtn') soon(t.getAttribute('aria-label') || '');
+    if (t && t.id !== 'themeBtn') {
+      if (t.classList.contains('avatar') && MO.routes['#settings']) return MO.routes['#settings']();
+      soon(t.getAttribute('aria-label') || '');
+    }
   }, true);
   document.addEventListener('keydown', function (e) {
     if (e.key !== 'Escape') return;

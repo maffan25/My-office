@@ -35,6 +35,15 @@
         (C.tabs.length > 1 ? '<nav class="ac-tabs">' + C.tabs.map(function (t) { return '<button class="ac-tab" data-act="tab" data-t="' + t[0] + '">' + t[1] + '</button>'; }).join('') + '</nav>' : '') + '<div class="ac-body"></div></section>');
       ov.hidden = true; document.body.appendChild(ov); body = ov.querySelector('.ac-body');
       ov.addEventListener('click', onClick);
+      ov.addEventListener('input', function (e) {
+        var k = e.target.dataset && e.target.dataset.in; if (!k) return;
+        st[k] = e.target.value; var pos = e.target.selectionStart; render();
+        var n = body.querySelector('[data-in="' + k + '"]'); if (n && n.tagName === 'INPUT' && n.type === 'text' || n && n.type === 'search') { n.focus(); try { n.setSelectionRange(pos, pos); } catch (x) { } }
+      });
+      ov.addEventListener('change', function (e) {
+        var t = e.target, a = t.dataset && t.dataset.chg; if (!a || !C.act) return;
+        C.act(a, Object.assign({}, t.dataset, { v: t.value }), t); save(); render();
+      });
       ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
       document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && !ov.hidden && !document.querySelector('.ac-ov2, .ac-soon:not([hidden])')) close(); });
     }
@@ -67,15 +76,16 @@
       m.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); off(); } });
       m.querySelector('form').addEventListener('submit', function (e) {
         e.preventDefault();
-        var f = e.target, bad = null, rec = id ? it : { id: uid() };
+        var f = e.target, bad = null, rec = id ? Object.assign({}, it) : { id: uid() };
         sp.fields.forEach(function (fd2) {
           var inp = f.elements[fd2.k], v = inp.value.trim();
           if (fd2.req && !v && !bad) bad = inp;
           rec[fd2.k] = fd2.bool ? v === 'true' : fd2.t === 'number' ? (v === '' ? '' : +v) : v;
         });
         if (bad) { bad.focus(); if (bad.reportValidity) bad.reportValidity(); return; }
-        if (!id) D[ent].push(rec);
-        if (C.saved) C.saved(ent, rec, !id, before);
+        var err = C.validate && C.validate(ent, rec, !id); if (err) { MO.msg('Periksa data', err); return; }
+        if (id) Object.assign(it, rec); else D[ent].push(rec);
+        if (C.saved) C.saved(ent, id ? it : rec, !id, before);
         save(); off(); render();
       });
       var first = m.querySelector('input,select,textarea'); if (first) first.focus();
@@ -86,6 +96,7 @@
     }
     function del(ent, id) {
       var it = by(D[ent], id); if (!it) return;
+      var blk = C.canDel && C.canDel(ent, id); if (blk) return MO.msg('Tidak bisa dihapus', blk);
       if (!confirm('Hapus "' + (it.name || it.title || it.item || it.task || C.specs[ent].title) + '"?' + ((C.cascade || {})[ent] ? ' Data turunannya ikut terhapus.' : ''))) return;
       rm(ent, id); if (st.proj === id) st.proj = null; save(); render();
     }
@@ -96,14 +107,15 @@
       if (a === 'tab') { tab = d.t; return render(); }
       if (a === 'add') {
         var g = C.guard && C.guard(d.e); if (g) return MO.msg(g[0], g[1]);
-        var pre = {}; if (d.pk) pre[d.pk] = d.pv; return form(d.e, null, pre);
+        var pre = {}; if (d.pk) pre[d.pk] = d.pv; if (d.pre) pre = Object.assign(pre, JSON.parse(d.pre)); return form(d.e, null, pre);
       }
       if (a === 'edit') return form(d.e, d.id);
       if (a === 'del') return del(d.e, d.id);
       if (a === 'filt') { st[d.f] = d.v; return render(); }
-      if (C.act) C.act(a, d, e.target);
+      if (C.act) C.act(a, d, e.target, e);
       save(); render();
     }
+    app.form = form; app.render = render;
     return { open: open };
   }
 
@@ -377,6 +389,7 @@
     };
   });
 
+  MO.kit = { App: App, uid: uid, esc: esc, has: has, fmt: fmt, rp: rp, fd: fd, todayS: todayS, by: by, el: el, link: link, btns: btns, empty: empty, bar: bar, add: add, chips: chips, prog: prog, opt: opt, stat: stat, badge: badge };
   MO.routes['#work'] = work.open;
   MO.routes['#organization'] = org.open;
   MO.routes['#project'] = proj.open;
