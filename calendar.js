@@ -88,18 +88,23 @@
     }
     var taskBtn = function (t) { return '<button class="ev tk' + (t.status === 'Done' ? ' dn' : '') + '" style="--c:#8a94a6" data-act="gotask" title="Tenggat tugas' + (t.dueTime ? ' ' + t.dueTime : '') + '">☑ ' + esc(t.title) + '</button>'; };
 
-    function month(a) {
-      var mi = monthInfo(a), first = mi.first, lead = (dow(first) - (+CF.wk) + 7) % 7, now = today(), h = '<div class="mg">';
-      for (var i = 0; i < 7; i++) h += '<div class="mh">' + DS[(+CF.wk + i) % 7] + '</div>';
-      for (i = 0; i < lead; i++) h += '<div class="mc out"></div>';
+    function month(a, ttl) {
+      var mi = monthInfo(a), first = mi.first, lead = (dow(first) - (+CF.wk) + 7) % 7, now = today(), sel = st.sel || now, i;
+      var h = '<div class="kc-wrap"><div class="kc-cal"><div class="kc-nav"><button class="kc-nb" data-act="cnav" data-d="-1" aria-label="Bulan sebelumnya">‹</button><b>' + ttl + '</b><button class="kc-nb" data-act="cnav" data-d="1" aria-label="Bulan berikutnya">›</button></div><div class="kc-wk">';
+      for (i = 0; i < 7; i++) h += '<span>' + DS[(+CF.wk + i) % 7] + '</span>';
+      h += '</div><div class="kc-days">';
+      for (i = 0; i < lead; i++) h += '<span class="kc-d out"></span>';
       for (i = 0; i < mi.len; i++) {
-        var d = addD(first, i), ev = onDay(d), tk = tasksOn(d), n = 0, cell = '';
-        ev.forEach(function (e) { if (n++ < 3) cell += item(e); });
-        tk.forEach(function (t) { if (n++ < 3) cell += taskBtn(t); });
-        h += '<div class="mc' + (d === now ? ' td' : '') + '" data-act="newday" data-d="' + d + '">' + dayNum(d) + cell + (n > 3 ? '<div class="more">+' + (n - 3) + ' lagi</div>' : '') + '</div>';
+        var d = addD(first, i), busy = onDay(d).length + tasksOn(d).length > 0;
+        h += '<button class="kc-d' + (d === now ? ' td' : '') + (d === sel ? ' sel' : '') + '" data-act="selday" data-d="' + d + '" aria-label="' + fd(d) + (busy ? ', ada kegiatan' : '') + '"' + (d === sel ? ' aria-pressed="true"' : '') + '>' + dayNum(d) + (busy ? '<u class="kc-dot"></u>' : '') + '</button>';
       }
-      while ((lead + i) % 7) { h += '<div class="mc out"></div>'; i++; }
-      return h + '</div>';
+      h += '</div><div class="kc-foot"><span><i></i>Ada kegiatan</span><button class="kc-today" data-act="cnav" data-d="0">Kembali ke hari ini</button></div></div>';
+      var ev = onDay(sel).sort(function (x, y) { return rng(x)[0] - rng(y)[0]; }), tk = tasksOn(sel);
+      h += '<aside class="kc-side" aria-live="polite"><small>' + DL[dow(sel)] + ', ' + (+sel.slice(8)) + ' ' + MN[+sel.slice(5, 7) - 1] + ' ' + sel.slice(0, 4) + '</small>';
+      if (!ev.length && !tk.length) h += '<p>Belum ada kegiatan pada tanggal ini.</p>';
+      ev.forEach(function (e) { h += '<button class="kc-ev" style="--c:' + color(e) + '" data-act="edit" data-e="ev" data-id="' + e.id + '"><i></i><div><b>' + esc(e.title) + '</b><small>' + esc(tl(e)) + (e.location ? ' · ' + esc(e.location) : '') + '</small></div></button>'; });
+      tk.forEach(function (t) { h += '<button class="kc-ev" style="--c:#8a94a6" data-act="gotask"><i></i><div><b>' + esc(t.title) + '</b><small>Tenggat tugas · ' + esc(t.status) + (t.dueTime ? ' · ' + t.dueTime : '') + '</small></div></button>'; });
+      return h + '<button class="kc-add" data-act="newday" data-d="' + sel + '">+ Tambah kegiatan</button></aside></div>';
     }
     function lanes(S) {
       S.sort(function (x, y) { return x.s - y.s || y.en - x.en; });
@@ -151,13 +156,15 @@
       if (v === 'Monthly') {
         var mi = monthInfo(a), last = addD(mi.first, mi.len - 1);
         ttl = CF.mode === 'hijri' ? hijStr(mi.first, last) + ' <small style="opacity:.6">' + mStr(mi.first, last) + '</small>' : mStr(mi.first, last) + (CF.mode === 'both' ? ' <small style="opacity:.6">' + hijStr(mi.first, last) + '</small>' : '');
-        body = month(a);
+        body = month(a, ttl);
       } else if (v === 'Weekly') {
         var s = addD(a, -((dow(a) - +CF.wk + 7) % 7)), days = []; for (var i = 0; i < 7; i++) days.push(addD(s, i));
         ttl = fd(days[0]) + ' – ' + fd(days[6]); body = grid(days);
       } else if (v === 'Daily') {
         var hh = hij(a); ttl = DL[dow(a)] + ', ' + fd(a) + (CF.mode !== 'masehi' && hh ? ' <small style="opacity:.6">' + hh.d + ' ' + HM[hh.m - 1] + ' ' + hh.y + ' H</small>' : ''); body = grid([a]);
       } else { ttl = 'Agenda 30 hari dari ' + fd(a); body = agenda(a); }
+      if (v === 'Monthly') return '<div class="kc-top"><h3>Kalender kegiatan</h3><p>Pilih tanggal untuk melihat detail kegiatan. Titik emas menandai hari yang memiliki agenda.</p></div><div class="kc-tools">' +
+        chips(['Daily', 'Weekly', 'Monthly', 'Agenda List'].map(function (x) { return x === 'Agenda List' ? 'Agenda' : x; }), 'Monthly', 'v') + add('ev', 'Acara') + '</div>' + body;
       return '<div class="ac-bar"><div class="ac-acts"><button class="ac-btn sm" data-act="cnav" data-d="-1" aria-label="Sebelumnya">←</button><button class="ac-btn sm" data-act="cnav" data-d="0">Hari ini</button><button class="ac-btn sm" data-act="cnav" data-d="1" aria-label="Berikutnya">→</button></div><b style="font-size:15px">' + ttl + '</b>' + add('ev', 'Acara') + '</div>' +
         chips(['Daily', 'Weekly', 'Monthly', 'Agenda List'].map(function (x) { return x === 'Agenda List' ? 'Agenda' : x; }), v === 'Agenda List' ? 'Agenda' : v, 'v') + body;
     }
@@ -191,11 +198,12 @@
         if (a === 'set') CF[d.k] = (d.k === 'wk' || d.k === 'hij') ? +d.v : d.v;
         if (a === 'cnav') {
           var cur = st.d || today(), v = st.v || 'Monthly', n = +d.d;
-          if (!n) { st.d = today(); return; }
+          if (!n) { st.d = today(); st.sel = today(); return; }
           if (v === 'Monthly') { var mi = monthInfo(cur); st.d = CF.mode === 'hijri' ? (n > 0 ? addD(mi.first, mi.len) : addD(mi.first, -1)) : new Date(Date.UTC(+cur.slice(0, 4), +cur.slice(5, 7) - 1 + n, 1)).toISOString().slice(0, 10); }
           else st.d = addD(cur, n * (v === 'Weekly' ? 7 : v === 'Daily' ? 1 : 30));
         }
         if (a === 'filt' && d.f === 'v') st.v = d.v === 'Agenda' ? 'Agenda List' : d.v;
+        if (a === 'selday') st.sel = d.d;
         if (a === 'goday') { st.d = d.d; st.v = 'Daily'; }
         if (a === 'newday') app.form('ev', null, { start: d.d, end: d.d, allDay: true });
         if (a === 'slot') {
