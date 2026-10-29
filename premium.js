@@ -21,7 +21,7 @@
     { k: 'cal', m: /kalender|calendar/, sym: 'i-cal', a: '#ec4899', b: '#f97316' },
     { k: 'fin', m: /financ|keuangan/, sym: 'i-fin', a: '#10b981', b: '#0ea5e9' },
     { k: 'goal', m: /goal/, sym: 'i-goal', a: '#f43f5e', b: '#f59e0b' },
-    { k: 'doc', m: /document/, sym: 'i-doc', a: '#ca8a04', b: '#ea580c' },
+    { k: 'doc', m: /document/, sym: 'i-doc', a: '#a8642b', b: '#c78a4c' },
     { k: 'ana', m: /analytic/, sym: 'i-chart', a: '#06b6d4', b: '#6366f1' },
     { k: 'set', m: /setting/, sym: 'i-set', a: '#64748b', b: '#6366f1' }
   ];
