@@ -50,6 +50,8 @@
     function open() { if (!ov) build(); ov.hidden = false; document.body.style.overflow = 'hidden'; render(); ov.querySelector('.ac-x').focus(); }
     function close() { if (ov) ov.hidden = true; document.body.style.overflow = ''; }
     function render() {
+      if (app.onChange) app.onChange();
+      if (!ov) return;
       C.tabs.forEach(function (t) { var b = ov.querySelector('[data-t="' + t[0] + '"]'); if (b) b.setAttribute('aria-selected', t[0] === tab); });
       ov.querySelector('header p').textContent = C.sub ? C.sub() : '';
       var top = body.scrollTop;
@@ -115,8 +117,8 @@
       if (C.act) C.act(a, d, e.target, e);
       save(); render();
     }
-    app.form = form; app.render = render;
-    return { open: open };
+    app.form = form; app.render = render; app.del = del; app.close = close;
+    return { open: open, app: app };
   }
 
   /* =====================================================
@@ -206,7 +208,7 @@
       }]
     ];
     return {
-      specs: specs, tabs: tabs, sub: function () { return 'Pendapatan pekerjaan terpisah dari pemasukan pribadi'; },
+      skin: 'wo-skin', specs: specs, tabs: tabs, sub: function () { return 'Pendapatan pekerjaan terpisah dari pemasukan pribadi'; },
       cascade: { client: [], job: [['wtask', 'jobId'], ['log', 'jobId'], ['wdoc', 'jobId']] },
       guard: function (e) { if (['wtask', 'log'].indexOf(e) > -1 && !D.job.length) return ['Belum ada pekerjaan', 'Tambahkan pekerjaan terlebih dahulu.']; },
       act: function (a, d, t) { if (a === 'tgw') { var x = by(D.wtask, d.id); x.status = t.checked ? 'Selesai' : 'Belum dikerjakan'; } }
@@ -390,6 +392,7 @@
   });
 
   MO.kit = { App: App, uid: uid, esc: esc, has: has, fmt: fmt, rp: rp, fd: fd, todayS: todayS, by: by, el: el, link: link, btns: btns, empty: empty, bar: bar, add: add, chips: chips, prog: prog, opt: opt, stat: stat, badge: badge };
+  MO.work = work;
   MO.routes['#work'] = work.open;
   MO.routes['#organization'] = org.open;
   MO.routes['#project'] = proj.open;
