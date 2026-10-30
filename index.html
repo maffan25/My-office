@@ -145,6 +145,8 @@ body{overflow-x:hidden;overflow-y:auto}
 <link rel="stylesheet" href="polish.css">
 <link rel="stylesheet" href="v6.css">
 <link rel="stylesheet" href="fixes.css">
+<link rel="stylesheet" href="gnome.css">
+<link rel="preload" as="image" href="assets/island.jpg">
 </head>
 <body>
 
@@ -372,6 +374,7 @@ body{overflow-x:hidden;overflow-y:auto}
   <div class="p-sec">
     <h2>Latar</h2>
     <div class="walls" id="walls">
+      <button class="wall" data-v="kurcaci"><span>Kurcaci</span></button>
       <button class="wall" data-v="angkasa"><span>Angkasa</span></button>
       <button class="wall" data-v="pixel"><span>Pixel</span></button>
       <button class="wall" data-v="scene" style="background-image:linear-gradient(180deg,#5a80b4,#e5c4b4 70%,#4a6a8a)"><span>Danau Senja</span></button>
@@ -421,7 +424,7 @@ body{overflow-x:hidden;overflow-y:auto}
   tick();setInterval(tick,1000);
 
   /* ---------- Tema & wallpaper ---------- */
-  var G={pixel:'linear-gradient(180deg,#36227a,#b44d80 55%,#ffb868)',angkasa:'radial-gradient(90% 70% at 70% 20%,#2a1d6e,#0a0c2b 55%,#03040c)',aurora:'linear-gradient(160deg,#1d2b64,#5b3f8c 45%,#f093a0)',
+  var G={kurcaci:'url(assets/island.jpg)',pixel:'linear-gradient(180deg,#36227a,#b44d80 55%,#ffb868)',angkasa:'radial-gradient(90% 70% at 70% 20%,#2a1d6e,#0a0c2b 55%,#03040c)',aurora:'linear-gradient(160deg,#1d2b64,#5b3f8c 45%,#f093a0)',
          laut:'linear-gradient(180deg,#0f4c75,#3282b8 50%,#bbe1fa)',
          hutan:'linear-gradient(170deg,#12372a,#436850 55%,#adbc9f)',
          fajar:'linear-gradient(180deg,#ff9a8b,#ff6a88 40%,#a18cd1)'};
@@ -467,9 +470,10 @@ body{overflow-x:hidden;overflow-y:auto}
   $('reset').addEventListener('click',function(){
     S.del('mo-custom');S.del('mo-theme');S.del('mo-wall');custom=null;
     var t=$('customTile');t.classList.add('up');t.style.backgroundImage='';t.firstChild.textContent='+ Foto sendiri';
-    setTheme('senja');setWall('angkasa');
+    setTheme('senja');setWall('kurcaci');
   });
-  setTheme(S.get('mo-theme')||'senja');showCustomTile();setWall(S.get('mo-wall')||'angkasa');
+  var w0=S.get('mo-wall');if(S.get('mo-gn')!=='1'){w0='kurcaci';S.set('mo-gn','1')}
+  setTheme(S.get('mo-theme')||'senja');showCustomTile();setWall(w0||'kurcaci');
 
   /* ---------- Panel ---------- */
   var panel=$('panel'),btn=$('themeBtn');
@@ -502,5 +506,6 @@ body{overflow-x:hidden;overflow-y:auto}
 <script src="polish.js"></script>
 <script src="v6.js"></script>
 <script src="fx.js"></script>
+<script src="gnome.js"></script>
 </body>
 </html>
