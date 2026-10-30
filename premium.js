@@ -13,19 +13,19 @@
 
   /* ---------- Identitas tiap menu ---------- */
   var MODS = [
-    { k: 'academic', m: /academic/, sym: 'i-academic', a: '#95cad5', b: '#92c8d4' },
-    { k: 'work', m: /work/, sym: 'i-work', a: '#548a96', b: '#86bfcc' },
-    { k: 'org', m: /organi/, sym: 'i-org', a: '#90c6d2', b: '#e9ac9a' },
-    { k: 'project', m: /project/, sym: 'i-project', a: '#df9b88', b: '#e9ab99' },
-    { k: 'task', m: /task/, sym: 'i-task', a: '#86bfcc', b: '#649ca9' },
-    { k: 'cal', m: /kalender|calendar/, sym: 'i-cal', a: '#e9ac9a', b: '#df9b88' },
-    { k: 'fin', m: /financ|keuangan/, sym: 'i-fin', a: '#5d94a1', b: '#70a9b6' },
-    { k: 'goal', m: /goal/, sym: 'i-goal', a: '#e9ab99', b: '#d89582' },
-    { k: 'doc', m: /document/, sym: 'i-doc', a: '#c38271', b: '#e09d8a' },
-    { k: 'ana', m: /analytic/, sym: 'i-chart', a: '#649ca9', b: '#93c9d4' },
-    { k: 'set', m: /setting/, sym: 'i-set', a: '#7b877a', b: '#93c9d4' }
+    { k: 'academic', m: /academic/, sym: 'i-academic', a: '#5b7cff', b: '#8b5cf6' },
+    { k: 'work', m: /work/, sym: 'i-work', a: '#0ea5a4', b: '#3b82f6' },
+    { k: 'org', m: /organi/, sym: 'i-org', a: '#a855f7', b: '#ec4899' },
+    { k: 'project', m: /project/, sym: 'i-project', a: '#f97316', b: '#ef4444' },
+    { k: 'task', m: /task/, sym: 'i-task', a: '#3b82f6', b: '#06b6d4' },
+    { k: 'cal', m: /kalender|calendar/, sym: 'i-cal', a: '#ec4899', b: '#f97316' },
+    { k: 'fin', m: /financ|keuangan/, sym: 'i-fin', a: '#10b981', b: '#0ea5e9' },
+    { k: 'goal', m: /goal/, sym: 'i-goal', a: '#f43f5e', b: '#f59e0b' },
+    { k: 'doc', m: /document/, sym: 'i-doc', a: '#a8642b', b: '#c78a4c' },
+    { k: 'ana', m: /analytic/, sym: 'i-chart', a: '#06b6d4', b: '#6366f1' },
+    { k: 'set', m: /setting/, sym: 'i-set', a: '#64748b', b: '#6366f1' }
   ];
-  var DEF = { k: 'x', sym: 'i-project', a: '#95cad5', b: '#92c8d4' };
+  var DEF = { k: 'x', sym: 'i-project', a: '#5b7cff', b: '#8b5cf6' };
   function modOf(label) {
     label = (label || '').toLowerCase();
     for (var i = 0; i < MODS.length; i++) if (MODS[i].m.test(label)) return MODS[i];

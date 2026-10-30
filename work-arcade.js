@@ -11,8 +11,8 @@
   var IS = ['Tidak relevan', 'Belum ditagih', 'Sudah ditagih', 'Sudah diterima'];
   var TS = ['Belum dikerjakan', 'Sedang dikerjakan', 'Selesai'];
   var DT = ['Kontrak', 'Invoice', 'Brief', 'Deliverable', 'Lainnya'];
-  var PALETTE = ['#d89582', '#92c8d4', '#73adba', '#edb4a3', '#e7a795', '#738271', '#e9ac9a', '#5e96a2', '#93c9d4', '#df9b88'];
-  var SCOL = { Prospek: '#d0d9c6', Berjalan: '#738271', Review: '#e7a795', Selesai: '#73adba', Dibatalkan: '#edb4a3' };
+  var PALETTE = ['#f59e0b', '#8b5cf6', '#1ea7e1', '#ff4757', '#f7c533', '#22c55e', '#ec4899', '#14b8a6', '#6366f1', '#f97316'];
+  var SCOL = { Prospek: '#9aa4b8', Berjalan: '#22c55e', Review: '#f7c533', Selesai: '#1ea7e1', Dibatalkan: '#ff4757' };
   var NAV = [['jobs', 'Pekerjaan'], ['clients', 'Klien'], ['tasks', 'Tugas'], ['hours', 'Jam Kerja'], ['docs', 'Dokumen'], ['income', 'Pendapatan']];
   var WTABS = [['tasks', 'Tugas'], ['hours', 'Jam Kerja'], ['docs', 'Dokumen'], ['income', 'Pendapatan'], ['info', 'Info']];
 
@@ -22,7 +22,7 @@
   /* ---------- helpers ---------- */
   function jobColor(j, i) { return j.color || PALETTE[(i == null ? D.job.indexOf(j) : i) % PALETTE.length]; }
   function lum(hex) { var h = (hex || '#888').replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); var r = parseInt(h.substr(0, 2), 16), g = parseInt(h.substr(2, 2), 16), b = parseInt(h.substr(4, 2), 16); return (0.299 * r + 0.587 * g + 0.114 * b) / 255; }
-  function ink(hex) { return lum(hex) > 0.68 ? '#674239' : '#fff'; }
+  function ink(hex) { return lum(hex) > 0.68 ? '#1a1405' : '#fff'; }
   function cn(id) { var c = by(D.client, id); return c ? c.name : ''; }
   function jn(id) { var j = by(D.job, id); return j ? j.title : '—'; }
   function hrs(id) { return D.log.filter(function (l) { return l.jobId === id; }).reduce(function (a, l) { return a + (+l.hours || 0); }, 0); }
@@ -43,19 +43,19 @@
   /* ---------- ilustrasi bawaan (bila belum ada gambar) ---------- */
   function mascot(i) {
     var v = i % 4, ears = '';
-    if (v === 1) ears = '<path d="M52 66 40 22 82 48Z" fill="rgba(255,250,244,0.88)"/><path d="M148 66 160 22 118 48Z" fill="rgba(255,250,244,0.88)"/>';
-    if (v === 2) ears = '<ellipse cx="72" cy="34" rx="14" ry="34" fill="rgba(255,250,244,0.88)"/><ellipse cx="128" cy="34" rx="14" ry="34" fill="rgba(255,250,244,0.88)"/>';
-    if (v === 3) ears = '<path d="M100 2l9 22 24 2-18 16 6 24-21-13-21 13 6-24-18-16 24-2Z" fill="#eeb7a6"/>';
+    if (v === 1) ears = '<path d="M52 66 40 22 82 48Z" fill="rgba(255,255,255,.88)"/><path d="M148 66 160 22 118 48Z" fill="rgba(255,255,255,.88)"/>';
+    if (v === 2) ears = '<ellipse cx="72" cy="34" rx="14" ry="34" fill="rgba(255,255,255,.88)"/><ellipse cx="128" cy="34" rx="14" ry="34" fill="rgba(255,255,255,.88)"/>';
+    if (v === 3) ears = '<path d="M100 2l9 22 24 2-18 16 6 24-21-13-21 13 6-24-18-16 24-2Z" fill="#ffe14d"/>';
     return '<svg class="wo-mascot" viewBox="0 0 200 210" aria-hidden="true">' + ears +
-      '<ellipse cx="100" cy="200" rx="62" ry="9" fill="rgba(32,39,33,0.18)"/>' +
-      '<circle cx="100" cy="112" r="78" fill="rgba(255,250,244,0.92)"/>' +
+      '<ellipse cx="100" cy="200" rx="62" ry="9" fill="rgba(0,0,0,.18)"/>' +
+      '<circle cx="100" cy="112" r="78" fill="rgba(255,255,255,.92)"/>' +
       '<circle cx="100" cy="112" r="78" fill="url(#wg' + i + ')"/>' +
       '<defs><radialGradient id="wg' + i + '" cx=".35" cy=".3" r=".9"><stop offset="0" stop-color="#fff" stop-opacity=".0"/><stop offset="1" stop-color="#000" stop-opacity=".16"/></radialGradient></defs>' +
-      '<ellipse cx="74" cy="104" rx="9" ry="14" fill="#3a616b"/><ellipse cx="126" cy="104" rx="9" ry="14" fill="#3a616b"/>' +
+      '<ellipse cx="74" cy="104" rx="9" ry="14" fill="#1b1b2a"/><ellipse cx="126" cy="104" rx="9" ry="14" fill="#1b1b2a"/>' +
       '<circle cx="77" cy="98" r="4" fill="#fff"/><circle cx="129" cy="98" r="4" fill="#fff"/>' +
-      '<ellipse cx="58" cy="128" rx="13" ry="8" fill="#f3c4b3" opacity=".55"/><ellipse cx="142" cy="128" rx="13" ry="8" fill="#f3c4b3" opacity=".55"/>' +
-      '<path d="M88 130q12 14 24 0" fill="none" stroke="#3a616b" stroke-width="5" stroke-linecap="round"/>' +
-      '<circle cx="30" cy="132" r="17" fill="rgba(255,250,244,0.92)"/><circle cx="170" cy="132" r="17" fill="rgba(255,250,244,0.92)"/></svg>';
+      '<ellipse cx="58" cy="128" rx="13" ry="8" fill="#ff6b8b" opacity=".55"/><ellipse cx="142" cy="128" rx="13" ry="8" fill="#ff6b8b" opacity=".55"/>' +
+      '<path d="M88 130q12 14 24 0" fill="none" stroke="#1b1b2a" stroke-width="5" stroke-linecap="round"/>' +
+      '<circle cx="30" cy="132" r="17" fill="rgba(255,255,255,.92)"/><circle cx="170" cy="132" r="17" fill="rgba(255,255,255,.92)"/></svg>';
   }
   function art(j, i) { return j.img ? '<img class="wo-img" src="' + esc(j.img) + '" alt="" draggable="false">' : mascot(i); }
 
@@ -107,7 +107,7 @@
   /* ---------- carousel ---------- */
   var stage;
   function jobsHTML(n) {
-    var L = filtered(), cards = L.map(function (j, i) { return cardHTML(j, i); }).join('') + '<div class="wo-card add" role="button" tabindex="0" style="--c:#36403a"><div class="wo-plus">+</div><b>Tambah Pekerjaan</b><small>Buat kartu baru</small></div>';
+    var L = filtered(), cards = L.map(function (j, i) { return cardHTML(j, i); }).join('') + '<div class="wo-card add" role="button" tabindex="0" style="--c:#2a2d3a"><div class="wo-plus">+</div><b>Tambah Pekerjaan</b><small>Buat kartu baru</small></div>';
     return '<div class="wo-hero"><span class="wo-gold"><svg viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="13" rx="2"/><path d="M12 8v13M3 12h18M12 8c-2-4-6-4-6-1.5S10 8 12 8Zm0 0c2-4 6-4 6-1.5S14 8 12 8Z"/></svg><b>' + n + ' Aktif</b> • Work Office</span>' +
       '<h1>Pekerjaan Seru</h1><h1 class="two"><span class="cy">Work</span> <span class="rd">Office</span></h1></div>' +
       '<div class="wo-stagewrap"><button class="wo-arr l" data-a="prev" aria-label="Sebelumnya"><svg viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></svg></button>' +
@@ -226,7 +226,7 @@
     var h = '<div class="wo-bar"><div class="wo-chips">' + ['Semua'].concat(DT).map(function (x) { return '<button data-a="filt" data-f="dt" data-v="' + x + '" aria-pressed="' + (S.dt === x) + '">' + x + '</button>'; }).join('') + '</div><button class="wo-btn go" data-a="add" data-e="wdoc"' + pre + '>+ Dokumen</button></div>';
     if (!L.length) return h + '<p class="wo-empty">Belum ada dokumen.</p>';
     return h + L.map(function (d) {
-      return '<div class="wo-item"><div class="wo-ib"><b>' + esc(d.title) + '</b><em class="wo-st" style="--s:#92c8d4">' + esc(d.type) + '</em><small>' + (jobId ? '' : esc(jn(d.jobId))) + (d.link ? (jobId ? '' : ' · ') + K.link(d.link) : '') + '</small>' + (d.notes ? '<small>' + esc(d.notes) + '</small>' : '') + '</div>' +
+      return '<div class="wo-item"><div class="wo-ib"><b>' + esc(d.title) + '</b><em class="wo-st" style="--s:#8b5cf6">' + esc(d.type) + '</em><small>' + (jobId ? '' : esc(jn(d.jobId))) + (d.link ? (jobId ? '' : ' · ') + K.link(d.link) : '') + '</small>' + (d.notes ? '<small>' + esc(d.notes) + '</small>' : '') + '</div>' +
         '<button class="wo-mini" data-a="edit" data-e="wdoc" data-id="' + d.id + '">Edit</button><button class="wo-mini dng" data-a="del" data-e="wdoc" data-id="' + d.id + '">Hapus</button></div>';
     }).join('');
   }

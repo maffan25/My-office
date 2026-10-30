@@ -143,7 +143,7 @@
   var TABS = [['dash', 'Dashboard', 'dash'], ['course', 'Mata Kuliah', 'book'], ['sem', 'Semester', 'cal'], ['task', 'Tugas', 'task'],
     ['exam', 'Ujian', 'exam'], ['ana', 'Analitik', 'chart'], ['cfg', 'Formula Nilai', 'set']];
   var PAGE = { course: 'Mata Kuliah', sem: 'Semester', task: 'Tugas', exam: 'Ujian', ana: 'Analitik', cfg: 'Formula Nilai' };
-  var PALETTE = ['#edd0ac', '#cde7ed', '#fbdfd2', '#dee6d6', '#d2eaef', '#f9d8cb', '#c2e2e8'];
+  var PALETTE = ['#ffe24a', '#cfe6ff', '#ffd3d3', '#d6f0c4', '#e4d8ff', '#ffe0bd', '#c9f0e8'];
   var ICO = {
     dash: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/>',
     book: '<path d="M2 4h6a4 4 0 0 1 4 4v12a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v12a3 3 0 0 1 3-3h7z"/>',
@@ -162,7 +162,7 @@
     plus: '<path d="M12 5v14M5 12h14"/>', x: '<path d="M18 6 6 18M6 6l12 12"/>', flat: '<path d="M5 12h14"/>'
   };
   function ic(n) { return '<svg class="ad-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICO[n] + '</svg>'; }
-  var MARK = '<svg class="ad-mk" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="2.5" fill="#3d6771"/><rect x="13" y="2" width="9" height="9" rx="2.5" fill="#edd0ac"/><rect x="2" y="13" width="9" height="9" rx="2.5" fill="#edd0ac"/><rect x="13" y="13" width="9" height="9" rx="2.5" fill="#3d6771"/></svg>';
+  var MARK = '<svg class="ad-mk" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="9" height="9" rx="2.5" fill="#1e1b3a"/><rect x="13" y="2" width="9" height="9" rx="2.5" fill="#ffe24a"/><rect x="2" y="13" width="9" height="9" rx="2.5" fill="#ffe24a"/><rect x="13" y="13" width="9" height="9" rx="2.5" fill="#1e1b3a"/></svg>';
   var prof = function () { try { return JSON.parse(localStorage.getItem('mo-settings-v1')) || {}; } catch (e) { return {}; } };
   var ipf = function (v) { return v == null ? '—' : (Math.round(v * 100) / 100).toFixed(2); };
   var fshort = function (v) {

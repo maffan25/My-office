@@ -23,8 +23,8 @@
 
   /* ---------- Jenis berkas → warna sampul ---------- */
   var PAL = {
-    pdf: ['#e4a18e', '#ba7a69'], doc: ['#77b2bf', '#568b98'], xls: ['#7c8b79', '#515e53'], ppt: ['#e6a794', '#c48272'],
-    img: ['#6fa9b5', '#4d818d'], av: ['#7ebac7', '#5a919d'], txt: ['#fde9df', '#f8d4c6'], zip: ['#949e90', '#505b52'], oth: ['#9ba696', '#ae6e5f']
+    pdf: ['#d2634a', '#9b3125'], doc: ['#4a7cc0', '#2a4f8c'], xls: ['#58a275', '#2f6e4a'], ppt: ['#e79442', '#b85a1d'],
+    img: ['#45a2b0', '#26667a'], av: ['#8264b8', '#523a88'], txt: ['#fdf8ee', '#eadcc0'], zip: ['#7a8190', '#474e5c'], oth: ['#a08672', '#664f3f']
   };
   function kind(f) {
     var t = f.type || '', n = f.name.toLowerCase(), s = t + ' ' + n;
@@ -146,7 +146,7 @@
 
     /* ----- Grid (Semua / Terbaru / hasil cari) ----- */
     function folderCover(f) {
-      return '<button class="rd-cover k-fold p' + (hash(f.name) % 4) + '" style="--c1:#d3907e;--c2:#aa6b5c" data-act="cd" data-id="' + f.id + '" title="' + esc(pstr(f.id)) + '" aria-label="Buka rak ' + esc(f.name) + '"><i class="rd-art"></i><i class="rd-ext">RAK</i><b class="rd-name">' + esc(f.name) + '</b><span class="rd-fico">' + ic('folder', 1.5) + '</span></button>';
+      return '<button class="rd-cover k-fold p' + (hash(f.name) % 4) + '" style="--c1:#b07a45;--c2:#7a4a24" data-act="cd" data-id="' + f.id + '" title="' + esc(pstr(f.id)) + '" aria-label="Buka rak ' + esc(f.name) + '"><i class="rd-art"></i><i class="rd-ext">RAK</i><b class="rd-name">' + esc(f.name) + '</b><span class="rd-fico">' + ic('folder', 1.5) + '</span></button>';
     }
     function card(f, i) {
       var tg = tagList(f);

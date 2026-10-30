@@ -7,41 +7,41 @@
 :root{
   --tech:'Chakra Petch','Inter',system-ui,sans-serif;
   --pix:'Pixelify Sans','Chakra Petch',ui-monospace,monospace;
-  --neon-a:#8fc6d2;   /* aksen utama  */
-  --neon-b:#eeb8a7;   /* aksen kedua  */
-  --neon-c:#a3d2dc;
+  --neon-a:#4be8ff;   /* aksen utama  */
+  --neon-b:#ff4fd8;   /* aksen kedua  */
+  --neon-c:#9b7bff;
 }
 
 /* ---------- Palet gelap bersama (Angkasa + Pixel) ---------- */
 html[data-wall=angkasa],html[data-wall=pixel]{
-  --ink:#dbeef2;
-  --glass:rgba(56,94,103,0.78);
-  --glass2:rgba(56,94,103,0.8);
-  --glass-line:rgba(181,219,227,0.22);
-  --panel:rgba(54,91,100,0.97);
+  --ink:#e9eefc;
+  --glass:rgba(14,18,44,.78);
+  --glass2:rgba(14,18,44,.8);
+  --glass-line:rgba(160,185,255,.22);
+  --panel:rgba(12,16,38,.97);
   --scene-filter:none;
   color-scheme:dark;
 }
 html[data-wall=pixel]{
-  --neon-a:#d0d9c6; --neon-b:#f1bead; --neon-c:#b5dbe3;
+  --neon-a:#7cf08a; --neon-b:#ffa45c; --neon-c:#c9a0ff;
   --tech:var(--pix);
-  --glass:rgba(59,98,108,0.82); --glass2:rgba(59,98,108,0.84);
-  --glass-line:rgba(241,190,173,0.38); --panel:rgba(58,97,107,0.98);
+  --glass:rgba(28,16,56,.82); --glass2:rgba(28,16,56,.84);
+  --glass-line:rgba(255,164,92,.38); --panel:rgba(26,15,52,.98);
 }
-html[data-wall=angkasa] body{background:#232b25}
-html[data-wall=pixel] body{background:#3e6973}
-html[data-wall=angkasa] .bg{background:radial-gradient(120% 90% at 50% 115%,#416e79 0,#375c65 42%,#232b25 100%)}
-html[data-wall=pixel] .bg{background:#3e6973}
+html[data-wall=angkasa] body{background:#03040c}
+html[data-wall=pixel] body{background:#1b1446}
+html[data-wall=angkasa] .bg{background:radial-gradient(120% 90% at 50% 115%,#1a1655 0,#0a0c2b 42%,#03040c 100%)}
+html[data-wall=pixel] .bg{background:#1b1446}
 html[data-wall=angkasa] .stack,html[data-wall=pixel] .stack{filter:none}
 html[data-wall=pixel] .stack{display:none}
-html[data-wall=angkasa] .bg::after{background:radial-gradient(ellipse at 50% 45%,transparent 50%,rgba(35,42,36,0.5) 100%)}
+html[data-wall=angkasa] .bg::after{background:radial-gradient(ellipse at 50% 45%,transparent 50%,rgba(2,3,10,.5) 100%)}
 html[data-wall=pixel] .bg::after{background:none}
 
 /* kaca tanpa blur: blur di atas kanvas animasi adalah biaya terbesar */
 html[data-wall=angkasa] .nav,html[data-wall=angkasa] .info,html[data-wall=angkasa] .panel,
 html[data-wall=pixel] .nav,html[data-wall=pixel] .info,html[data-wall=pixel] .panel,
 html[data-wall=angkasa] .ac-ov,html[data-wall=pixel] .ac-ov{-webkit-backdrop-filter:none;backdrop-filter:none}
-html[data-wall=angkasa] .ac-ov,html[data-wall=pixel] .ac-ov{background:rgba(36,43,37,0.74)}
+html[data-wall=angkasa] .ac-ov,html[data-wall=pixel] .ac-ov{background:rgba(3,4,14,.74)}
 
 /* ---------- Kanvas & nebula ---------- */
 #nebula,#cosmos{position:absolute;display:none;pointer-events:none}
@@ -53,10 +53,10 @@ html[data-wall=angkasa] #nebula{display:block}
 #nebula{
   inset:-8%;
   background:
-    radial-gradient(38% 34% at 16% 28%,rgba(142,197,209,0.28),transparent 70%),
-    radial-gradient(34% 30% at 84% 20%,rgba(130,189,201,0.2),transparent 70%),
-    radial-gradient(44% 38% at 72% 88%,rgba(237,181,163,0.15),transparent 70%),
-    radial-gradient(60% 46% at 28% 104%,rgba(111,169,182,0.26),transparent 70%);
+    radial-gradient(38% 34% at 16% 28%,rgba(120,72,255,.28),transparent 70%),
+    radial-gradient(34% 30% at 84% 20%,rgba(40,165,255,.2),transparent 70%),
+    radial-gradient(44% 38% at 72% 88%,rgba(255,72,170,.15),transparent 70%),
+    radial-gradient(60% 46% at 28% 104%,rgba(36,96,210,.26),transparent 70%);
   animation:nebDrift 90s ease-in-out infinite alternate;will-change:transform;
 }
 @keyframes nebDrift{from{transform:translate3d(-2%,-1%,0)}to{transform:translate3d(2%,1.5%,0)}}
@@ -67,10 +67,10 @@ html[data-lite="1"] #nebula{animation:none}
   position:relative;margin:0;display:flex;align-items:center;justify-content:center;
   min-height:2.5em;max-width:min(92vw,980px);
   font-family:var(--tech);font-weight:600;line-height:1.18;letter-spacing:.015em;
-  font-size:clamp(28px,4.6vw,66px);color:#fffaf4;text-shadow:none}
+  font-size:clamp(28px,4.6vw,66px);color:#fff;text-shadow:none}
 .glitch{position:relative;display:block;text-align:center;text-wrap:balance;
-  text-shadow:0 0 18px rgba(162,209,220,0.5)}
-html[data-wall=pixel] .glitch{letter-spacing:.01em;text-shadow:3px 3px 0 #416f7a,0 0 0 #202721}
+  text-shadow:0 0 18px rgba(120,150,255,.5)}
+html[data-wall=pixel] .glitch{letter-spacing:.01em;text-shadow:3px 3px 0 #2a1458,0 0 0 #000}
 html[data-wall=pixel] .hero .greet{font-weight:600;font-size:clamp(26px,4.2vw,58px)}
 .glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;pointer-events:none;opacity:0;text-shadow:none}
 .glitch::before{color:var(--neon-a)}
@@ -92,29 +92,29 @@ html[data-wall=pixel] .hero .greet{font-weight:600;font-size:clamp(26px,4.2vw,58
   100%{clip-path:inset(76% 0 6% 0);transform:translate(2px,-1px)}
 }
 .greet::after{content:"";position:absolute;left:-4%;right:-4%;top:0;height:2px;pointer-events:none;opacity:0;
-  background:linear-gradient(90deg,transparent,var(--neon-a),#fffaf4,var(--neon-b),transparent)}
+  background:linear-gradient(90deg,transparent,var(--neon-a),#fff,var(--neon-b),transparent)}
 .greet.scan::after{animation:scan .7s cubic-bezier(.5,0,.2,1)}
 @keyframes scan{0%{transform:translateY(0);opacity:0}15%{opacity:.9}85%{opacity:.9}100%{transform:translateY(2.4em);opacity:0}}
 
 .greet-dots{display:flex;gap:7px;margin-top:14px}
-.greet-dots i{width:18px;height:2px;border-radius:2px;background:rgba(255,250,244,0.28);transition:background .3s,width .3s}
+.greet-dots i{width:18px;height:2px;border-radius:2px;background:rgba(255,255,255,.28);transition:background .3s,width .3s}
 .greet-dots i.on{width:34px;background:var(--neon-a)}
 html[data-wall=pixel] .greet-dots i{height:4px;border-radius:0}
 
-.hero .quote{text-shadow:0 1px 14px rgba(54,91,100,0.85)}
-html[data-wall=angkasa] .quote,html[data-wall=pixel] .quote{color:rgba(220,239,243,0.9)}
+.hero .quote{text-shadow:0 1px 14px rgba(10,14,40,.85)}
+html[data-wall=angkasa] .quote,html[data-wall=pixel] .quote{color:rgba(232,236,255,.9)}
 
 /* ---------- Nav, info, brand ---------- */
-html[data-wall=angkasa] .nav,html[data-wall=angkasa] .info{box-shadow:0 10px 36px rgba(34,41,35,0.45),inset 0 1px 0 rgba(196,227,233,0.12)}
+html[data-wall=angkasa] .nav,html[data-wall=angkasa] .info{box-shadow:0 10px 36px rgba(0,0,10,.45),inset 0 1px 0 rgba(190,205,255,.12)}
 html[data-wall=angkasa] .nav a:hover .ic{filter:drop-shadow(0 0 6px var(--neon-a))}
 html[data-wall=angkasa] .info b,html[data-wall=pixel] .info b{font-family:var(--tech);font-weight:500;letter-spacing:.04em}
 .brand{font-family:var(--tech);font-weight:500;letter-spacing:.06em}
 html[data-wall=angkasa] .foot-l,html[data-wall=pixel] .foot-l{font-family:var(--tech);letter-spacing:.14em}
 /* gaya pixel: sudut kotak, tepi tegas, bayangan berundak */
-html[data-wall=pixel] .nav,html[data-wall=pixel] .info{border:2px solid var(--glass-line);border-radius:6px;box-shadow:0 4px 0 rgba(51,86,94,0.7)}
+html[data-wall=pixel] .nav,html[data-wall=pixel] .info{border:2px solid var(--glass-line);border-radius:6px;box-shadow:0 4px 0 rgba(10,4,30,.7)}
 html[data-wall=pixel] .nav a:hover{transform:translateY(-3px)}
 html[data-wall=pixel] .nav a:hover span{color:var(--neon-a)}
-html[data-wall=pixel] .foot-l{color:#f8d5c7;text-shadow:2px 2px 0 #416f7a}
+html[data-wall=pixel] .foot-l{color:#ffd9b0;text-shadow:2px 2px 0 #2a1458}
 html[data-wall=pixel] .foot-l::before{height:3px;background:var(--neon-b)}
 
 /* ---------- Bounce ringan saat diklik (hanya transform) ---------- */
@@ -153,4 +153,4 @@ html[data-lite="1"] .glitch.on::before,html[data-lite="1"] .glitch.on::after{ani
 }
 
 /* keterbacaan kutipan di atas pemandangan pixel */
-html[data-wall=pixel] .hero .quote{color:#fffaf4;text-shadow:2px 2px 0 #416f7a,-1px -1px 0 #416f7a,1px -1px 0 #416f7a,-1px 1px 0 #416f7a}
+html[data-wall=pixel] .hero .quote{color:#fff;text-shadow:2px 2px 0 #2a1458,-1px -1px 0 #2a1458,1px -1px 0 #2a1458,-1px 1px 0 #2a1458}

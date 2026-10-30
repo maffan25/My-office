@@ -1,0 +1,17 @@
+/* MyOffice — penyempurnaan: warna per menu, ringan & mulus */
+/* Kaburan latar jendela memberatkan GPU: ganti dengan lapisan pekat yang lembut */
+.ac-ov,.wo-ov,.es-ov{-webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+.ac-ov:not(.ac-ov2){background:rgba(24,32,36,.55)}
+.ad-ov{background:rgba(28,32,56,.5)!important}
+.wo-ov{background:rgba(6,12,15,.78)!important}
+.es-ov{background:rgba(20,40,36,.5)!important}
+/* Transisi hanya pada properti murah, sentuhan halus */
+.ac-ov button,.ac-ov a{transition:background-color .25s ease,color .25s ease,box-shadow .3s ease,transform .3s cubic-bezier(.2,.7,.2,1),opacity .25s}
+.ac-ov button:active{transform:scale(.97)}
+:focus-visible{outline:2px solid currentColor;outline-offset:3px}
+::selection{background:rgba(120,160,150,.35)}
+.ac-ov *{scrollbar-width:thin;scrollbar-color:rgba(120,130,125,.4) transparent}
+/* Settings: biru-slate agar beda dari Calendar */
+.ac-ov:not(.ad-skin):not(.an-skin):not(.gq-skin):not(.rd-skin):not(.pj-skin):not(.tk-skin).st-skin{--fb-or:#5f8fb0;--fb-or2:#8db3cc;--fb-tint:#eaf2f7;--fb-bg:#f3f6f8;--ac:#5f8fb0!important}
+/* Tema Angkasa/Pixel: nav lebih jernih di layar kecil */
+@media (prefers-reduced-motion:reduce){*{animation-duration:.01ms!important;transition-duration:.01ms!important}}

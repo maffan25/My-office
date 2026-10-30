@@ -9,7 +9,7 @@
 
   var FS = ['Belum', 'Berjalan', 'Selesai'];
   var OD = ['Proposal', 'Notulen', 'Laporan pertanggungjawaban', 'Surat', 'Materi presentasi', 'Dokumen lainnya'];
-  var PALETTE = ['#cc8a78', '#6aa3b0', '#d3907e', '#707f6f', '#92c8d4', '#f4c5b5', '#5e96a2', '#e39f8c'];
+  var PALETTE = ['#e60012', '#00a0e9', '#f5a300', '#2db36f', '#8a5cf6', '#ff6fa5', '#14b8a6', '#ff7a1a'];
   var NAV = [['search', 'Cari'], ['orgs', 'Organisasi'], ['meet', 'Rapat'], ['bud', 'Anggaran'], ['docs', 'Dokumen']];
   var WT = [['meet', 'Rapat'], ['bud', 'Anggaran'], ['docs', 'Dokumen'], ['info', 'Info']];
 
@@ -18,7 +18,7 @@
 
   function oc(o, i) { return o.color || PALETTE[(i == null ? D.org.indexOf(o) : i) % PALETTE.length]; }
   function lum(h) { h = (h || '#888').replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); return (0.299 * parseInt(h.substr(0, 2), 16) + 0.587 * parseInt(h.substr(2, 2), 16) + 0.114 * parseInt(h.substr(4, 2), 16)) / 255; }
-  function ink(h) { return lum(h) > 0.7 ? '#674239' : '#fff'; }
+  function ink(h) { return lum(h) > 0.7 ? '#1a1405' : '#fff'; }
   function on(id) { var o = by(D.org, id); return o ? o.name : '—'; }
   function save() { app.save(); }
   function cnt(id, k) { return D[k].filter(function (x) { return x.orgId === id; }).length; }
@@ -42,7 +42,7 @@
       '<path d="M0 250Q150 170 300 230T600 210V340H0Z" class="s1"/><path d="M0 290Q200 230 380 280T600 260V340H0Z" class="s2"/>' +
       '<g class="s3" transform="translate(' + (v === 2 ? 120 : 330) + ' 120)"><rect x="0" y="40" width="120" height="110" rx="6"/><rect x="30" y="0" width="60" height="50" rx="5"/>' +
       '<g fill="#fff" opacity=".9"><rect x="14" y="58" width="16" height="16" rx="3"/><rect x="52" y="58" width="16" height="16" rx="3"/><rect x="90" y="58" width="16" height="16" rx="3"/><rect x="14" y="90" width="16" height="16" rx="3"/><rect x="90" y="90" width="16" height="16" rx="3"/><rect x="46" y="112" width="28" height="38" rx="3"/><rect x="42" y="14" width="14" height="14" rx="3"/><rect x="64" y="14" width="14" height="14" rx="3"/></g>' +
-      '<path d="M60 0V-30" stroke="#fff" stroke-width="4"/><path d="M60-30l30 9-30 9Z" fill="#edb6a4"/></g></svg>';
+      '<path d="M60 0V-30" stroke="#fff" stroke-width="4"/><path d="M60-30l30 9-30 9Z" fill="#ffd24a"/></g></svg>';
   }
   function art(o, i) { return o.img ? '<img class="es-img" src="' + esc(o.img) + '" alt="" draggable="false">' : scene(i); }
 

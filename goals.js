@@ -20,9 +20,9 @@
     var PF = D.pf[0]; if (!PF.claims) PF.claims = [];
     var LV = [0, ['🌱', 'Santai', 'Pelan tapi pasti', 5, 10], ['⭐', 'Stabil', 'Konsisten tiap hari', 10, 25], ['🚀', 'Intens', 'Progres nyata', 15, 40], ['🔥', 'Maksimal', 'Tantang batasmu', 30, 80]];
     var LB = ['Baru mulai', 'Mulai terasa', 'Separuh jalan', 'Hampir sampai', 'Tercapai!'];
-    var CAT = { 'Akademik': ['📚', '#86c0cc', '#a5d3dd'], 'Karier / Pekerjaan': ['💼', '#8fc6d2', '#add7e0'], 'Keuangan': ['💰', '#d18f7d', '#eeb7a6'], 'Spiritual': ['🕌', '#528894', '#83bdca'], 'Kesehatan': ['💪', '#ebb09e', '#f6cfc0'], 'Relasi & sosial': ['🤝', '#e8ab99', '#f4c8b8'], 'Pengembangan diri': ['🚀', '#79b5c2', '#a3d2dc'], 'Bisnis': ['📈', '#588f9b', '#92c8d4'], 'Lainnya': ['🎯', '#73aeba', '#a2d2dc'] };
+    var CAT = { 'Akademik': ['📚', '#3d7ff5', '#7fb2ff'], 'Karier / Pekerjaan': ['💼', '#7a5af0', '#a98fff'], 'Keuangan': ['💰', '#f2a900', '#ffd24d'], 'Spiritual': ['🕌', '#0f9f7a', '#55d3ae'], 'Kesehatan': ['💪', '#ee4f6a', '#ff98a8'], 'Relasi & sosial': ['🤝', '#ff8433', '#ffbd7a'], 'Pengembangan diri': ['🚀', '#1f9bf0', '#7ccffd'], 'Bisnis': ['📈', '#0db0b0', '#6fe3d6'], 'Lainnya': ['🎯', '#66769a', '#a9b5cf'] };
     var cat = function (g) { return CAT[g.cat] || CAT['Lainnya']; };
-    var CH = '<svg class="gq-chest" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v1H3z" fill="#c58372"/><rect x="3" y="11" width="18" height="9" rx="2" fill="#a16556"/><rect x="10" y="10" width="4" height="6" rx="1" fill="#ebb19f"/></svg>';
+    var CH = '<svg class="gq-chest" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 10a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4v1H3z" fill="#b8621f"/><rect x="3" y="11" width="18" height="9" rx="2" fill="#7a3d12"/><rect x="10" y="10" width="4" height="6" rx="1" fill="#ffcf3f"/></svg>';
     var dstr = function (d) { return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); };
     /* XP nyata: tugas 10, milestone 30, evaluasi 5, hadiah misi 20. Streak = hari beruntun yang punya aktivitas bertanggal. */
     function xpInfo() {
