@@ -8,7 +8,9 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%B8%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:wght@400;500&family=Inter:wght@300;400;500&family=Caveat:wght@400;500&family=Chakra+Petch:wght@400;500;600&family=Pixelify+Sans:wght@400;500;600&family=Sora:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@600;700;800&family=Chakra+Petch:wght@400;500;600&family=EB+Garamond:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@600;700;800&family=Chakra+Petch:wght@400;500;600&family=EB+Garamond:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap"></noscript>
+<meta name="theme-color" content="#0a0c2b">
 <style>
 :root{
   --ink:#1f2f4d;
@@ -16,7 +18,7 @@
   --glass-line:rgba(255,255,255,.55);
   --serif:'EB Garamond','Cormorant Garamond',Georgia,serif;
   --sans:'Inter',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
-  --hand:'Caveat','Segoe Script',cursive;
+  --hand:'Segoe Script',cursive;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
@@ -30,7 +32,7 @@ body{overflow-x:hidden;overflow-y:auto}
 .bg{position:fixed;inset:0;z-index:0;background:#5a80b4}
 .stack{position:absolute;inset:0;filter:var(--scene-filter,none);transition:filter .5s}
 .stack svg{position:absolute;left:0;right:0;bottom:0;width:100%;height:100%}
-.stack .photo{position:absolute;inset:0;background:url("assets/bg.jpg") center bottom/cover no-repeat}
+.stack .photo{position:absolute;inset:0;background:center bottom/cover no-repeat}
 .bg::after{content:"";position:absolute;inset:0;pointer-events:none;
   background:linear-gradient(180deg,rgba(40,60,100,.16) 0,transparent 22%,transparent 70%,rgba(30,25,45,.22) 100%)}
 /* Layar tinggi (HP/tablet portrait): tampilkan seluruh pemandangan, tanpa zoom */
@@ -38,6 +40,7 @@ body{overflow-x:hidden;overflow-y:auto}
   .stack svg{height:calc(100vw * 1024 / 1536);-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 20%);mask-image:linear-gradient(180deg,transparent 0,#000 20%)}
 }
 
+.sr-only{position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0}
 /* ---------- Layout ---------- */
 .app{position:relative;z-index:1;min-height:100dvh;display:flex;flex-direction:column}
 .top{display:flex;align-items:center;justify-content:space-between;padding:20px 32px 0;height:62px}
@@ -128,10 +131,8 @@ body{overflow-x:hidden;overflow-y:auto}
 <link rel="stylesheet" href="premium.css">
 <link rel="stylesheet" href="elite.css">
 <link rel="stylesheet" href="academic-art.css">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@600;700;800&family=Nunito:wght@500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="finance.css">
 <link rel="stylesheet" href="fibnk.css">
-<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="readowl.css">
 <link rel="stylesheet" href="work-arcade.css">
 <link rel="stylesheet" href="org-shop.css">
@@ -141,6 +142,7 @@ body{overflow-x:hidden;overflow-y:auto}
 <link rel="stylesheet" href="analytics.css">
 <link rel="stylesheet" href="refine.css">
 <link rel="stylesheet" href="worlds.css">
+<link rel="stylesheet" href="polish.css">
 </head>
 <body>
 
@@ -315,10 +317,10 @@ body{overflow-x:hidden;overflow-y:auto}
       MyOffice
     </a>
     <div class="tools">
-      <button aria-label="Cari"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-search"/></svg></button>
-      <button id="themeBtn" aria-label="Tema dan wallpaper" aria-expanded="false" aria-controls="panel"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-palette"/></svg></button>
-      <button aria-label="Notifikasi"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bell"/></svg><span class="dot"></span></button>
-      <button class="avatar" aria-label="Akun"><i></i><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 4.5 3.5 3.5 3.5-3.5"/></svg></button>
+      <button type="button" aria-label="Cari"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-search"/></svg></button>
+      <button type="button" id="themeBtn" aria-label="Tema dan wallpaper" aria-expanded="false" aria-controls="panel"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-palette"/></svg></button>
+      <button type="button" aria-label="Notifikasi"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bell"/></svg><span class="dot"></span></button>
+      <button type="button" class="avatar" aria-label="Akun"><i></i><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 4.5 3.5 3.5 3.5-3.5"/></svg></button>
     </div>
   </header>
 
@@ -429,7 +431,7 @@ body{overflow-x:hidden;overflow-y:auto}
   function setWall(v){
     if(v==='custom'&&!custom)v='scene';
     root.dataset.wall=v;
-    if(v==='scene'){scene.style.display='';photo.style.backgroundImage='url("assets/bg.jpg")'}
+    if(v==='scene'){scene.style.display='';photo.style.backgroundImage=''}
     else{scene.style.display='none';photo.style.backgroundImage=v==='custom'?'url("'+custom+'")':G[v]}
     press($('walls'),v);S.set('mo-wall',v);
   }
@@ -495,5 +497,6 @@ body{overflow-x:hidden;overflow-y:auto}
 <script src="settings.js"></script>
 <script src="premium.js"></script>
 <script src="worlds.js"></script>
+<script src="polish.js"></script>
 </body>
 </html>

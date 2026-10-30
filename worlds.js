@@ -70,7 +70,7 @@ function scan(){
 }
 function sched(){if(!pend){pend=1;requestAnimationFrame(scan)}}
 new MutationObserver(sched).observe(D.body,{childList:true});
-new MutationObserver(sched).observe(D.body,{attributes:true,attributeFilter:['hidden'],subtree:true});
+new MutationObserver(sched).observe(D.body,{attributes:true,attributeFilter:['hidden'],subtree:false,childList:false}); /* hanya anak langsung <body> (overlay); subtree:true memicu pemindaian penuh tiap elemen di dalam menu di-hide/show */
 addEventListener('hashchange',sched);
 sched();
 })();

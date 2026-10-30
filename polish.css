@@ -1,0 +1,235 @@
+/* =====================================================================
+   MyOffice — POLISH (dimuat paling akhir, setelah worlds.css)
+   Tujuan: simetri & presisi di HP/tablet/PC, tampilan beranda yang lebih
+   matang, jendela menu yang seragam, dan beban GPU/CPU yang lebih ringan.
+   Tidak mengubah logika data. Semua aturan di sini bisa dihapus tanpa
+   merusak fungsi (cukup hapus <link> polish.css dan <script> polish.js).
+   ===================================================================== */
+
+:root{
+  --r-win:28px;
+  --nav-w:86px;
+  --safe-t:env(safe-area-inset-top,0px);
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{text-rendering:optimizeLegibility;overscroll-behavior:none}
+button,[role=button],a{-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+
+/* =====================================================================
+   1. BERANDA
+   ===================================================================== */
+
+/* ---- Bar atas: target sentuh 40px, jarak rata ---- */
+.top{height:auto;min-height:64px;padding:max(18px,var(--safe-t)) 28px 0}
+.brand{font-size:18px;gap:10px}
+.tools{gap:4px}
+.tools button{width:40px;height:40px;padding:0;border-radius:12px;opacity:1;transition:background-color .2s}
+.tools button:hover{background:rgba(255,255,255,.12);transform:none}
+.tools .ic{width:20px;height:20px}
+.dot{top:8px;right:9px}
+.avatar{width:auto!important;padding:0 6px!important;gap:5px!important}
+.avatar i{width:28px;height:28px}
+
+/* ---- Dock menu: ikon-ikon berwarna sesuai identitas jendelanya ---- */
+.nav-wrap{padding:12px 16px 0}
+.nav{align-items:stretch;gap:2px;padding:10px 12px;border-radius:30px}
+.nav a{--c:#7c8cff;width:var(--nav-w);flex:none;padding:8px 2px 7px;gap:8px;border-radius:20px;
+  font-size:11px;line-height:14px;font-weight:500;letter-spacing:.005em;opacity:.94;
+  transition:background-color .2s,opacity .2s}
+.nav a:hover{transform:none;opacity:1;background:rgba(255,255,255,.07)}
+.nav a:active{background:rgba(255,255,255,.12)}
+.nav a span{display:flex;align-items:flex-start;justify-content:center;min-height:28px;text-wrap:balance}
+.nav a .ic{box-sizing:content-box;width:20px;height:20px;padding:11px;border-radius:16px;stroke-width:1.6;
+  color:color-mix(in srgb,var(--c) 38%,#fff);
+  background:color-mix(in srgb,var(--c) 20%,transparent);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 34%,transparent);
+  transition:background-color .2s,box-shadow .2s}
+.nav a:hover .ic{background:color-mix(in srgb,var(--c) 34%,transparent);filter:none}
+html[data-theme=pagi] .nav a .ic{color:color-mix(in srgb,var(--c) 88%,#000)}
+.nav a[href="#academic"]{--c:#5b7cff}
+.nav a[href="#work"]{--c:#14b8b6}
+.nav a[href="#organization"]{--c:#a855f7}
+.nav a[href="#project"]{--c:#f97316}
+.nav a[href="#task"]{--c:#3b82f6}
+.nav a[href="#calendar"]{--c:#ec4899}
+.nav a[href="#finance"]{--c:#10b981}
+.nav a[href="#goal"]{--c:#f43f5e}
+.nav a[href="#documents"]{--c:#d08a3c}
+.nav a[href="#analytics"]{--c:#06b6d4}
+.nav a[href="#settings"]{--c:#8b9bb4}
+.nav a:focus-visible{outline:2px solid #fff;outline-offset:-2px;border-radius:20px}
+
+/* ---- Hero ---- */
+.hero{padding:6px 20px 92px}
+.hero .quote{max-width:46ch;margin:20px auto 0;text-wrap:balance;font-size:clamp(14px,1.1vw,16px);line-height:1.65}
+.hero .quote br{display:none}
+.greet-dots{margin-top:16px}
+
+/* kartu tanggal & jam: dua sel setara, tidak pernah patah baris */
+.info{grid-template-columns:minmax(0,1.2fr) 1px minmax(0,1fr);width:min(540px,calc(100% - 8px));height:auto;min-height:78px;margin-top:28px}
+.info .cell{padding:14px 18px;justify-content:center;min-width:0}
+.info .cell>span{min-width:0}
+.info b,.info small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.info .sep{height:44px}
+
+/* ---- Footer: tengah di HP, kiri di PC ---- */
+.foot-l{bottom:max(26px,calc(var(--safe-b) + 16px))}
+
+/* ---- Panel tema: tidak melewati layar ---- */
+.panel{top:max(60px,calc(var(--safe-t) + 52px));max-height:calc(100dvh - 76px - var(--safe-t))}
+
+@media (max-width:1100px){
+  :root{--nav-w:74px}
+  .nav a{font-size:10.5px}
+}
+
+@media (max-width:820px){
+  .top{padding:max(14px,var(--safe-t)) 14px 0 18px;min-height:58px}
+  /* 11 menu: 4 + 4 + 3, baris terakhir di tengah (simetris) */
+  .nav-wrap{padding:10px 14px 0}
+  .nav{display:flex;flex-wrap:wrap;justify-content:center;gap:6px 0;width:100%;max-width:430px;padding:12px 6px;border-radius:26px}
+  .nav a{flex:0 0 25%;width:auto;min-width:0;padding:6px 2px}
+  .nav a .ic{padding:10px;border-radius:15px}
+  .hero{padding:4px 18px 84px}
+  .foot-l{left:0;right:0;justify-content:center}
+  .foot-l::before{display:none}
+}
+@media (max-width:480px){
+  .info{grid-template-columns:minmax(0,1fr) 1px auto;width:min(420px,100%);margin-top:24px}
+  .info .cell{padding:12px 14px;gap:10px}
+  .info b{font-size:13.5px}.info small{font-size:11.5px}
+}
+@media (max-width:380px){
+  .info .ic{display:none}
+  .nav a{font-size:10px}
+}
+/* layar pendek (HP landscape): kurangi ruang kosong */
+@media (max-height:560px){
+  .hero{padding-bottom:40px}
+  .info{margin-top:16px}
+  .foot-l{display:none}
+}
+
+/* =====================================================================
+   2. JENDELA MENU — ukuran, radius, dan jarak seragam
+   ===================================================================== */
+
+@media (min-width:900px){
+  html:root :is(
+    .ac-ov:not(.ac-ov2) .ac-win:not(.ac-form):not(.vw),
+    .ad-ov .ad-win, .wo-ov .wo-frame, .es-ov .es-frame, .fn-ov .fn-app
+  ){
+    width:min(1280px,calc(100vw - 48px))!important;
+    height:min(840px,calc(100dvh - 48px))!important;
+    max-width:none!important;max-height:none!important;
+    margin:auto!important;
+    border-radius:var(--r-win)!important;
+  }
+}
+@media (min-width:701px) and (max-width:899px){
+  html:root :is(
+    .ac-ov:not(.ac-ov2) .ac-win:not(.ac-form):not(.vw),
+    .ad-ov .ad-win, .wo-ov .wo-frame, .es-ov .es-frame
+  ){
+    width:calc(100vw - 32px)!important;
+    height:calc(100dvh - 32px)!important;
+    max-width:none!important;max-height:none!important;
+    margin:auto!important;
+    border-radius:var(--r-win)!important;
+  }
+}
+
+/* Header jendela: judul boleh 2 baris, tombol tutup tidak pernah terdorong */
+.ac-ov:not(.rd-skin) .ac-win:not(.ac-form):not(.vw)>header{align-items:center}
+.ac-ov:not(.rd-skin) .ac-win:not(.ac-form):not(.vw)>header>div{min-width:0;flex:1 1 auto}
+.ac-ov:not(.rd-skin) .ac-win:not(.ac-form):not(.vw)>header h2{overflow-wrap:anywhere;text-wrap:balance}
+.ac-ov:not(.rd-skin) .ac-win:not(.ac-form):not(.vw)>header p{
+  white-space:normal;max-width:none;overflow:hidden;text-overflow:clip;
+  display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;line-clamp:2}
+.ac-win .ac-x{flex:none}
+
+/* Tab: bisa digeser, ada petunjuk gradasi di tepi kanan, tidak ada scrollbar */
+.ac-win>.ac-tabs{scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.ac-win>.ac-tabs::-webkit-scrollbar{display:none}
+@media (max-width:899px){
+  .ac-win>.ac-tabs{scroll-padding-inline:16px;
+    -webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 30px),transparent);
+    mask-image:linear-gradient(90deg,#000 calc(100% - 30px),transparent);
+    padding-inline-end:36px}
+}
+
+/* Documents (rak buku): tombol tutup melayang di kanan atas, sisakan ruangnya */
+@media (max-width:700px){
+  html:root .ac-ov.rd-skin:not(.ad-skin) .rd-side{padding-right:58px}
+}
+
+/* Jendela form/lembar bawah: aman terhadap notch dan keyboard */
+@media (max-width:700px){
+  .ac-ov2 .ac-win{max-height:calc(100dvh - 24px - var(--safe-t))}
+  .ac-ov:not(.ac-ov2) .ac-win:not(.ac-form):not(.vw)>.ac-body{padding-inline:16px}
+}
+
+/* Kolom kartu: min-width:0 agar isi (angka panjang, nama panjang) tidak
+   mendorong lebar grid melewati jendela */
+.ac-body,.ac-card,.ac-grid>*,.ac-stats>*{min-width:0}
+.ac-card{overflow-wrap:anywhere}
+
+/* =====================================================================
+   3. PERFORMA
+   Latar bergerak + lapisan kaca memberatkan HP. Di layar sentuh, mode
+   hemat, atau saat pengguna meminta gerak berkurang: latar jendela jadi
+   statis (tetap berwarna, tanpa animasi terus-menerus).
+   ===================================================================== */
+html.touch .wx-amb :is(.wx-p,.wx-s,.wx-sh,.wx-sp,.wx-l,.wx-c,.wx-f,.wx-r,.wx-w,.wx-au,.wx-sheen,.wx-sun,.wx-spot),
+html[data-lite="1"] .wx-amb :is(.wx-p,.wx-s,.wx-sh,.wx-sp,.wx-l,.wx-c,.wx-f,.wx-r,.wx-w,.wx-au,.wx-sheen,.wx-sun,.wx-spot){display:none!important}
+html.touch .wx-amb .wx-b,
+html[data-lite="1"] .wx-amb .wx-b{animation:none!important;will-change:auto}
+
+/* Beranda: kaca buram + kanvas bergerak = mahal. Di sentuh/hemat pakai lapisan pekat. */
+html.touch .nav,html.touch .info,html.touch .panel,
+html[data-lite="1"] .nav,html[data-lite="1"] .info,html[data-lite="1"] .panel{-webkit-backdrop-filter:none;backdrop-filter:none}
+html.touch:not([data-theme=pagi]) .nav,html.touch:not([data-theme=pagi]) .info{background:rgba(16,22,52,.88)}
+
+/* Tab disembunyikan / jendela tertutup: hentikan semua animasi CSS */
+html.is-hidden *,html.is-hidden *::before,html.is-hidden *::after{animation-play-state:paused!important}
+
+/* =====================================================================
+   4. AKSESIBILITAS
+   ===================================================================== */
+:focus-visible{outline:2px solid color-mix(in srgb,currentColor 80%,transparent);outline-offset:3px;border-radius:10px}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .wx-amb :is(.wx-p,.wx-s,.wx-sh,.wx-sp,.wx-l,.wx-c,.wx-f,.wx-r,.wx-w,.wx-au,.wx-sheen,.wx-sun,.wx-spot){display:none!important}
+}
+
+/* Foto latar "Danau Senja" (opsional) — aktif hanya bila assets/bg.jpg ada */
+html[data-has-photo="1"][data-wall=scene] .stack .photo{background-image:url("assets/bg.jpg")}
+
+/* ---- Penyelarasan akhir beranda ---- */
+.hero .quote{color:rgba(236,240,255,.94);font-weight:400}
+html[data-theme=pagi] .hero .quote{color:#fff}
+@media (max-width:820px){
+  .hero{padding-inline:14px}
+  .info{width:100%;max-width:430px}
+}
+
+/* =====================================================================
+   5. PERBAIKAN PER MENU (hasil audit tata letak)
+   ===================================================================== */
+/* Organization: menu atas (Cari · Organisasi · Rapat · Anggaran · Dokumen)
+   meluap dan tertutup avatar di HP → jadi baris yang bisa digeser */
+.es-top{grid-template-columns:auto minmax(0,1fr) auto}
+.es-nav{min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain}
+.es-nav::-webkit-scrollbar{display:none}
+.es-nav>*{flex:none}
+@media (max-width:700px){
+  .es-nav{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 24px),transparent);padding-inline-end:24px}
+}
+/* Kartu "tambah" yang sendirian: penuh selebar kolom di HP, bukan separuh tersangkut di kiri */
+@media (max-width:700px){
+  .es-grid>.es-card.add:only-child,.ad-cg>.ad-add:only-child{grid-column:1/-1;width:100%;min-height:120px}
+}
+
+/* Analytics: keterangan angka utama boleh 2 baris, tidak terpotong "..." */
+.an-skin small{white-space:normal!important;overflow:visible!important;text-overflow:clip!important;display:block}
