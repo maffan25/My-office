@@ -14,6 +14,8 @@
 
   var tasks = K.App('Task', 'mo-task-v1', function () { return { task: [], sub: [], cats: ['Belajar', 'Kerja', 'Rapat', 'Administrasi', 'Kesehatan', 'Rumah', 'Lainnya'] }; }, function (app) {
     var D = app.D, st = app.st; if (!D.cats) D.cats = ['Lainnya'];
+    if (!D.dash || !D.dash.length) D.dash = [{ id: 'dash', emoji: '🥳', title: 'Halo', sub: 'Rencanakan hari ini dengan tenang', hint: 'Mulai dari tugas yang paling penting.', btn: 'Tambah tugas' }];
+    var DS = D.dash[0];
     var live = function (t) { return t.status !== 'Done' && t.status !== 'Archived'; };
     var pn = function (id) { var p = by(projects(), id); return p ? p.name : ''; };
     var specs = {
@@ -27,6 +29,7 @@
         { k: 'pin', l: 'Fokus hari ini (My Day)', t: 'select', bool: 1, o: [['false', 'Tidak'], ['true', 'Ya']] }, { k: 'doneAt', l: 'Tanggal selesai', t: 'date' },
         { k: 'goalRef', l: 'Terkait goal / milestone', t: 'select', full: 1, o: function () { return MO.goalOpts ? MO.goalOpts() : [['', '—']]; } },
         { k: 'notes', l: 'Catatan tambahan', t: 'textarea', full: 1 }] },
+      dash: { title: 'Sapaan Dashboard', def: {}, fields: [{ k: 'title', l: 'Sapaan', t: 'text', req: 1, full: 1 }, { k: 'emoji', l: 'Emoji', t: 'text', ph: '🥳' }, { k: 'btn', l: 'Teks tombol', t: 'text' }, { k: 'sub', l: 'Kalimat utama', t: 'text', full: 1 }, { k: 'hint', l: 'Kalimat pendukung', t: 'text', full: 1 }] },
       sub: { title: 'Subtugas', def: {}, fields: [{ k: 'title', l: 'Subtugas', t: 'text', req: 1, full: 1 }] }
     };
     function dueTag(t) {
@@ -115,6 +118,29 @@
       }
       return h + '</div><p class="ac-hint" style="margin-top:8px">Tugas ditampilkan pada tanggal tenggatnya.</p>';
     }
+    var AI = { Akademik: '🎓', Pekerjaan: '💼', Organisasi: '🏛️', Pribadi: '⭐' };
+    function dash() {
+      var T = todayS(), set = ls('mo-settings-v1'), nick = set.nick || '', act = D.task.filter(live), n = 0;
+      var td = sorted(base('myday')).slice(0, 5);
+      var pgm = st.pg || 'cat', kf = pgm === 'proj' ? function (t) { return t.projId ? pn(t.projId) || 'Proyek dihapus' : 'Tanpa proyek'; } : pgm === 'area' ? function (t) { return t.area || 'Tanpa area'; } : function (t) { return t.category || 'Tanpa kategori'; };
+      var M = {}, ks = []; D.task.filter(function (t) { return t.status !== 'Archived'; }).forEach(function (t) { var k = kf(t); if (!M[k]) { M[k] = [0, 0]; ks.push(k); } M[k][1]++; if (t.status === 'Done') M[k][0]++; });
+      ks.sort(function (a, b) { return M[b][1] - M[a][1]; });
+      var key = st.tm || T.slice(0, 7), y = +key.slice(0, 4), m = +key.slice(5), wk = (ls('mo-cal-v1').set || {}).wk; wk = wk == null ? 1 : +wk;
+      var first = new Date(y, m - 1, 1), lead = (first.getDay() - wk + 7) % 7, nd = new Date(y, m, 0).getDate(), nm = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'], i;
+      var cal = '<div class="tk-cal">'; for (i = 0; i < 7; i++) cal += '<span class="tk-wd">' + nm[(wk + i) % 7] + '</span>'; for (i = 0; i < lead; i++) cal += '<span></span>';
+      for (var d = 1; d <= nd; d++) { var ds = key + '-' + pad(d), c = act.filter(function (t) { return t.due === ds; }).length; cal += '<button class="tk-d' + (c ? ' on' : '') + (ds === T ? ' td' : '') + '" data-act="add" data-e="task" data-pre="' + esc(JSON.stringify({ due: ds })) + '" aria-label="Tambah tugas tanggal ' + d + (c ? ', ' + c + ' tugas' : '') + '">' + d + '</button>'; }
+      cal += '</div>';
+      var up = sorted(act.filter(function (t) { return t.due && t.due >= T && t.due <= addDays(T, 14); })).slice(0, 3);
+      var cf = [[78, 12, '#4a9fff'], [90, 28, '#ff5f8d'], [68, 58, '#ffd34d'], [92, 66, '#4a9fff'], [80, 84, '#ff5f8d'], [62, 20, '#ffd34d']].map(function (x) { return '<i style="left:' + x[0] + '%;top:' + x[1] + '%;background:' + x[2] + '"></i>'; }).join('');
+      var done = D.task.filter(function (t) { return t.status === 'Done'; }).length;
+      return '<div class="tk-grid"><section class="tk-hero"><div class="tk-conf">' + cf + '</div><span class="tk-em">' + esc(DS.emoji || '🥳') + '</span><div><button class="tk-pen" data-act="edit" data-e="dash" data-id="dash" aria-label="Ubah sapaan">✎ Ubah</button><h3>' + esc(DS.title) + (nick ? ', <u>' + esc(nick) + '</u>' : '') + '!</h3><p>' + esc(DS.sub || '') + '</p><small>' + esc(DS.hint || '') + '</small><div><button class="tk-cta" data-act="add" data-e="task">' + esc(DS.btn || 'Tambah tugas') + ' +</button></div></div></section>' +
+        '<section class="tk-card"><div class="tk-hd"><h4>Tugas hari ini</h4><button class="tk-va" data-act="tab" data-t="myday">Lihat semua</button></div>' + (td.length ? td.map(function (t) { return '<div class="tk-row"><input type="checkbox" data-act="tgd" data-id="' + t.id + '" aria-label="Selesai"><div><button class="t" data-act="edit" data-e="task" data-id="' + t.id + '">' + esc(t.title) + '</button><small>' + (t.due ? fd(t.due) + (t.dueTime ? ' · ' + t.dueTime : '') : 'Tanpa tenggat') + ' · ' + esc(t.priority) + '</small></div></div>'; }).join('') : '<p class="tk-none">Belum ada tugas untuk hari ini. Tekan tombol di atas untuk menambah.</p>') + '</section>' +
+        '<section class="tk-card"><div class="tk-hd"><h4>Progres tugas</h4><div class="tk-sw">' + [['cat', 'Kategori'], ['proj', 'Proyek'], ['area', 'Area']].map(function (o) { return '<button aria-pressed="' + (o[0] === pgm) + '" data-act="filt" data-f="pg" data-v="' + o[0] + '">' + o[1] + '</button>'; }).join('') + '</div></div>' +
+        (ks.length ? ks.slice(0, 7).map(function (k, j) { var v = M[k]; return '<div class="tk-pr"><span>' + esc(k) + (pgm === 'cat' && D.cats.indexOf(k) > -1 ? ' <button class="tk-mini" data-act="rencat" data-n="' + esc(k) + '" aria-label="Ubah nama kategori ' + esc(k) + '">✎</button>' : '') + '</span><em>' + v[0] + '/' + v[1] + '</em><div class="tk-bar c' + (j % 4) + '"><i style="width:' + v[0] / v[1] * 100 + '%"></i></div></div>'; }).join('') : '<p class="tk-none">Belum ada tugas.</p>') + (pgm === 'cat' ? '<button class="tk-va" data-act="addcat">+ Kategori</button>' : '') + '</section>' +
+        '<aside class="tk-side"><div class="tk-me"><span class="tk-av" style="' + (set.photo ? 'background-image:url(&quot;' + esc(set.photo) + '&quot;)' : '') + '"></span><div><b>' + esc(nick || 'Pengguna') + '</b><small>' + act.length + ' aktif · ' + done + ' selesai</small></div></div>' +
+        '<div class="tk-card"><div class="tk-nav"><button data-act="tnav" data-d="-1" aria-label="Bulan sebelumnya">‹</button><b>' + first.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' }) + '</b><button data-act="tnav" data-d="1" aria-label="Bulan berikutnya">›</button></div>' + cal + '<small class="tk-none">Tekan tanggal untuk menambah tugas.</small></div>' +
+        '<div class="tk-hd"><h4>Akan datang</h4><button class="tk-va" data-act="tab" data-t="upcoming">Lihat semua</button></div><small class="tk-none">' + fd(T) + '</small>' + (up.length ? up.map(function (t) { return '<button class="tk-ev" style="--c:' + PCOL[t.priority] + '" data-act="edit" data-e="task" data-id="' + t.id + '"><span><b>' + esc(t.title) + '</b><small>' + fd(t.due) + (t.dueTime ? ' · ' + t.dueTime : '') + '</small></span><i>' + (AI[t.area] || '⭐') + '</i></button>'; }).join('') : '<p class="tk-none">Tidak ada tugas 14 hari ke depan.</p>') + '</aside></div>';
+    }
     function view(id) {
       var L = sorted(base(id).filter(match)), md = st.md || 'Daftar', h = toolbar(L.length);
       if (id === 'done') L.sort(function (a, b) { return (b.doneAt || '').localeCompare(a.doneAt || ''); });
@@ -124,7 +150,7 @@
       return h + groups(id, L).map(function (g) { return (g[0] ? '<div class="ac-h">' + esc(g[0]) + ' · ' + g[1].length + '</div>' : '') + g[1].map(card).join(''); }).join('');
     }
     return {
-      specs: specs, tabs: TABS.map(function (t) { return [t[0], t[1], function () { return view(t[0]); }]; }),
+      skin: 'tk-skin', specs: specs, tabs: [['dash', 'Dashboard', dash]].concat(TABS.map(function (t) { return [t[0], t[1], function () { return view(t[0]); }]; })),
       sub: function () { var n = D.task.filter(function (t) { return live(t) && t.due && t.due < todayS(); }).length; return D.task.filter(live).length + ' tugas aktif' + (n ? ' · ' + n + ' terlambat' : ''); },
       cascade: { task: [['sub', 'taskId']] },
       saved: function (e, r, isNew) {
@@ -138,6 +164,7 @@
         if (a === 'mvp') { if (d.v) by(D.task, d.id).projId = d.v === '__none' ? '' : d.v; }
         if (a === 'mvs') { x = by(D.task, d.id); var i = Math.max(0, Math.min(4, ST.indexOf(x.status) + +d.d)); x.status = ST[i]; x.doneAt = ST[i] === 'Done' ? todayS() : ''; }
         if (a === 'tnav') { var k = (st.tm || todayS().slice(0, 7)).split('-'), dt = new Date(+k[0], +k[1] - 1 + +d.d, 1); st.tm = dt.getFullYear() + '-' + pad(dt.getMonth() + 1); }
+        if (a === 'rencat') { var nn = (prompt('Ubah nama kategori:', d.n) || '').trim(); if (nn && nn !== d.n && D.cats.indexOf(nn) < 0) { D.cats = D.cats.map(function (c) { return c === d.n ? nn : c; }); D.task.forEach(function (t) { if (t.category === d.n) t.category = nn; }); } }
         if (a === 'addcat') { var n = (prompt('Nama kategori baru:') || '').trim(); if (n && D.cats.indexOf(n) < 0) D.cats.push(n); }
       }
     };
