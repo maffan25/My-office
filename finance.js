@@ -312,7 +312,7 @@
     const w = t.closest('[data-img]'), fit = w.querySelector('[data-fit]').checked;
     toSquare(t.files[0], fit, url => { w.querySelector('input[type=hidden]').value = url; w.querySelector('.fn-imp').innerHTML = '<img src="' + url + '" alt="">'; t.value = ''; });
   });
-  R.addEventListener('input', e => { if (e.target.dataset.in === 'q') { st.q = e.target.value; const g = R.querySelector('#fng'); if (g) g.innerHTML = gridHTML(); } });
+  let fqt; R.addEventListener('input', e => { if (e.target.dataset.in === 'q') { st.q = e.target.value; clearTimeout(fqt); fqt = setTimeout(() => { const g = R.querySelector('#fng'); if (g) g.innerHTML = gridHTML(); }, 120); } });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !R.hidden) { if (!SH.hidden) closeSh(); else A.close(); } });
   const X = MO.fin = { D, st, views: {}, addM, mlab, pc, mon, empty, meter, txRow, ci, cic, ic, bal, sum, expBy, budFor, got, expCats, cn, an, total: () => D.acc.filter(a => a.active).reduce((a, x) => a + bal(x), 0) };
   function open() { R.hidden = false; document.body.style.overflow = 'hidden'; render(); R.querySelector('.fn-hb button:last-child').focus(); }

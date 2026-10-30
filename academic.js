@@ -191,7 +191,7 @@
     body = ov.querySelector('#acBody'); sideEl = ov.querySelector('#acSide'); subEl = ov.querySelector('#acSub'); hiEl = ov.querySelector('#acHi'); dotEl = ov.querySelector('#acDot');
     ov.addEventListener('click', onClick);
     ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
-    ov.addEventListener('input', function (e) { if (e.target.id === 'acQ') { q = e.target.value.trim(); renderBody(); } });
+    var qt; ov.addEventListener('input', function (e) { if (e.target.id === 'acQ') { q = e.target.value.trim(); clearTimeout(qt); qt = setTimeout(renderBody, 140); } });
     ov.addEventListener('change', function (e) { if (e.target.id === 'acRng') { rng = e.target.value; renderBody(); } });
     ov.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && e.target.getAttribute && e.target.getAttribute('role') === 'button') e.target.click();

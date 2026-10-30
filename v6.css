@@ -1,0 +1,181 @@
+/* =====================================================================
+   MyOffice — V6 (dimuat paling akhir, setelah polish.css)
+   1. PERFORMA   : buang blur layar-penuh, lapisan bintang digerakkan GPU,
+                   jeda animasi saat jendela menu terbuka
+   2. BUG TATA LETAK : tombol tutup Academic di HP, avatar, tombol Simpan,
+                   kartu hint Esc, grid kategori Finance, Documents, Organization
+   3. TAMPILAN   : dock, ringkasan hari ini, lonceng notifikasi, kartu kosong,
+                   scrollbar, fokus, transisi buka-tutup
+   Tidak menyentuh data. Hapus <link> v6.css + <script> v6.js untuk membatalkan.
+   ===================================================================== */
+
+/* =====================================================================
+   1. PERFORMA
+   ===================================================================== */
+
+/* 1a. Lapisan bintang statis (dibuat oleh cosmos.js) — murni transform/GPU */
+#starfx{position:absolute;inset:0;overflow:hidden;pointer-events:none;animation:sf-in .9s ease both}
+#starfx .sf-wrap{position:absolute;inset:-32px;overflow:hidden;will-change:transform}
+#starfx .sf{position:absolute;left:0;top:0;display:block;
+  width:calc(var(--W,100vw)*2 + 64px);height:calc(var(--H,100vh)*2 + 64px);
+  background-repeat:repeat;background-size:var(--W,100vw) var(--H,100vh);
+  will-change:transform;animation:sf-drift 600s linear infinite}
+#starfx .sf-mid{animation-duration:260s}
+@keyframes sf-drift{to{transform:translate3d(calc(var(--W,100vw)*-1),calc(var(--H,100vh)*-1),0)}}
+@keyframes sf-in{from{opacity:0}to{opacity:1}}
+html[data-lite="1"] #starfx .sf,html.touch #starfx .sf{animation:none}
+@media (prefers-reduced-motion:reduce){#starfx .sf{animation:none}}
+
+/* 1b. Saat jendela menu terbuka, latar beranda tidak perlu bergerak */
+html.win-open #starfx .sf,html.win-open #nebula,html.win-open .stack *,
+html.is-hidden #starfx .sf,html.is-hidden #nebula{animation-play-state:paused!important}
+
+/* 1c. Blur layar-penuh (backdrop-filter) di atas kanvas yang bergerak adalah
+   penyebab utama macet. Jendela sudah hampir buram, jadi blurnya tidak terlihat
+   — diganti lapisan gelap biasa yang jauh lebih murah. */
+html:root .ac-ov,html:root .ad-ov,html:root .wo-ov,html:root .es-ov,html:root .fn-ov,
+html:root .ac-ov2,html:root .wo-ov2,html:root .es-ov2,html:root .ac-soon,html:root .sp-ov,
+html:root .gq-cele,html:root .fn-sh,
+html:root .ac-ov .ac-win,html:root .ac-ov2 .ac-win,html:root .wo-arr{
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+html:root .ac-ov:not(.ac-ov2):not(.ad-ov),html:root .wo-ov,html:root .es-ov,html:root .fn-ov{
+  background-color:rgba(8,12,30,.62)}
+
+/* 1d. Isolasi tata letak: perubahan di dalam satu jendela tidak memicu
+   perhitungan ulang seluruh halaman */
+.ac-ov>.ac-win,.ad-ov>.ad-win,.wo-ov>.wo-frame,.es-ov>.es-frame,.fn-ov>.fn-app{contain:layout style}
+
+/* =====================================================================
+   2. BUG TATA LETAK
+   ===================================================================== */
+
+/* 2a. Avatar bar atas: panah turun di bawah foto (grid menimpa flex) */
+.tools .avatar{display:flex!important;flex-direction:row;align-items:center;justify-content:center;gap:4px!important;
+  width:auto!important;min-width:56px;padding:0 6px!important}
+.tools .avatar i{flex:none}
+.tools .avatar svg{width:12px;height:12px;flex:none;opacity:.85}
+
+/* 2b. Academic di HP: tombol Tutup ada di ujung strip tab yang bisa digeser,
+   di luar layar, sedangkan Tutup di header disembunyikan -> pengguna terjebak.
+   Sekarang tombol Tutup menempel di tepi kanan strip dan selalu terlihat. */
+@media (max-width:760px){
+  html:root .ad-ov .ad-menu{flex:none}
+  html:root .ad-ov .ad-closeNav{display:flex;position:sticky;right:0;z-index:3;margin-left:auto;flex:none;width:auto;
+    padding:9px 12px;border-radius:99px;background:var(--ad-card,#fff);color:var(--ad-ink,#23294d);
+    box-shadow:-16px 0 14px 2px var(--ad-bg,#fff),0 0 0 1px var(--ad-line,rgba(0,0,0,.08))}
+  html:root .ad-ov .ad-closeNav span{display:none!important}
+  html:root .ad-ov .ad-closeNav .ad-ic{opacity:1}
+}
+
+/* 2c. Settings: tombol "Simpan" patah jadi "Simp an" */
+.cfgrow .ac-btn,.cfgrow button{white-space:nowrap;flex:none}
+.cfgrow>div[style*="flex"]>input{flex:1 1 auto;min-width:0}
+
+/* 2d. Kartu hint "Esc untuk menutup": deklarasi background sebelumnya tidak valid
+   (warna di lapisan non-akhir), sehingga kartu hilang dan hanya garis putih yang melayang */
+html:root .ac-ov:not(.ad-skin) .ac-side-foot{
+  background:
+    radial-gradient(circle at 80% 58%,#79d36b 0 20px,transparent 21px) no-repeat,
+    radial-gradient(circle at 94% 92%,var(--fb-yel,#f7c948) 0 14px,transparent 15px) no-repeat,
+    linear-gradient(150deg,var(--fb-or2,#f0a08a),var(--fb-or,#e8806a))}
+html:root .ac-ov:not(.ad-skin) .ac-side-foot kbd{background:rgba(0,0,0,.24);color:#fff}
+html.touch .ac-side-foot{display:none!important}   /* HP tidak punya tombol Esc */
+
+/* 2e. Finance: kategori tidak rata di PC → grid yang mengisi lebar; di HP tetap geser */
+@media (min-width:701px){
+  .fn-cats{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:12px;overflow:visible;margin:18px 0 6px;padding:4px 0 8px}
+  .fn-cats button{width:auto}
+}
+@media (max-width:700px){
+  .fn-cats{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 28px),transparent)}
+}
+
+/* 2f. Documents di HP: tombol tutup melayang menimpa baris tab */
+@media (max-width:700px){
+  html:root .ac-ov.rd-skin:not(.ad-skin) .rd-top{margin-right:46px}
+  html:root .ac-ov.rd-skin:not(.ad-skin) .rd-tabs{overflow-x:auto;scrollbar-width:none;min-width:0}
+  html:root .ac-ov.rd-skin:not(.ad-skin) .rd-tabs::-webkit-scrollbar{display:none}
+}
+
+/* 2g. Organization di HP: bar atas terlalu sempit */
+@media (max-width:480px){
+  .es-top{gap:6px;padding-inline:12px}
+  .es-av{width:34px;height:34px}
+  .es-nav>button{padding:6px 13px;font-size:13px}
+}
+
+/* 2h. Baris judul seksi (mis. "Tugas Prioritas · Hari ini · Tambah") sejajar tengah */
+.ad-sh,.ad-secH,.ad-h2row{align-items:center}
+
+/* =====================================================================
+   3. TAMPILAN
+   ===================================================================== */
+
+/* 3a. Dock: ikon terangkat halus saat disorot, tekan memberi umpan balik */
+.nav a .ic{transition:transform .22s cubic-bezier(.2,.7,.2,1),background-color .2s,box-shadow .2s}
+.nav a:hover .ic{transform:translateY(-2px)}
+.nav a:active .ic{transform:scale(.94)}
+.nav a:hover .ic{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--c) 55%,transparent),0 8px 18px -10px color-mix(in srgb,var(--c) 80%,transparent)}
+
+/* 3b. Ringkasan hari ini (dibuat oleh v6.js) */
+.today{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;width:min(540px,calc(100% - 8px));margin:12px auto 0}
+.tchip{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:62px;padding:10px 8px;border-radius:18px;
+  text-decoration:none;color:var(--ink);text-align:center;
+  background:var(--glass2,rgba(14,18,44,.8));border:1px solid var(--glass-line,rgba(160,185,255,.22));
+  transition:transform .2s,border-color .2s,background-color .2s}
+.tchip:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--tc,#8ea2ff) 60%,transparent)}
+.tchip:active{transform:scale(.97)}
+.tchip b{font-size:20px;line-height:24px;font-weight:600;font-variant-numeric:tabular-nums;color:var(--tc,#8ea2ff)}
+.tchip span{font-size:11.5px;line-height:15px;opacity:.82}
+.tchip:nth-child(1){--tc:#7da0ff}.tchip:nth-child(2){--tc:#ff8fb8}.tchip:nth-child(3){--tc:#ff9d7a}
+html[data-theme=pagi] .tchip b{filter:brightness(.7) saturate(1.2)}
+html.touch .tchip{background:rgba(16,22,52,.88)}
+html.touch[data-theme=pagi] .tchip{background:rgba(255,255,255,.7)}
+@media (max-width:820px){.today{width:100%;max-width:430px;gap:8px}.tchip{min-height:58px;padding:9px 4px}.tchip span{font-size:11px}}
+@media (max-height:640px){.today{display:none}}
+
+/* 3c. Lonceng notifikasi (dibuat oleh v6.js) */
+.dot[hidden]{display:none}
+.notif{position:fixed;top:max(60px,calc(var(--safe-t,0px) + 52px));right:24px;z-index:12;width:340px;max-width:calc(100vw - 24px);
+  max-height:calc(100dvh - 90px);overflow:auto;padding:14px;border-radius:20px;background:var(--panel);color:var(--ink);
+  border:1px solid var(--glass-line);box-shadow:0 20px 60px rgba(20,30,60,.38);display:none;font-size:13px}
+.notif.open{display:block;animation:pop .18s ease-out}
+.notif h2{font-size:13px;font-weight:600;margin:0 0 10px;display:flex;justify-content:space-between;align-items:center}
+.notif h2 small{font-weight:400;opacity:.65;font-size:11.5px}
+.notif ul{list-style:none;display:grid;gap:6px}
+.notif li a{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px;padding:9px 10px;border-radius:12px;
+  text-decoration:none;color:inherit;background:rgba(127,140,170,.12)}
+.notif li a:hover{background:rgba(127,140,170,.22)}
+.notif .nk{width:30px;height:30px;border-radius:10px;display:grid;place-items:center;font-size:15px;background:rgba(127,140,170,.18)}
+.notif .nt{min-width:0}
+.notif .nt b{display:block;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.notif .nt small{display:block;opacity:.7;font-size:11.5px}
+.notif .nw{font-size:11px;font-weight:600;padding:3px 8px;border-radius:99px;background:rgba(255,107,107,.18);color:#ff8d8d;white-space:nowrap}
+.notif .nw.ok{background:rgba(120,200,160,.2);color:#7fd6a8}
+.notif .ne{padding:18px 8px;text-align:center;opacity:.75;line-height:1.55}
+html[data-theme=pagi] .notif .nw{color:#c0392b}html[data-theme=pagi] .notif .nw.ok{color:#1d8a5b}
+@media (max-width:820px){.notif{right:12px}}
+
+/* 3d. Kartu "tambah" (keadaan kosong): label di tengah, sorot saat disentuh */
+.es-card.add,.ad-add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center}
+.es-card.add,.ad-add,.ac-add{transition:transform .2s,border-color .2s,background-color .2s}
+.es-card.add:hover,.ad-add:hover{transform:translateY(-2px)}
+
+/* 3e. Scrollbar tipis & seragam di dalam jendela */
+.ac-ov,.ad-ov,.wo-ov,.es-ov,.fn-ov,.panel,.notif{scrollbar-width:thin;scrollbar-color:rgba(127,140,170,.45) transparent}
+.ac-ov ::-webkit-scrollbar,.ad-ov ::-webkit-scrollbar,.wo-ov ::-webkit-scrollbar,.es-ov ::-webkit-scrollbar,.fn-ov ::-webkit-scrollbar{width:8px;height:8px}
+.ac-ov ::-webkit-scrollbar-thumb,.ad-ov ::-webkit-scrollbar-thumb,.wo-ov ::-webkit-scrollbar-thumb,.es-ov ::-webkit-scrollbar-thumb,.fn-ov ::-webkit-scrollbar-thumb{background:rgba(127,140,170,.4);border-radius:8px;border:2px solid transparent;background-clip:padding-box}
+
+/* 3f. Teks yang panjang tidak mendorong tata letak (angka, nama, judul) */
+.ac-card,.ad-cc,.es-card,.fn-btn,.fn-lst>*{min-width:0;overflow-wrap:anywhere}
+
+/* 3g. Sentuhan: target minimal 40px untuk tombol ikon kecil di HP */
+@media (hover:none) and (pointer:coarse){
+  .ac-x,.ad-ib,.es-x,.wo-x{min-width:40px;min-height:40px}
+}
+
+/* 3h. Transisi buka jendela: singkat & hanya opacity/transform (compositor) */
+@keyframes v6-in{from{opacity:0;transform:translateY(10px) scale(.985)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:no-preference){
+  .wx-open>:first-child{animation:v6-in .28s cubic-bezier(.2,.7,.2,1) both}
+}

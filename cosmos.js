@@ -80,6 +80,7 @@
   var Stars = (function () {
     var W = 0, H = 0, far, mid, sprites = [], near = [], twink = [], meteors = [], flares = [];
     var ox = [0, 0], oy = [0, 0], px = 0, py = 0, tx = 0, ty = 0, nextMeteor = 0, tm = 0;
+    var fx = null, fxA = null, fxB = null;          // lapisan bintang statis digerakkan CSS (GPU), bukan JS per frame
     var COLORS = ['255,255,255', '255,255,255', '190,212,255', '160,190,255', '255,226,196'];
 
     function glow(c, r) {                         // sprite halo bintang, dibuat sekali
@@ -107,10 +108,34 @@
       for (i = 0; i < nn; i++) near.push({ x: Math.random() * W, y: Math.random() * H, s: sprites[(Math.random() * 5) | 0], z: rand(.5, 1.1), p: rand(0, TAU), f: rand(.6, 2), flare: Math.random() < .25 });
       for (i = 0; i < nt; i++) twink.push({ x: Math.random() * W, y: Math.random() * H, s: sprites[(Math.random() * 5) | 0], z: rand(.3, .55), p: rand(0, TAU), f: rand(.8, 2.4) });
     }
+    function wrap(cls) {
+      var w = document.createElement('div'), i = document.createElement('i');
+      w.className = 'sf-wrap'; i.className = 'sf ' + cls; w.appendChild(i);
+      return { w: w, s: i, u: '' };
+    }
+    function paint(o, canvas) {
+      if (!canvas.toBlob) { o.s.style.backgroundImage = 'url("' + canvas.toDataURL() + '")'; return; }
+      canvas.toBlob(function (b) {
+        if (!b) return;
+        var u = URL.createObjectURL(b), old = o.u; o.u = u;
+        o.s.style.backgroundImage = 'url("' + u + '")';
+        if (old) URL.revokeObjectURL(old);
+      });
+    }
+    function mount() {
+      if (!fx) {
+        fx = document.createElement('div'); fx.id = 'starfx'; fx.setAttribute('aria-hidden', 'true');
+        fxA = wrap('sf-far'); fxB = wrap('sf-mid'); fx.appendChild(fxA.w); fx.appendChild(fxB.w);
+        cv.parentNode.insertBefore(fx, cv);
+      }
+      fx.style.display = '';
+      fx.style.setProperty('--W', W + 'px'); fx.style.setProperty('--H', H + 'px');
+      paint(fxA, far); paint(fxB, mid);
+    }
     function size() {
       W = window.innerWidth; H = window.innerHeight; cv.width = W; cv.height = H;
       cv.style.cssText = 'left:0;top:0;width:100%;height:100%;transform:none';
-      build();
+      build(); mount();
     }
     function tile(o, x, y) {                       // geser + bungkus layer statis
       x = ((x % W) + W) % W; y = ((y % H) + H) % H;
@@ -130,8 +155,10 @@
       tm = now / 1000;
       ctx.clearRect(0, 0, W, H);
       ox[0] += 2.2 * dt; oy[0] -= .5 * dt; ox[1] += 5.5 * dt; oy[1] -= 1.2 * dt;
-      tile(far, ox[0] + px * 5, oy[0] + py * 3);
-      tile(mid, ox[1] + px * 13, oy[1] + py * 8);
+      if (fxA) {                                    // paralaks pointer: hanya transform (compositor), tanpa gambar ulang
+        fxA.w.style.transform = 'translate3d(' + (-px * 5).toFixed(1) + 'px,' + (-py * 3).toFixed(1) + 'px,0)';
+        fxB.w.style.transform = 'translate3d(' + (-px * 13).toFixed(1) + 'px,' + (-py * 8).toFixed(1) + 'px,0)';
+      }
       var i, s, a, x, y;
       for (i = 0; i < twink.length; i++) {
         s = twink[i]; a = .35 + .65 * Math.abs(Math.sin(tm * s.f + s.p));
@@ -169,7 +196,7 @@
     }
     return {
       start: function () { size(); meteors = []; nextMeteor = performance.now() + 1400; window.addEventListener('pointermove', onMove, { passive: true }); },
-      stop: function () { window.removeEventListener('pointermove', onMove); meteors = []; },
+      stop: function () { window.removeEventListener('pointermove', onMove); meteors = []; if (fx) fx.style.display = 'none'; },
       resize: size, frame: frame
     };
   })();
