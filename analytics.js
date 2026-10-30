@@ -1,7 +1,7 @@
 /* MyOffice — Analytics. Membaca data semua modul (hanya baca) dan menyusun grafik + analisis berbasis aturan. */
 (function () {
   'use strict';
-  var MO = window.MyOffice, K = MO.kit, esc = K.esc, rp = K.rp, stat = K.stat, empty = K.empty;
+  var MO = window.MyOffice, K = MO.kit, esc = K.esc, rp = K.rp, stat = K.stat, empty = K.empty, by = K.by, btns = K.btns, add = K.add, bar = K.bar;
   var ls = function (k) { try { return JSON.parse(localStorage.getItem(k)) || {}; } catch (e) { return {}; } };
   var sum = function (a, f) { return a.reduce(function (s, x) { return s + (+f(x) || 0); }, 0); };
   var n1 = function (n) { return String(Math.round(n * 10) / 10); };
@@ -22,10 +22,36 @@
     var mx = Math.max.apply(null, rows.map(function (r) { return r[1]; }).concat([0.0001]));
     return '<div class="ac-bars">' + rows.map(function (r) { return '<div class="ac-bar2"><span>' + esc(r[0]) + '</span><div class="ac-track"><i style="width:' + r[1] / mx * 100 + '%"></i></div><span>' + (f ? f(r[1]) : n1(r[1])) + '</span></div>'; }).join('') + '</div>';
   }
-  var H = function (t) { return '<div class="ac-h">' + t + '</div>'; };
+  var LBL = {};
+  var H = function (t) { return '<div class="ac-h">' + esc(LBL[t] || t) + '</div>'; };
+  var HK = ['Angka utama', 'Analisis otomatis', 'Catatan saya', 'IP per semester (batang oranye = target)', 'Nilai akhir mata kuliah aktif', 'Distribusi huruf mutu', 'Status tugas kuliah', 'Waktu belajar per mata kuliah (jam)', 'Arus kas 6 bulan (batang gelap = pemasukan, oranye = pengeluaran)', 'Pemasukan pribadi vs pendapatan pekerjaan (bulan ini)', 'Pengeluaran per kategori (bulan ini)', 'Saldo per akun aktif', 'Progres target tabungan (%)', 'Jam kerja tercatat per pekerjaan', 'Pendapatan pekerjaan menurut status (terpisah dari pemasukan pribadi)', 'Pekerjaan menurut status', 'Progres proyek (tugas/milestone selesai, %)', 'Tindak lanjut rapat organisasi', 'Tugas selesai per minggu (8 minggu terakhir)', 'Task menurut status', 'Tugas aktif per area', 'Goal berjalan menurut horizon'];
+  var wrap = function (h) { var p = h.split('<div class="ac-h">'); return p[0] + p.slice(1).map(function (x) { return '<section class="an-sec"><div class="ac-h">' + x + '</section>'; }).join(''); };
+  var ART = '<svg viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice" aria-hidden="true"><defs><radialGradient id="anG" cx=".5" cy=".38" r=".75"><stop offset="0" stop-color="#FFE98F"/><stop offset="1" stop-color="#FFB52E"/></radialGradient></defs><rect width="400" height="300" fill="url(#anG)"/><g fill="#FFF6C9" opacity=".75"><rect x="52" y="120" width="34" height="90" rx="17"/><rect x="96" y="90" width="34" height="120" rx="17"/><rect x="270" y="100" width="34" height="110" rx="17"/><rect x="314" y="70" width="34" height="140" rx="17"/></g><circle cx="200" cy="120" r="82" fill="#FFD23F"/><circle cx="168" cy="108" r="11" fill="#3b2a12"/><circle cx="232" cy="108" r="11" fill="#3b2a12"/><circle cx="171" cy="104" r="4" fill="#fff"/><circle cx="235" cy="104" r="4" fill="#fff"/><circle cx="140" cy="140" r="14" fill="#FF8F5A" opacity=".8"/><circle cx="260" cy="140" r="14" fill="#FF8F5A" opacity=".8"/><path d="M178 138q22 30 44 0z" fill="#3b2a12"/></svg>';
+  var seed = function () {
+    return {
+      cfg: { maxWeekHours: 45, ipTarget: 3, overdueMax: 3, spendRise: 20, budgetWarn: 80 }, title: 'Analytics', sub: 'Membaca data dari semua modul · hanya baca', lbl: {}, hid: {},
+      theme: { bg1: '#FFD65C', bg2: '#FFEBD2', a1: '#FFA95C', a2: '#FF7A2E', ink: '#3B2A12' },
+      hero: [{ id: 'h', title: 'Ringkasan Hidupmu', chips: 'Mingguan, Otomatis', meta: 'Akademik / Keuangan / Kerja / Tugas', desc: 'Angka dan analisis dari semua menu dirangkum di sini. Ubah teks, kartu, grafik, dan warnanya sesuai gayamu.', cta: 'Lihat analisis keuangan', ctaTab: 'fin', img: '' }],
+      card: [
+        { id: 'c1', icon: '🎓', title: 'IPK', src: 'ipk', val: '', color: '0', tab: 'acad', note: 'Dihitung dari formula nilai di Academic Management. Aktifkan formula agar angkanya muncul.' },
+        { id: 'c2', icon: '💰', title: 'Total saldo', src: 'saldo', val: '', color: '1', tab: 'fin', note: 'Jumlah saldo semua akun aktif di menu Financial.' },
+        { id: 'c3', icon: '🧾', title: 'Pengeluaran bulan ini', src: 'spend', val: '', color: '2', tab: 'fin', note: 'Total pengeluaran sejak tanggal 1 bulan ini.' },
+        { id: 'c4', icon: '✅', title: 'Tugas aktif', src: 'tasks', val: '', color: '3', tab: 'prod', note: 'Tugas di menu Task yang belum selesai atau diarsipkan.' },
+        { id: 'c5', icon: '📚', title: 'Mata kuliah aktif', src: 'courses', val: '', color: '4', tab: 'acad', note: 'Mata kuliah pada semester yang sedang aktif.' },
+        { id: 'c6', icon: '🎯', title: 'Goal berjalan', src: 'goals', val: '', color: '0', tab: '', note: 'Goal berstatus Berjalan di menu Goals.' }],
+      note: [], chart: []
+    };
+  };
+  var AUTOOPT = [['manual', 'Isi manual'], ['courses', 'Otomatis: mata kuliah aktif'], ['ipk', 'Otomatis: IPK'], ['tasks', 'Otomatis: tugas aktif'], ['saldo', 'Otomatis: total saldo'], ['spend', 'Otomatis: pengeluaran bulan ini'], ['goals', 'Otomatis: goal berjalan']];
+  var TABOPT = [['', 'Tidak ada'], ['ins', 'Ringkasan & Analisis'], ['acad', 'Akademik'], ['fin', 'Keuangan'], ['work', 'Kerja & Proyek'], ['prod', 'Produktivitas'], ['mine', 'Grafik Saya'], ['cfg', 'Pengaturan']];
+  var COL = [['0', 'Kuning'], ['1', 'Oranye muda'], ['2', 'Krem'], ['3', 'Peach'], ['4', 'Putih']];
+  var readImg = function (f, cb) { var r = new FileReader(); r.onload = function () { var im = new Image(); im.onload = function () { var k = Math.min(1, 900 / Math.max(im.width, im.height)), c = document.createElement('canvas'); c.width = Math.round(im.width * k); c.height = Math.round(im.height * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height); cb(c.toDataURL('image/jpeg', .85)); }; im.src = r.result; }; r.readAsDataURL(f); };
+  var parseRows = function (t) { var o = []; String(t || '').split('\n').forEach(function (l) { var i = l.lastIndexOf(':'); if (i < 0) return; var n = l.slice(i + 1).split(',').map(parseFloat); if (isNaN(n[0])) return; o.push({ l: l.slice(0, i).trim() || '—', a: n[0], b: isNaN(n[1]) ? null : n[1] }); }); return o; };
+  var score = function (I) { var g = 0, f = 0, n = 0; I.forEach(function (x) { if (x[1] === 'Belum cukup data') return; n++; if (x[0] === 'good') g++; else if (x[0] === 'info') f += .5; }); return n ? Math.round((g + f) / n * 100) / 10 : null; };
 
-  var an = K.App('Analytics', 'mo-an-v1', function () { return { cfg: { maxWeekHours: 45, ipTarget: 3, overdueMax: 3, spendRise: 20, budgetWarn: 80 } }; }, function (app) {
-    var D = app.D; D.cfg = Object.assign({ maxWeekHours: 45, ipTarget: 3, overdueMax: 3, spendRise: 20, budgetWarn: 80 }, D.cfg);
+  var an = K.App('Analytics', 'mo-an-v1', seed, function (app) {
+    var D = app.D, st = app.st, S0 = seed(); Object.keys(S0).forEach(function (k) { if (D[k] == null) D[k] = S0[k]; });
+    D.cfg = Object.assign({}, S0.cfg, D.cfg); D.theme = Object.assign({}, S0.theme, D.theme); LBL = D.lbl;
     var today = K.todayS;
 
     /* ---------- Akademik: memakai konfigurasi formula yang Anda simpan ---------- */
@@ -96,12 +122,47 @@
       if (!I.length) I.push(['info', 'Belum cukup data', 'Isi data di modul Academic, Work, Task, Financial, atau Goal. Analisis akan muncul otomatis.']);
       return I;
     }
+    function autoVals() {
+      var a = acad(), f = fin(), T = ls('mo-task-v1').task || [], ym = today().slice(0, 7), G = ls('mo-goal-v1').goal || [];
+      return {
+        courses: String(a.C.filter(function (c) { var s = (a.A.sem || []).filter(function (x) { return x.id === c.semId; })[0]; return s && s.active; }).length),
+        ipk: a.ok && a.ipk != null ? String(Math.round(a.ipk * 100) / 100) : '—',
+        tasks: String(T.filter(function (t) { return t.status !== 'Done' && t.status !== 'Archived'; }).length),
+        saldo: rp(f.total), spend: rp(f.m('Expense', ym)), goals: String(G.filter(function (g) { return g.status === 'Berjalan'; }).length)
+      };
+    }
+    function look() {
+      var T = D.theme, s = document.getElementById('an-theme'); if (!s) { s = document.createElement('style'); s.id = 'an-theme'; document.head.appendChild(s); }
+      s.textContent = 'html:root .ac-ov.an-skin:not(.ad-skin){--an-bg1:' + T.bg1 + ';--an-bg2:' + T.bg2 + ';--an-a1:' + T.a1 + ';--an-a2:' + T.a2 + ';--an-ink:' + T.ink + '}';
+      var h = document.querySelector('.ac-ov.an-skin:not(.ac-ov2) header h2'); if (h) h.textContent = D.title || 'Analytics';
+    }
+    var specs = {
+      hero: { title: 'Tampilan Ringkasan', def: {}, fields: [{ k: 'title', l: 'Judul', t: 'text', req: 1, full: 1 }, { k: 'chips', l: 'Label kecil (pisahkan dengan koma)', t: 'text', full: 1 }, { k: 'meta', l: 'Baris oranye', t: 'text', full: 1 }, { k: 'desc', l: 'Deskripsi', t: 'textarea', full: 1 }, { k: 'cta', l: 'Teks tombol besar', t: 'text', req: 1 }, { k: 'ctaTab', l: 'Tombol membuka tab', t: 'select', o: TABOPT.slice(1) }] },
+      card: { title: 'Kartu Angka', def: { src: 'manual', color: '0', icon: '⭐', tab: '' }, fields: [{ k: 'title', l: 'Judul kartu', t: 'text', req: 1 }, { k: 'icon', l: 'Ikon (emoji)', t: 'text' }, { k: 'src', l: 'Sumber angka', t: 'select', o: AUTOOPT }, { k: 'val', l: 'Angka manual (dipakai bila sumber = Isi manual)', t: 'text' }, { k: 'color', l: 'Warna kartu', t: 'select', o: COL }, { k: 'tab', l: 'Tombol ▶ membuka tab', t: 'select', o: TABOPT }, { k: 'note', l: 'Penjelasan', t: 'textarea', full: 1 }] },
+      note: { title: 'Catatan', def: { kind: 'info' }, fields: [{ k: 'title', l: 'Judul', t: 'text', req: 1, full: 1 }, { k: 'text', l: 'Isi catatan', t: 'textarea', full: 1 }, { k: 'kind', l: 'Jenis', t: 'select', o: [['good', 'Positif'], ['warn', 'Perhatian'], ['info', 'Info']] }] },
+      chart: { title: 'Grafik', def: { kind: 'hb', unit: '' }, fields: [{ k: 'title', l: 'Judul grafik', t: 'text', req: 1, full: 1 }, { k: 'kind', l: 'Bentuk', t: 'select', o: [['hb', 'Batang mendatar'], ['vb', 'Kolom tegak']] }, { k: 'unit', l: 'Satuan (jam, %, Rp, ...)', t: 'text' }, { k: 'data', l: 'Data: satu baris "Label: nilai" (kolom tegak boleh "Label: nilai, nilai2")', t: 'textarea', full: 1 }] }
+    };
     var vIns = function () {
-      var a = acad(), f = fin(), T = ls('mo-task-v1').task || [], td = today(), ym = td.slice(0, 7), G = (ls('mo-goal-v1').goal || []);
-      var act = a.C.filter(function (c) { var s = (a.A.sem || []).filter(function (x) { return x.id === c.semId; })[0]; return s && s.active; }).length;
-      return '<p class="ac-hint" style="margin-bottom:12px">Analisis memakai aturan sederhana dengan ambang yang bisa Anda ubah di tab Ambang Analisis. Ini bantuan membaca data, bukan saran profesional.</p><div class="ac-grid">' +
-        stat(act, 'Mata kuliah aktif') + stat(a.ok && a.ipk != null ? (Math.round(a.ipk * 100) / 100) : '—', 'IPK (sesuai formula)') + stat(T.filter(function (t) { return t.status !== 'Done' && t.status !== 'Archived'; }).length, 'Tugas aktif (Task)') + stat(rp(f.total), 'Total saldo') + stat(rp(f.m('Expense', ym)), 'Pengeluaran bulan ini') + stat(G.filter(function (g) { return g.status === 'Berjalan'; }).length, 'Goal berjalan') + '</div>' +
-        insights().map(function (i) { return '<div class="ins ' + i[0] + '"><b>' + esc(i[1]) + '</b>' + esc(i[2]) + '</div>'; }).join('');
+      var q = (st.q || '').toLowerCase(), AV = autoVals(), h0 = D.hero[0] || {}, all = insights(), I = all.filter(function (i) { return !D.hid[i[1]]; }), nh = all.length - I.length;
+      var hit = function (x) { return !q || String(x).toLowerCase().indexOf(q) >= 0; };
+      var cv = function (c) { return c.src && c.src !== 'manual' && AV[c.src] != null ? AV[c.src] : (c.val || '—'); };
+      var cards = D.card.filter(function (c) { return hit(c.title + ' ' + c.note); }), sel = by(cards, st.sel) || cards[0], sc = score(all), fs = sc == null ? 0 : Math.round(sc / 2);
+      var chips = String(h0.chips || '').split(',').map(function (x) { return x.trim(); }).filter(Boolean).map(function (x) { return '<span class="an-chip">' + esc(x) + '</span>'; }).join('');
+      var thumbs = D.card.slice(0, 3).map(function (c) { return '<i class="an-th c' + esc(c.color) + '">' + esc(c.icon) + '</i>'; }).join('') + (D.card.length > 3 ? '<i class="an-th more">+' + (D.card.length - 3) + '</i>' : '');
+      var hero = '<div class="an-hero"><div class="an-img"' + (h0.img ? ' style="background-image:url(' + h0.img + ')"' : '') + '>' + (h0.img ? '' : ART) +
+        '<label class="an-up" title="Ganti foto sampul">📷<input type="file" accept="image/*" data-chg="img" hidden></label>' + (h0.img ? '<button class="an-up r" data-act="imgdel" title="Pakai gambar bawaan" aria-label="Pakai gambar bawaan">✕</button>' : '') + '</div>' +
+        '<div class="an-sh"><button class="an-play" data-act="tab" data-t="' + esc(h0.ctaTab || 'fin') + '" aria-label="Buka">▶</button><h3>' + esc(h0.title) + '</h3><div>' + chips + '</div><p class="an-meta">' + esc(h0.meta) + '</p><p class="an-desc">' + esc(h0.desc) + '</p>' +
+        '<div class="an-thumbs">' + thumbs + '</div><button class="an-cta" data-act="tab" data-t="' + esc(h0.ctaTab || 'fin') + '">' + esc(h0.cta) + '</button><button class="an-edit" data-act="edit" data-e="hero" data-id="h">✎ Edit teks &amp; tombol</button></div></div>';
+      var car = cards.length ? cards.map(function (c) { return '<button class="an-poster c' + esc(c.color) + (c === sel ? ' on' : '') + '" data-act="sel" data-id="' + c.id + '"><span class="e">' + esc(c.icon) + '</span><b>' + esc(cv(c)) + '</b><small>' + esc(c.title) + '</small></button>'; }).join('') : '<p class="ac-hint">' + (D.card.length ? 'Tidak ada kartu yang cocok.' : 'Belum ada kartu.') + '</p>';
+      var feat = '<div class="an-feat">' + (sel ? '<div class="an-fart c' + esc(sel.color) + '"><span>' + esc(sel.icon) + '</span>' + (sel.tab ? '<button class="an-play" data-act="tab" data-t="' + esc(sel.tab) + '" aria-label="Buka detail">▶</button>' : '') + '</div><h4>' + esc(sel.title) + ' · ' + esc(cv(sel)) + '</h4>' +
+        '<div class="an-rate"><span class="stars" aria-hidden="true">' + '★'.repeat(fs) + '☆'.repeat(5 - fs) + '</span><em>' + (sc == null ? '—' : sc) + '</em><small>Skor kondisi</small></div><p>' + esc(sel.note) + '</p><div class="ac-acts">' + btns('card', sel.id) + '</div>' : '') +
+        '<div class="ac-acts" style="margin-top:10px">' + add('card', 'Kartu angka') + '</div></div>';
+      var right = '<div class="an-right"><div class="an-search"><span aria-hidden="true">🔍</span><input type="search" data-in="q" value="' + esc(st.q || '') + '" placeholder="Cari angka, analisis, atau catatan" aria-label="Cari"></div>' + H('Angka utama') + '<div class="an-car">' + car + '</div>' + feat + '</div>';
+      var ins = I.filter(function (i) { return hit(i[1] + ' ' + i[2]); }).map(function (i) { return '<div class="ins ' + i[0] + '"><b>' + esc(i[1]) + '</b>' + esc(i[2]) + '<button class="an-x" data-act="hid" data-k="' + esc(i[1]) + '">Sembunyikan</button></div>'; }).join('');
+      var notes = D.note.filter(function (n) { return hit(n.title + ' ' + n.text); }).map(function (n) { return '<div class="ins ' + esc(n.kind) + ' mine"><b>' + esc(n.title) + '</b>' + esc(n.text) + '<div class="ac-acts" style="margin-top:8px">' + btns('note', n.id) + '</div></div>'; }).join('');
+      var sheet = '<div class="an-sheet"><i class="an-grab"></i>' + H('Analisis otomatis') + '<p class="ac-hint" style="margin-bottom:12px">Analisis memakai aturan sederhana dengan ambang yang bisa Anda ubah di tab Pengaturan. Ini bantuan membaca data, bukan saran profesional.</p>' + (ins || '<p class="ac-hint">Tidak ada analisis yang cocok.</p>') +
+        (nh ? '<button class="an-x" data-act="unhid">Tampilkan ' + nh + ' analisis yang disembunyikan</button>' : '') + H('Catatan saya') + notes + '<div class="ac-acts">' + add('note', 'Catatan') + '</div></div>';
+      return '<div class="an-top">' + hero + right + '</div>' + sheet;
     };
     var vAcad = function () {
       var a = acad(), S = a.A.sem || [];
@@ -117,7 +178,7 @@
       h += H('Status tugas kuliah') + hb(Object.keys(st).map(function (k) { return [k, st[k]]; }), String);
       var sd = {}; (a.A.study || []).forEach(function (s) { var c = a.C.filter(function (x) { return x.id === s.courseId; })[0]; if (c) sd[c.name] = (sd[c.name] || 0) + (+s.minutes || 0); });
       h += H('Waktu belajar per mata kuliah (jam)') + hb(Object.keys(sd).map(function (k) { return [k, sd[k] / 60]; }), n1);
-      return h;
+      return wrap(h);
     };
     var vFin = function () {
       var f = fin(), ym = today().slice(0, 7);
@@ -131,7 +192,7 @@
       h += H('Saldo per akun aktif') + hb(f.acc.map(function (x) { return [x.name, Math.max(0, f.bal(x))]; }), rp);
       var gs = (f.F.goal || []).filter(function (g) { return g.status === 'Aktif'; });
       h += H('Progres target tabungan (%)') + hb(gs.map(function (g) { var c = sum((f.F.con || []).filter(function (x) { return x.goalId === g.id; }), function (x) { return x.amount; }); return [g.name, Math.min(100, c / (+g.target || 1) * 100)]; }), function (v) { return Math.round(v) + '%'; });
-      return h;
+      return wrap(h);
     };
     var vWork = function () {
       var W = ls('mo-work-v1'), P = ls('mo-proj-v1'), O = ls('mo-org-v1');
@@ -144,7 +205,7 @@
       h += H('Pekerjaan menurut status') + hb(Object.keys(st).map(function (k) { return [k, st[k]]; }), String);
       h += H('Progres proyek (tugas/milestone selesai, %)') + hb((P.proj || []).map(function (p) { var ms = p.basis === 'ms', a = ms ? (P.ms || []).filter(function (x) { return x.projId === p.id; }) : (P.ptask || []).filter(function (x) { return x.projId === p.id; }); return [p.name, a.length ? a.filter(function (x) { return ms ? x.done : x.status === 'Selesai'; }).length / a.length * 100 : 0]; }), function (v) { return Math.round(v) + '%'; });
       var fu = O.followup || []; h += H('Tindak lanjut rapat organisasi') + hb(['Belum', 'Berjalan', 'Selesai'].map(function (s) { return [s, fu.filter(function (x) { return x.status === s; }).length]; }), String);
-      return h;
+      return wrap(h);
     };
     var vProd = function () {
       var T = (ls('mo-task-v1').task || []), td = today(), ws = [], i;
@@ -158,16 +219,43 @@
       h += H('Goal berjalan menurut horizon') + hb(['Harian', 'Mingguan', 'Bulanan', 'Semesteran', 'Tahunan', 'Jangka panjang'].map(function (z) { return [z, gs.filter(function (g) { return g.horizon === z; }).length]; }).filter(function (r) { return r[1] > 0; }), String);
       var E = (ls('mo-cal-v1').ev || []).filter(function (e) { return !e.allDay && e.start >= addD(td, -6) && e.start <= td && e.endTime; });
       var hrs = sum(E, function (e) { var s = e.startTime.split(':'), t = e.endTime.split(':'); return ((+t[0] * 60 + +t[1]) - (+s[0] * 60 + +s[1])) / 60; });
-      return h + '<p class="ac-hint" style="margin-top:12px">Jam acara terjadwal 7 hari terakhir (yang punya jam selesai): <b>' + n1(hrs) + ' jam</b>.</p>';
+      return wrap(h) + '<p class="ac-hint" style="margin-top:12px">Jam acara terjadwal 7 hari terakhir (yang punya jam selesai): <b>' + n1(hrs) + ' jam</b>.</p>';
+    };
+    var vMine = function () {
+      var h = bar('Buat grafik sendiri dari data yang Anda ketik. Satu baris = satu batang, formatnya “Label: nilai”.', add('chart', 'Grafik'));
+      if (!D.chart.length) return h + empty('Belum ada grafik. Tekan “+ Grafik” untuk membuat yang pertama.');
+      return h + D.chart.map(function (c) {
+        var r = parseRows(c.data), f = c.unit === 'Rp' ? rp : function (v) { return n1(v) + (c.unit ? ' ' + c.unit : ''); }, two = r.some(function (x) { return x.b != null; });
+        var g = !r.length ? '<p class="ac-hint">Data belum valid. Tulis satu baris per batang, contoh “Senin: 5”.</p>' : c.kind === 'vb' ? vb(r.map(function (x) { return x.l; }), r.map(function (x) { return x.a; }), two ? r.map(function (x) { return x.b || 0; }) : null, f) : hb(r.map(function (x) { return [x.l, x.a]; }), f);
+        return '<section class="an-sec"><div class="ac-row"><div class="ac-h">' + esc(c.title) + '</div>' + btns('chart', c.id) + '</div>' + g + '</section>';
+      }).join('');
     };
     var vCfg = function () {
+      var T = D.theme, cols = [['bg1', 'Warna latar atas'], ['bg2', 'Warna latar bawah'], ['a1', 'Tombol: warna awal'], ['a2', 'Tombol & aksen: warna akhir'], ['ink', 'Warna teks']];
       var rows = [['maxWeekHours', 'Ambang jam kerja + belajar per minggu', 'jam'], ['ipTarget', 'Target IPK untuk analisis', 'skala 4'], ['overdueMax', 'Batas tugas terlambat sebelum diberi peringatan', 'tugas'], ['spendRise', 'Kenaikan pengeluaran yang dianggap tinggi', '%'], ['budgetWarn', 'Peringatan anggaran mulai dari', '%']];
-      return '<p class="ac-hint" style="margin-bottom:12px">Ambang ini milik Anda; analisis tidak memakai angka tersembunyi.</p><div class="ac-card">' + rows.map(function (r) { return '<div class="cfgrow"><label>' + r[1] + '</label><div><input type="number" step="any" min="0" value="' + D.cfg[r[0]] + '" data-chg="cfg" data-k="' + r[0] + '" style="max-width:140px"> <small>' + r[2] + '</small></div></div>'; }).join('') + '</div>';
+      var tx = function (l, k, v) { return '<div class="cfgrow w"><label>' + l + '</label><input type="text" value="' + esc(v) + '" data-chg="txt" data-k="' + k + '"></div>'; };
+      return '<section class="an-sec"><div class="ac-h">Warna tema</div>' + cols.map(function (c) { return '<div class="cfgrow"><label>' + c[1] + '</label><input type="color" value="' + esc(T[c[0]]) + '" data-chg="theme" data-k="' + c[0] + '"></div>'; }).join('') + '<div class="ac-acts" style="margin-top:10px"><button class="ac-btn sm" data-act="themereset">Kembalikan warna bawaan</button></div></section>' +
+        '<section class="an-sec"><div class="ac-h">Judul jendela</div>' + tx('Judul', 'title', D.title) + tx('Keterangan di bawah judul', 'sub', D.sub) + '</section>' +
+        '<section class="an-sec"><div class="ac-h">Nama judul grafik &amp; bagian</div><p class="ac-hint" style="margin-bottom:8px">Ubah teks, kosongkan kolom untuk memakai nama bawaan.</p>' + HK.map(function (k) { return '<div class="cfgrow w"><label>' + esc(k) + '</label><input type="text" value="' + esc(LBL[k] || '') + '" placeholder="' + esc(k) + '" data-chg="lbl" data-k="' + esc(k) + '"></div>'; }).join('') + '</section>' +
+        '<section class="an-sec"><div class="ac-h">Ambang analisis</div><p class="ac-hint" style="margin-bottom:8px">Ambang ini milik Anda; analisis tidak memakai angka tersembunyi.</p>' + rows.map(function (r) { return '<div class="cfgrow"><label>' + r[1] + '</label><div><input type="number" step="any" min="0" value="' + D.cfg[r[0]] + '" data-chg="cfg" data-k="' + r[0] + '" style="max-width:120px"> <small>' + r[2] + '</small></div></div>'; }).join('') + '</section>' +
+        '<div class="ac-acts"><button class="ac-btn danger" data-act="resetall">Kembalikan tampilan Ringkasan ke bawaan</button></div>';
     };
     return {
-      specs: {}, tabs: [['ins', 'Ringkasan & Analisis', vIns], ['acad', 'Akademik', vAcad], ['fin', 'Keuangan', vFin], ['work', 'Kerja & Proyek', vWork], ['prod', 'Produktivitas', vProd], ['cfg', 'Ambang Analisis', vCfg]],
-      sub: function () { return 'Membaca data dari semua modul · hanya baca'; },
-      act: function (a, d) { if (a === 'cfg') { var v = parseFloat(d.v); if (!isNaN(v) && v >= 0) D.cfg[d.k] = v; } }
+      skin: 'an-skin', specs: specs, tabs: [['ins', 'Ringkasan & Analisis', vIns], ['acad', 'Akademik', vAcad], ['fin', 'Keuangan', vFin], ['work', 'Kerja & Proyek', vWork], ['prod', 'Produktivitas', vProd], ['mine', 'Grafik Saya', vMine], ['cfg', 'Pengaturan', vCfg]],
+      sub: function () { look(); return D.sub; },
+      act: function (a, d, t) {
+        if (a === 'cfg') { var v = parseFloat(d.v); if (!isNaN(v) && v >= 0) D.cfg[d.k] = v; }
+        else if (a === 'sel') st.sel = d.id;
+        else if (a === 'hid') D.hid[d.k] = 1;
+        else if (a === 'unhid') D.hid = {};
+        else if (a === 'img') { var f = t && t.files && t.files[0]; if (f) readImg(f, function (u) { D.hero[0].img = u; app.save(); app.render(); }); }
+        else if (a === 'imgdel') D.hero[0].img = '';
+        else if (a === 'theme') { if (/^#[0-9a-f]{6}$/i.test(d.v)) D.theme[d.k] = d.v; }
+        else if (a === 'themereset') D.theme = seed().theme;
+        else if (a === 'lbl') { var x = String(d.v).trim(); if (x) LBL[d.k] = x; else delete LBL[d.k]; }
+        else if (a === 'txt') { D[d.k] = String(d.v).trim() || seed()[d.k]; }
+        else if (a === 'resetall') { if (confirm('Kembalikan hero, kartu angka, warna, dan nama bagian ke bawaan? Catatan dan grafik Anda tidak dihapus.')) { var S = seed(); ['hero', 'card', 'theme', 'hid'].forEach(function (k) { D[k] = S[k]; }); Object.keys(LBL).forEach(function (k) { delete LBL[k]; }); D.title = S.title; D.sub = S.sub; } }
+      }
     };
   });
   MO.routes['#analytics'] = an.open;
