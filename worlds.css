@@ -1,0 +1,74 @@
+/* MyOffice — WORLDS: tiap menu punya suasana, cahaya, dan gerak sendiri */
+:root{--wx-ease:cubic-bezier(.16,1,.3,1)}
+.wx-live>:first-child{isolation:isolate}
+.wx-amb{position:absolute;inset:0;z-index:-1;overflow:hidden;pointer-events:none;border-radius:inherit;contain:strict}
+.wx-b{position:absolute;border-radius:50%;left:var(--x);top:var(--y);width:var(--s);height:var(--s);margin:calc(var(--s)/-2) 0 0 calc(var(--s)/-2);background:radial-gradient(circle,var(--c) 0,transparent 66%);opacity:var(--o);animation:wx-float var(--t) ease-in-out infinite alternate;will-change:transform}
+@keyframes wx-float{from{transform:translate3d(0,0,0) scale(1)}to{transform:translate3d(var(--dx),var(--dy),0) scale(1.18)}}
+.wx-p{position:absolute;border-radius:50%;background:var(--c);left:var(--x);width:var(--s);height:var(--s);bottom:-16px;opacity:0;animation:wx-rise var(--t) linear var(--d) infinite;will-change:transform,opacity}
+@keyframes wx-rise{0%{transform:translate3d(0,0,0);opacity:0}15%{opacity:var(--o)}85%{opacity:var(--o)}100%{transform:translate3d(var(--dx),-105vh,0);opacity:0}}
+.wx-s{position:absolute;border-radius:50%;background:var(--c);left:var(--x);top:var(--y);width:var(--s);height:var(--s);opacity:var(--o);animation:wx-tw var(--t) ease-in-out var(--d) infinite alternate}
+@keyframes wx-tw{from{opacity:.08;transform:scale(.7)}to{opacity:var(--o);transform:scale(1.25)}}
+.wx-c{position:absolute;top:var(--y);left:-40%;width:var(--s);height:calc(var(--s)*.22);border-radius:50%;background:radial-gradient(closest-side,var(--c),transparent);opacity:var(--o);animation:wx-drift var(--t) linear var(--d) infinite;will-change:transform}
+@keyframes wx-drift{to{transform:translate3d(calc(100vw + 90%),0,0)}}
+.wx-spot{position:absolute;inset:0;background:radial-gradient(460px circle at var(--mx,70%) var(--my,10%),var(--c),transparent 62%);opacity:.9}
+/* Isi jendela muncul berurutan saat dibuka */
+@keyframes wx-in{from{opacity:0;transform:translate3d(0,18px,0)}to{opacity:1;transform:none}}
+.wx-open .ac-body>*,.wx-open .ad-main>*,.wx-open .ad-side>*,.wx-open .wo-main>*,.wx-open .es-main>*,.wx-open .fn-v>*{animation:wx-in .75s var(--wx-ease) both;animation-delay:calc(var(--wx-i,0)*75ms + 140ms)}
+
+.wx-open .ac-body>:nth-child(2),.wx-open .ad-main>:nth-child(2),.wx-open .ad-side>:nth-child(2),.wo-ov .wo-main>:nth-child(2),.es-ov .es-main>:nth-child(2),.fn-v>:nth-child(2){--wx-i:1}
+.wx-open .ac-body>:nth-child(3),.wx-open .ad-main>:nth-child(3),.wx-open .ad-side>:nth-child(3),.wo-ov .wo-main>:nth-child(3),.es-ov .es-main>:nth-child(3),.fn-v>:nth-child(3){--wx-i:2}
+.wx-open .ac-body>:nth-child(4),.wx-open .ad-main>:nth-child(4),.wx-open .ad-side>:nth-child(4),.wo-ov .wo-main>:nth-child(4),.es-ov .es-main>:nth-child(4),.fn-v>:nth-child(4){--wx-i:3}
+.wx-open .ac-body>:nth-child(5),.wx-open .ad-main>:nth-child(5),.wx-open .ad-side>:nth-child(5),.wo-ov .wo-main>:nth-child(5),.es-ov .es-main>:nth-child(5),.fn-v>:nth-child(5){--wx-i:4}
+.wx-open .ac-body>:nth-child(6),.wx-open .ad-main>:nth-child(6),.wx-open .ad-side>:nth-child(6),.wo-ov .wo-main>:nth-child(6),.es-ov .es-main>:nth-child(6),.fn-v>:nth-child(6){--wx-i:5}
+.wx-open .ac-body>:nth-child(7),.wx-open .ad-main>:nth-child(7),.wx-open .ad-side>:nth-child(7),.wo-ov .wo-main>:nth-child(7),.es-ov .es-main>:nth-child(7),.fn-v>:nth-child(7){--wx-i:6}
+.wx-open .ac-body>:nth-child(8),.wx-open .ad-main>:nth-child(8),.wx-open .ad-side>:nth-child(8),.wo-ov .wo-main>:nth-child(8),.es-ov .es-main>:nth-child(8),.fn-v>:nth-child(8){--wx-i:7}
+.wx-open .ac-body>:nth-child(9),.wx-open .ad-main>:nth-child(9),.wx-open .ad-side>:nth-child(9),.wo-ov .wo-main>:nth-child(9),.es-ov .es-main>:nth-child(9),.fn-v>:nth-child(9){--wx-i:8}
+
+/* Sentuhan: kartu terangkat dengan cahaya warna dunianya */
+.ac-ov [class*="card"],.ad-win [class*="card"],.es-frame [class*="card"],.fn-app [class*="card"]{transition:transform .45s var(--wx-ease),box-shadow .45s var(--wx-ease)}
+.ac-ov [class*="card"]:hover,.ad-win [class*="card"]:hover,.es-frame [class*="card"]:hover,.fn-app [class*="card"]:hover{transform:translateY(-4px);box-shadow:0 18px 38px -14px var(--wx-glow,rgba(0,0,0,.25))}
+.ac-ov button:not(:disabled):hover{filter:brightness(1.05)}
+/* Pembuka jendela per dunia (Academic, Work, Organization, Finance) */
+@keyframes wx-rise-in{from{opacity:0;transform:translate3d(0,34px,0) scale(.97)}to{opacity:1;transform:none}}
+@keyframes wx-unfold{from{opacity:0;clip-path:inset(0 0 100% 0 round 30px)}to{opacity:1;clip-path:inset(0 0 0 0 round 30px)}}
+@keyframes wx-light{from{opacity:0;transform:scale(.94);filter:brightness(1.8)}to{opacity:1;transform:none;filter:none}}
+[data-wx=academic]>.ad-win{animation:wx-rise-in .9s var(--wx-ease) both!important}
+[data-wx=work]>.wo-frame{animation:wx-light .9s var(--wx-ease) both!important}
+[data-wx=org]>.es-frame{animation:wx-unfold 1s var(--wx-ease) both!important}
+[data-wx=finance]>.fn-app{animation:wx-rise-in .9s var(--wx-ease) both!important}
+
+[data-wx=academic]{--wx-glow:rgba(232,169,59,.45)}
+[data-wx=academic]>:first-child{background-image:linear-gradient(155deg,#fcf6ea 0,#f6eedc 55%,#efe4cc 100%)!important}
+html:root:root:root .ac-ov[data-wx=academic],html:root:root:root [data-wx=academic]{--ad-navy:#1f2b4d;--ad-bar:#1f2b4d;--ad-yel:#efb94b;--ad-yel2:#fbecc6;--ad-main:rgba(255,253,247,.8);--ad-card:#fffdf8;--ad-line:#eadfc8;--ad-ink:#1f2b4d;--ad-mute:#8a8571;--ad-grn:#4e8a62;--ad-grnbg:#e1efe2;--ad-sc1:#fbecc6;--ad-sc2:#e6edf9;--ad-mint:#dcefe6}
+[data-wx=work]{--wx-glow:rgba(79,195,184,.4)}
+[data-wx=work]>:first-child{background-image:radial-gradient(90% 60% at 50% 0%,#17353f 0,#0a1a21 55%,#050c10 100%)!important}
+[data-wx=org]{--wx-glow:rgba(47,125,109,.4)}
+[data-wx=org]>:first-child{background-image:linear-gradient(180deg,#cfe8dc 0,#e6f3ea 240px,#fbf9f0 520px)!important}
+[data-wx=project]{--wx-glow:rgba(217,96,63,.4)}
+[data-wx=project]>:first-child{background-image:linear-gradient(150deg,#f9efe5 0,#f3dfd0 55%,#ebc9b6 100%)!important}
+html:root:root:root .ac-ov[data-wx=project],html:root:root:root [data-wx=project]{--fb-bg:rgba(255,250,244,.72);--fb-card:#fffaf5;--fb-line:#ecd5c6;--fb-line2:#f3e3d7;--fb-ink:#3a2620;--fb-mute:#9a7f72;--fb-or:#d9603f;--fb-or2:#ec8d68;--fb-tint:rgba(217,96,63,.12);--fb-pri:#d9603f;--fb-prii:#fff;--fb-side:#3a2620;--fb-sidei:#d9bfae;--fb-lime:#f6d9bd;--fb-limei:#6e2c18;--fb-yel:#efb04f}
+[data-wx=task]{--wx-glow:rgba(140,158,255,.45)}
+[data-wx=task]>:first-child{background-image:radial-gradient(80% 60% at 85% 0%,#2c3265 0,#161a30 55%,#0d101e 100%)!important}
+html:root:root:root .ac-ov[data-wx=task],html:root:root:root [data-wx=task]{--fb-bg:rgba(23,27,50,.55);--fb-card:rgba(36,41,72,.78);--fb-line:rgba(190,200,255,.12);--fb-line2:rgba(190,200,255,.06);--fb-side:rgba(14,16,32,.7);--fb-or:#8c9eff;--fb-or2:#c1b2ff;--fb-tint:rgba(140,158,255,.18);--fb-pri:#8c9eff;--fb-prii:#10142b;--fb-lime:#5ad1b0;--fb-yel:#ffcf70}
+[data-wx=calendar]{--wx-glow:rgba(224,122,106,.42)}
+[data-wx=calendar]>:first-child{background-image:linear-gradient(165deg,#fff4ea 0,#fde4d8 55%,#f8d0d3 100%)!important}
+html:root:root:root .ac-ov[data-wx=calendar],html:root:root:root [data-wx=calendar]{--fb-bg:rgba(255,248,242,.7);--fb-card:#fffaf6;--fb-line:#f3d4c8;--fb-line2:#f9e4db;--fb-ink:#3a2a33;--fb-mute:#9a808a;--fb-or:#e07a6a;--fb-or2:#f0a08f;--fb-tint:#fde9e1;--fb-pri:#3a2a33;--fb-prii:#fff;--fb-side:#3a2a33;--fb-sidei:#d8c1c9;--fb-lime:#f6d58a;--fb-limei:#4a3410;--ac:#e07a6a!important}
+[data-wx=finance]{--wx-glow:rgba(185,130,42,.4)}
+[data-wx=finance]>:first-child{background-image:linear-gradient(160deg,#fcf5e6 0,#f5e8cf 60%,#ecdab8 100%)!important}
+html:root:root:root .ac-ov[data-wx=finance],html:root:root:root [data-wx=finance]{--red:#b9822a;--red2:#9b6a1d;--blue:#0f6b63;--blue2:#1b8a7f;--ink:#1d2f2c;--mute:#7d8a82;--cr:#fbf3e4;--cr2:#fffaf0;--cr3:#f1e3c8}
+[data-wx=goal]{--wx-glow:rgba(39,169,212,.4)}
+[data-wx=goal]>:first-child{background-image:linear-gradient(180deg,#d4f0f7 0,#e6f6f2 50%,#fdf5df 100%)!important}
+html:root:root:root .ac-ov[data-wx=goal],html:root:root:root [data-wx=goal]{--gq-bg:rgba(226,244,247,.7);--gq-card:#fff;--gq-line:#cfe7ee;--gq-ink:#1f3d4a;--gq-mute:#6f95a3;--gq-b1:#5cc8e6;--gq-b2:#27a9d4;--gq-b3:#1a7fa6;--gq-tint:#e8f5f9;--gq-orbg:#fff1cf;--gq-or:#b97a05;--gq-trk:#d6ebf1}
+[data-wx=documents]{--wx-glow:rgba(150,100,55,.4)}
+[data-wx=documents]>:first-child{background-image:linear-gradient(160deg,#fcf2e4 0,#f3e1c9 60%,#e9d0b0 100%)!important}
+html:root:root:root .ac-ov[data-wx=documents],html:root:root:root [data-wx=documents]{--rd-bg:rgba(255,251,245,.78);--rd-cream:#fbf0e1;--rd-cream2:#f6e5d0}
+[data-wx=analytics]{--wx-glow:rgba(108,98,214,.4)}
+[data-wx=analytics]>:first-child{background-image:linear-gradient(150deg,#e8e5f8 0,#f4e8f0 55%,#e4f1f3 100%)!important}
+html:root:root:root .ac-ov[data-wx=analytics],html:root:root:root [data-wx=analytics]{--an-a1:#6b5fd6;--an-a2:#f08f78;--an-bg1:#e8e5f8;--an-bg2:#d9d6f0}
+[data-wx=settings]{--wx-glow:rgba(90,134,173,.4)}
+[data-wx=settings]>:first-child{background-image:linear-gradient(160deg,#f0f4f8 0,#e1e9f0 60%,#d3dfe9 100%)!important}
+html:root:root:root .ac-ov[data-wx=settings],html:root:root:root [data-wx=settings]{--fb-bg:rgba(244,247,250,.7);--fb-card:#fbfcfd;--fb-line:#d9e3ec;--fb-line2:#e8eef4;--fb-ink:#22303f;--fb-mute:#7a8c9d;--fb-or:#5a86ad;--fb-or2:#8fb2d0;--fb-tint:#e6eef5;--fb-pri:#22303f;--fb-prii:#fff;--fb-side:#26323f;--fb-sidei:#a9b9c9;--fb-lime:#cfe3d6;--fb-limei:#1f3a2b;--ac:#5a86ad!important}
+html[data-lite="1"] .wx-b,html[data-lite="1"] .wx-p,html[data-lite="1"] .wx-s,html[data-lite="1"] .wx-c{animation:none}
+html[data-lite="1"] .wx-p,html[data-lite="1"] .wx-c,html[data-lite="1"] .wx-spot{display:none}
+@media (prefers-reduced-motion:reduce){.wx-b,.wx-p,.wx-s,.wx-c{animation:none!important}.wx-open *{animation:none!important}[data-wx]>:first-child{animation:none!important}}/* Project: latar luar sunset hangat, jendela terang di atasnya */
+[data-wx=documents]>.ac-win .ac-body{background:transparent}
