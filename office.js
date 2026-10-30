@@ -280,6 +280,10 @@
      ===================================================== */
   var proj = App('Project Management', 'mo-proj-v1', function () { return { proj: [], ptask: [], ms: [], pfile: [] }; }, function (app) {
     var D = app.D, st = app.st;
+    if (!D.promo || !D.promo.length) D.promo = [{ id: 'promo', emoji: '🏁', title: 'Tuntaskan dulu, baru rayakan', text: 'Pilih satu proyek dan selesaikan hari ini.', btn: 'Buka sorotan' }];
+    var PC = { Akademik: ['🎓', '#3d6bff', '#8ab4ff'], Pekerjaan: ['💼', '#1d2233', '#4a5675'], Organisasi: ['🏛️', '#0f9d7c', '#6fe0bd'], Pribadi: ['⭐', '#ff6a3d', '#ffb36b'] };
+    var pc = function (p) { return PC[p.area] || PC.Pribadi; }, live = function (p) { return p.status !== 'Selesai' && p.status !== 'Dibatalkan'; };
+    var PRN = { Tinggi: 0, Sedang: 1, Rendah: 2 }, prk = function (p) { return PRN[p.priority] == null ? 1 : PRN[p.priority]; };
     var AREAS = ['Akademik', 'Pekerjaan', 'Organisasi', 'Pribadi'], PS = ['Rencana', 'Berjalan', 'Ditunda', 'Selesai', 'Dibatalkan'], TS = ['Belum', 'Dikerjakan', 'Selesai'];
     var PV = [['overview', 'Project Overview'], ['board', 'Task Board'], ['timeline', 'Timeline'], ['ms', 'Milestones'], ['files', 'Files & Notes'], ['ana', 'Progress Analytics']];
     var projOpts = function () { return [['', '— Pilih proyek —']].concat(D.proj.map(function (p) { return [p.id, p.name]; })); };
@@ -295,26 +299,51 @@
         { k: 'name', l: 'Nama proyek', t: 'text', req: 1, full: 1 }, { k: 'desc', l: 'Deskripsi', t: 'textarea', full: 1 },
         { k: 'area', l: 'Area', t: 'select', o: opt(AREAS) }, { k: 'status', l: 'Status', t: 'select', o: opt(PS) }, { k: 'priority', l: 'Prioritas', t: 'select', o: opt(['Rendah', 'Sedang', 'Tinggi']) },
         { k: 'basis', l: 'Progres dihitung dari', t: 'select', o: [['tasks', 'Tugas yang selesai'], ['ms', 'Milestone yang selesai']] },
-        { k: 'start', l: 'Tanggal mulai', t: 'date' }, { k: 'target', l: 'Target selesai', t: 'date' }, { k: 'budget', l: 'Anggaran (Rp, jika perlu)', t: 'number', min: 0, full: 1 }, { k: 'notes', l: 'Catatan', t: 'textarea', full: 1 }] },
+        { k: 'start', l: 'Tanggal mulai', t: 'date' }, { k: 'target', l: 'Target selesai', t: 'date' }, { k: 'budget', l: 'Anggaran (Rp, jika perlu)', t: 'number', min: 0, full: 1 }, { k: 'emoji', l: 'Emoji sampul', t: 'text', ph: '🎓' }, { k: 'pin', l: 'Utamakan di banner Sorotan', t: 'select', bool: 1, o: [['false', 'Tidak'], ['true', 'Ya']] }, { k: 'notes', l: 'Catatan', t: 'textarea', full: 1 }] },
       ptask: { title: 'Tugas', def: { status: 'Belum' }, fields: [{ k: 'title', l: 'Judul tugas', t: 'text', req: 1, full: 1 }, { k: 'projId', l: 'Proyek', t: 'select', o: projOpts, req: 1 }, { k: 'status', l: 'Status', t: 'select', o: opt(TS) }, { k: 'due', l: 'Tenggat', t: 'date' }, { k: 'notes', l: 'Catatan', t: 'textarea', full: 1 }] },
       ms: { title: 'Milestone', def: { done: false }, fields: [{ k: 'title', l: 'Milestone', t: 'text', req: 1, full: 1 }, { k: 'projId', l: 'Proyek', t: 'select', o: projOpts, req: 1 }, { k: 'date', l: 'Tanggal target', t: 'date' }, { k: 'done', l: 'Status', t: 'select', bool: 1, o: [['false', 'Belum tercapai'], ['true', 'Tercapai']] }, { k: 'notes', l: 'Catatan', t: 'textarea', full: 1 }] },
+      promo: { title: 'Kartu Promo', def: {}, fields: [{ k: 'title', l: 'Judul', t: 'text', req: 1, full: 1 }, { k: 'emoji', l: 'Emoji', t: 'text' }, { k: 'btn', l: 'Teks tombol', t: 'text' }, { k: 'text', l: 'Kalimat pendukung', t: 'text', full: 1 }] },
       pfile: { title: 'Dokumen / Catatan', def: { kind: 'Dokumen' }, fields: [{ k: 'title', l: 'Judul', t: 'text', req: 1, full: 1 }, { k: 'projId', l: 'Proyek', t: 'select', o: projOpts, req: 1 }, { k: 'kind', l: 'Jenis', t: 'select', o: opt(['Dokumen', 'Catatan']) }, { k: 'link', l: 'Tautan dokumen', t: 'url', full: 1, ph: 'https://…' }, { k: 'text', l: 'Isi catatan', t: 'textarea', full: 1 }] }
     };
 
+    function banner(p, n) {
+      var g = pp(p), c = pc(p);
+      return '<section class="pj-ban" style="--c1:' + c[1] + ';--c2:' + c[2] + '"><span class="pj-bem">' + esc(p.emoji || c[0]) + '</span><div class="pj-bt"><span class="pj-tag">' + esc(p.area) + ' · ' + esc(p.status) + '</span><h3>' + esc(p.name) + '</h3><p>' + (g.pct == null ? 'Belum ada ' + g.unit + ' — progres belum bisa dihitung' : g.done + ' dari ' + g.n + ' ' + g.unit + ' selesai (' + fmt(g.pct) + '%)') + '</p><div class="pj-bb"><button class="pj-or" data-act="openp" data-id="' + p.id + '">Buka proyek</button><button class="pj-gh" data-act="edit" data-e="proj" data-id="' + p.id + '">Edit</button></div></div>' +
+        (n > 1 ? '<div class="pj-arr"><button data-act="bnav" data-d="-1" aria-label="Sorotan sebelumnya">‹</button><button data-act="bnav" data-d="1" aria-label="Sorotan berikutnya">›</button></div>' : '') + '</section>';
+    }
     function list() {
-      var ar = st.pa || 'Semua', L = D.proj.filter(function (p) { return ar === 'Semua' || p.area === ar; });
-      var h = bar('Proyek dari akademik, pekerjaan, organisasi, atau pribadi. Progres hanya dihitung dari tugas/milestone yang benar-benar selesai.', add('proj', 'Proyek')) + chips(['Semua'].concat(AREAS), ar, 'pa');
-      if (!L.length) return h + empty('Belum ada proyek.');
-      return h + L.map(function (p) {
-        var g = pp(p);
-        return '<article class="ac-card"><div class="ac-row"><div><h3><button class="t" style="font-size:15px;font-weight:500;background:none;border:0;color:inherit;cursor:pointer;font-family:inherit;padding:0" data-act="openp" data-id="' + p.id + '">' + esc(p.name) + '</button>' + badge(p.area) + badge(p.status, p.status === 'Selesai' ? 'on' : '') + badge(p.priority, p.priority === 'Tinggi' ? 'hi' : p.priority === 'Sedang' ? 'mid' : '') + '</h3></div><button class="ac-btn sm" data-act="openp" data-id="' + p.id + '">Buka</button></div>' +
-          '<div class="ac-meta"><span>Mulai: <b>' + fd(p.start) + '</b></span><span>Target: <b>' + fd(p.target) + '</b></span></div>' + prog(g.pct) + '<small>' + (g.pct == null ? 'Belum ada ' + g.unit + ' — progres belum bisa dihitung' : g.done + ' dari ' + g.n + ' ' + g.unit + ' selesai (' + fmt(g.pct) + '%)') + '</small></article>';
-      }).join('');
+      var ar = st.pa || 'Semua', q = (st.pq || '').toLowerCase().trim(), T = todayS(), set = {}; try { set = JSON.parse(localStorage.getItem('mo-settings-v1')) || {}; } catch (e) { }
+      var L = D.proj.filter(function (p) { return (ar === 'Semua' || p.area === ar) && (!q || (p.name + ' ' + (p.desc || '')).toLowerCase().indexOf(q) > -1); });
+      var nav = '<nav class="pj-nav"><div class="pj-tabs">' + ['Semua'].concat(AREAS).map(function (x) { return '<button aria-pressed="' + (x === ar) + '" data-act="filt" data-f="pa" data-v="' + x + '">' + (x === 'Semua' ? 'Beranda' : x) + '</button>'; }).join('') + '</div><input type="text" data-in="pq" placeholder="Cari proyek…" value="' + esc(st.pq || '') + '" aria-label="Cari proyek">' + add('proj', 'Proyek') + '</nav>';
+      if (!D.proj.length) return nav + empty('Belum ada proyek. Tekan "+ Proyek" untuk memulai.');
+      if (!L.length) return nav + empty('Tidak ada proyek yang cocok dengan filter atau pencarian.');
+      var lv = L.filter(live), F = (lv.length ? lv : L).slice().sort(function (a, b) { return (b.pin ? 1 : 0) - (a.pin ? 1 : 0) || prk(a) - prk(b) || (a.target || '9').localeCompare(b.target || '9'); });
+      var bi = ((st.bi || 0) % F.length + F.length) % F.length, fp = F[bi], ids = {}, it = [];
+      L.forEach(function (p) { ids[p.id] = 1; if (live(p) && p.target) it.push({ d: p.target, t: p.name, p: p, e: 'proj', id: p.id, k: 'Target proyek' }); });
+      D.ms.forEach(function (m) { if (ids[m.projId] && !m.done && m.date) it.push({ d: m.date, t: m.title, p: by(D.proj, m.projId), e: 'ms', id: m.id, k: 'Milestone' }); });
+      D.ptask.forEach(function (t) { if (ids[t.projId] && t.status !== 'Selesai' && t.due) it.push({ d: t.due, t: t.title, p: by(D.proj, t.projId), e: 'ptask', id: t.id, k: 'Tugas' }); });
+      it.sort(function (a, b) { return a.d.localeCompare(b.d); });
+      var nx = it.filter(function (x) { return x.d >= T; })[0] || it[0];
+      var nd = nx && nx.p ? '<section class="pj-nd"><span class="pj-tag">' + nx.k + (nx.d < T ? ' · terlambat' : '') + '</span><h3>' + esc(nx.t) + '</h3><p>' + esc(nx.p.name) + ' · ' + fd(nx.d) + '</p><div class="pj-bb"><button class="pj-or" data-act="openp" data-id="' + nx.p.id + '">Lihat proyek</button><button class="pj-gh" data-act="edit" data-e="' + nx.e + '" data-id="' + nx.id + '">Edit</button></div></section>' : '<section class="pj-nd"><h3>Belum ada tenggat</h3><p>Isi target selesai proyek, tanggal milestone, atau tenggat tugas agar muncul di sini.</p></section>';
+      var top = L.filter(live).sort(function (a, b) { return prk(a) - prk(b) || (a.target || '9').localeCompare(b.target || '9'); }).slice(0, 5);
+      var tbl = '<section class="pj-top"><h4 class="pj-h">5 proyek teratas</h4><div class="pj-th"><span>No</span><span>Proyek</span><span class="pj-c">Prioritas</span><span class="pj-c">Target</span><span>Progres</span><span></span></div>' + (top.length ? top.map(function (p, i) {
+        var g = pp(p), c = pc(p);
+        return '<div class="pj-tr' + (i === 0 ? ' hot' : '') + '" data-act="openp" data-id="' + p.id + '"><span>' + (i + 1) + '</span><span class="pj-n"><i style="background:linear-gradient(135deg,' + c[1] + ',' + c[2] + ')">' + esc(p.emoji || c[0]) + '</i><b><button class="t" data-act="openp" data-id="' + p.id + '">' + esc(p.name) + '</button><small>' + esc(p.area) + ' · ' + esc(p.status) + '</small></b></span><span class="pj-c">' + esc(p.priority) + '</span><span class="pj-c">' + fd(p.target) + '</span><span>' + (g.pct == null ? '—' : Math.round(g.pct) + '%') + '</span><span><button class="ac-btn sm" data-act="edit" data-e="proj" data-id="' + p.id + '">Edit</button></span></div>';
+      }).join('') : '<p class="ac-hint">Tidak ada proyek aktif pada filter ini.</p>') + '</section>';
+      var cards = '<section class="pj-an"><h4 class="pj-h">Progres semua proyek · ' + L.length + '</h4><div class="pj-cards">' + L.map(function (p) {
+        var g = pp(p), c = pc(p);
+        return '<article class="pj-pc" style="--c1:' + c[1] + ';--c2:' + c[2] + '" data-act="openp" data-id="' + p.id + '"><button class="pj-ed" data-act="edit" data-e="proj" data-id="' + p.id + '" aria-label="Edit ' + esc(p.name) + '">✎</button><span class="pj-pe">' + esc(p.emoji || c[0]) + '</span><button class="t" data-act="openp" data-id="' + p.id + '">' + esc(p.name) + '</button><small>' + (g.pct == null ? 'Belum ada ' + g.unit : g.done + '/' + g.n + ' ' + g.unit) + '</small><em>' + (g.pct == null ? '—' : Math.round(g.pct)) + '</em></article>';
+      }).join('') + '</div></section>';
+      var ps = D.proj.map(pp).filter(function (g) { return g.pct != null; }), avg = ps.length ? Math.round(ps.reduce(function (a, g) { return a + g.pct; }, 0) / ps.length) : null, P = D.promo[0];
+      var side = '<aside class="pj-side"><div class="pj-me"><span class="pj-av" style="' + (set.photo ? 'background-image:url(&quot;' + esc(set.photo) + '&quot;)' : '') + '"></span><b>' + esc(set.nick || 'Pengguna') + '</b><small>Pengelola proyek</small><div class="pj-st"><span>📁 ' + D.proj.filter(live).length + ' <small>aktif</small></span><span>📈 ' + (avg == null ? '—' : avg + '%') + ' <small>rata-rata</small></span><span>✅ ' + D.ptask.filter(function (t) { return t.status === 'Selesai'; }).length + ' <small>tugas selesai</small></span></div></div>' +
+        '<div class="pj-promo"><button class="pj-pen" data-act="edit" data-e="promo" data-id="promo" aria-label="Ubah kartu promo">✎</button><span>' + esc(P.emoji || '🏁') + '</span><b>' + esc(P.title) + '</b><small>' + esc(P.text || '') + '</small><button class="pj-or" ' + (fp ? 'data-act="openp" data-id="' + fp.id + '"' : 'data-act="add" data-e="proj"') + '>' + esc(P.btn || 'Buka sorotan') + '</button></div></aside>';
+      return nav + '<div class="pj-wrap">' + side + '<div class="pj-main"><div class="pj-row2"><div><h4 class="pj-h">Sorotan</h4>' + banner(fp, F.length) + '</div><div><h4 class="pj-h">Tenggat terdekat</h4>' + nd + '</div></div>' + tbl + cards + '</div></div>';
     }
     function detail(p) {
       var v = st.pv || 'overview';
-      var h = '<button class="ac-btn sm ac-back" data-act="openp" data-id="">← Semua proyek</button><div class="ac-row" style="margin-bottom:10px"><h3 style="font-family:var(--serif);font-weight:400;font-size:22px">' + esc(p.name) + '</h3>' + btns('proj', p.id) + '</div>' +
-        '<div class="ac-chips">' + PV.map(function (x) { return '<button class="ac-chip" aria-pressed="' + (x[0] === v) + '" data-act="pv" data-v="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>';
+      var g0 = pp(p), c0 = pc(p);
+      var h = '<button class="ac-btn sm ac-back" data-act="openp" data-id="">← Semua proyek</button><section class="pj-hero"><span class="pj-hem">' + esc(p.emoji || c0[0]) + '</span><div class="pj-ht"><h3>' + esc(p.name) + '</h3><div>' + badge(p.area) + badge(p.status, p.status === 'Selesai' ? 'on' : '') + badge(p.priority, p.priority === 'Tinggi' ? 'hi' : p.priority === 'Sedang' ? 'mid' : '') + '</div><div class="pj-bar"><i style="width:' + (g0.pct || 0) + '%"></i></div><small>' + (g0.pct == null ? 'Belum ada ' + g0.unit + ' — progres belum bisa dihitung' : g0.done + ' dari ' + g0.n + ' ' + g0.unit + ' selesai (' + fmt(g0.pct) + '%)') + '</small></div>' + btns('proj', p.id) + '</section>' +
+        '<div class="ac-chips pj-tabs">' + PV.map(function (x) { return '<button class="ac-chip" aria-pressed="' + (x[0] === v) + '" data-act="pv" data-v="' + x[0] + '">' + x[1] + '</button>'; }).join('') + '</div>';
       return h + ({ overview: vOv, board: vBoard, timeline: vTL, ms: vMs, files: vFiles, ana: vAna })[v](p);
     }
     function vOv(p) {
@@ -371,7 +400,7 @@
       return h + '<p class="ac-hint" style="margin-top:14px">Progres resmi = ' + g.unit + ' selesai ÷ total ' + g.unit + '. Dasar perhitungan bisa diubah di Edit proyek.</p>';
     }
     return {
-      specs: specs, tabs: [['p', 'Proyek', function () { var p = st.proj && by(D.proj, st.proj); return p ? detail(p) : list(); }]],
+      skin: 'pj-skin', specs: specs, tabs: [['p', 'Proyek', function () { var p = st.proj && by(D.proj, st.proj); if (!p) return list(); var c = pc(p); return '<div class="pj-world" style="--c1:' + c[1] + ';--c2:' + c[2] + '">' + detail(p) + '</div>'; }]],
       sub: function () { return D.proj.length + ' proyek'; },
       cascade: { proj: [['ptask', 'projId'], ['ms', 'projId'], ['pfile', 'projId']] },
       guard: function (e) { if (e !== 'proj' && !D.proj.length) return ['Belum ada proyek', 'Buat proyek terlebih dahulu.']; },
@@ -385,6 +414,7 @@
       act: function (a, d, t) {
         if (a === 'openp') { st.proj = d.id || null; st.pv = 'overview'; }
         if (a === 'pv') st.pv = d.v;
+        if (a === 'bnav') st.bi = (st.bi || 0) + (+d.d);
         if (a === 'mv') { var x = by(D.ptask, d.id), i = Math.max(0, Math.min(2, TS.indexOf(x.status) + +d.d)); if (TS[i] !== x.status) { log(x.projId, 'Tugas "' + x.title + '": ' + x.status + ' → ' + TS[i]); x.status = TS[i]; } }
         if (a === 'tgm') { var m = by(D.ms, d.id); m.done = t.checked; log(m.projId, 'Milestone "' + m.title + '" ' + (m.done ? 'tercapai' : 'dibuka kembali')); }
       }
