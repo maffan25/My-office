@@ -20,7 +20,7 @@ html:root .ac-ov.rd-skin:not(.ad-skin){
   --disp:var(--rd-font);--bad:#c4463a;color-scheme:light;font-family:var(--rd-font)}
 
 /* ---------- Palet (malam) ---------- */
-html:root[data-theme=malam] .ac-ov.rd-skin:not(.ad-skin){
+html:root[data-theme=malam] .ac-ov:not(:where([data-wx=calendar],[data-wx=settings],[data-wx=goal],[data-wx=documents],[data-wx=analytics],[data-wx=project],[data-wx=academic],[data-wx=org],[data-wx=finance])).rd-skin:not(.ad-skin){
   --rd-bg:#1d1815;--rd-cream:#2a2320;--rd-cream2:#251f1c;--rd-ink:#ecdccb;--rd-ink2:#a8937f;--rd-line:#3d322a;--rd-line2:#33291f;
   --rd-pill:#3b2f27;--rd-brand:#efb982;--rd-white:#352c26;--rd-field:#332a25;
   --rd-ledge1:#6a5744;--rd-ledge2:#54443a;--rd-ledge3:#3d3128;--rd-shadow:rgba(0,0,0,.6);
@@ -38,7 +38,7 @@ html:root .ac-ov.rd-skin:not(.ad-skin) .ac-win:not(.ac-form):not(.vw){display:fl
   box-shadow:0 0 0 1px rgba(120,80,40,.1),0 50px 120px -30px rgba(40,22,8,.55),0 18px 40px -18px rgba(40,22,8,.35);
   -webkit-backdrop-filter:none;backdrop-filter:none}
 html:root .ac-ov.rd-skin:not(.ad-skin) .ac-win:not(.ac-form):not(.vw)::before{display:none}
-html:root[data-theme=malam] html:root .ac-ov.rd-skin:not(.ad-skin) .ac-win:not(.ac-form):not(.vw){box-shadow:0 0 0 1px rgba(239,185,130,.14),0 50px 120px -30px rgba(0,0,0,.8)}
+html:root[data-theme=malam] html:root .ac-ov:not(:where([data-wx=calendar],[data-wx=settings],[data-wx=goal],[data-wx=documents],[data-wx=analytics],[data-wx=project],[data-wx=academic],[data-wx=org],[data-wx=finance])).rd-skin:not(.ad-skin) .ac-win:not(.ac-form):not(.vw){box-shadow:0 0 0 1px rgba(239,185,130,.14),0 50px 120px -30px rgba(0,0,0,.8)}
 
 /* judul bawaan disembunyikan (nama menu ada di logo); tombol tutup tetap */
 html:root .ac-ov.rd-skin:not(.ad-skin) .ac-win:not(.ac-form):not(.vw)>header{position:absolute;top:0;right:0;z-index:6;display:block;width:auto;margin:0;padding:20px 22px 0 0;border:0;background:none}

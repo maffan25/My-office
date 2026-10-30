@@ -12,7 +12,7 @@ html:root .ac-ov:not(.ad-skin){
   --ac:#e8806a!important;--ac2:#f0a08a!important;--ac-ink:#b5523a;--ac-tint:rgba(245,133,99,.11);--ac-tint2:rgba(245,133,99,.22);
   --disp:'Plus Jakarta Sans',var(--sans);--gold:#e8806a;--good:#2f9e5b;--bad:#e0473d;--r:22px;color-scheme:light;
   font-family:'Plus Jakarta Sans',var(--sans)}
-html:root[data-theme=malam] .ac-ov:not(.ad-skin){--fb-bg:#171718;--fb-card:#232325;--fb-line:rgba(245,133,99,.3);--fb-line2:rgba(245,133,99,.15);--fb-ink:#f5f0ed;--fb-mute:#a59f9a;
+html:root[data-theme=malam] .ac-ov:not(:where([data-wx=calendar],[data-wx=settings],[data-wx=goal],[data-wx=documents],[data-wx=analytics],[data-wx=project],[data-wx=academic],[data-wx=org],[data-wx=finance])):not(.ad-skin){--fb-bg:#171718;--fb-card:#232325;--fb-line:rgba(245,133,99,.3);--fb-line2:rgba(245,133,99,.15);--fb-ink:#f5f0ed;--fb-mute:#a59f9a;
   --fb-side:#0e0e0f;--fb-tint:rgba(245,133,99,.12);--fb-pri:#e8806a;--fb-prii:#fff;--ac-ink:#ff9d80;--soft:rgba(255,255,255,.04);--soft2:rgba(255,255,255,.09);
   --good:#8ee28f;--bad:#ff8579;color-scheme:dark}
 

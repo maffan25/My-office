@@ -1,0 +1,94 @@
+/* =====================================================================
+   MyOffice — fixes.css (dimuat PALING AKHIR)
+   1) Perbaikan teks yang tidak terbaca (kontras rendah)
+   2) Perbaikan tata letak yang rusak (kartu "Tambah organisasi", titik kalender)
+   3) Animasi klik untuk SEMUA tombol (dipasangkan dengan fx.js)
+   ===================================================================== */
+
+/* ---------- 1. KONTRAS TEKS ---------- */
+
+/* Badge tenggat "Hari ini 21:00" / "Besok" — sebelumnya cokelat gelap di atas latar gelap */
+html:root .ac-ov .ac-win .ac-badge.mid,
+html:root .ac-ov .ac-win .ac-badge.soon{background:rgba(245,158,11,.2);color:#8a5200;font-weight:700}
+html:root .ac-ov .ac-win .ac-badge.hi,
+html:root .ac-ov .ac-win .ac-badge.late{background:rgba(224,71,61,.14);color:#b3261e;font-weight:700}
+html:root .ac-ov .ac-win .ac-badge.on{font-weight:700}
+
+/* Permukaan gelap: jendela Task (skin gelap) dan seluruh jendela saat tema malam */
+html:root .ac-ov.tk-skin:not(.ad-skin) .ac-win .ac-badge.mid,
+html:root .ac-ov.tk-skin:not(.ad-skin) .ac-win .ac-badge.soon{background:rgba(255,196,87,.2);color:#ffd98a}
+html:root .ac-ov.tk-skin:not(.ad-skin) .ac-win .ac-badge.hi,
+html:root .ac-ov.tk-skin:not(.ad-skin) .ac-win .ac-badge.late{background:rgba(255,110,125,.2);color:#ffb3bc}
+html:root .ac-ov.tk-skin:not(.ad-skin) .ac-win .ac-badge:not(.on):not(.mid):not(.soon):not(.hi):not(.late){color:#d9ceff}
+
+/* Teks bantu / hint / keterangan kecil */
+html:root .ac-ov .ac-hint{color:color-mix(in srgb,var(--mute,#6b6a85) 68%,var(--ink,#222))}
+
+/* Tombol bahaya (Hapus) */
+html:root .ac-ov .ac-btn.danger,
+html:root .ac-ov .ac-btn.sm.danger{color:#b3261e}
+html:root .ac-ov.tk-skin:not(.ad-skin) .ac-btn.danger{color:#ffb3bc}
+
+/* Tombol utama kalender & pil analytics: putih di atas salmon pucat → gelapkan latar */
+html:root .ac-ov:not(.ad-skin) .kc-add{background:#b5402c;color:#fff}
+html:root .ac-ov:not(.ad-skin) .kc-add:hover{background:#9f3624;filter:none}
+.bn-pl.p3,html:root .ac-ov .bn-pl.p3{background:#c4513b;color:#fff}
+
+/* Hint pada kartu Analytics / Dokumen / Goal */
+html:root .ac-ov .gq-h{color:#8a5a00}
+html:root .ac-ov .gq-rb{color:#06708f}
+
+/* Titik angka notifikasi */
+.dot.n,.dot[class~=n]{background:#d6254a;color:#fff}
+
+/* ---------- 2. KALENDER ---------- */
+/* Titik "ada kegiatan" dulu menimpa angka Hijriah → pindahkan ke pojok kanan atas */
+html:root .kc-d .kc-dot{top:6px;right:8px;left:auto;bottom:auto;margin:0;width:7px;height:7px}
+html:root .kc-d small{opacity:.82}
+html:root .kc-d.sel small{opacity:.95;color:inherit}
+html:root .kc-d.sel .kc-dot{background:#ffd166;box-shadow:0 0 0 2px rgba(255,255,255,.35)}
+html:root .kc-nav b small{opacity:.8;font-family:inherit}
+html:root .kc-wk span{color:color-mix(in srgb,var(--mute,#7a626e) 62%,var(--ink,#222))}
+html:root .ac-ov .kc-foot{color:color-mix(in srgb,var(--mute,#7a626e) 62%,var(--ink,#222))}
+
+/* Kalender Task (tk-d) — angka putih di atas ungu muda */
+html:root .ac-ov.tk-skin:not(.ad-skin) .tk-d.on{background:#6b7be0;color:#fff}
+
+/* Kalender akademik: tanggal di luar bulan terlalu pudar */
+.ad-d.out{opacity:1;color:color-mix(in srgb,var(--mute,#7f7d96) 60%,var(--ink,#222))}
+
+
+/* ---------- Kartu "Tambah organisasi" (v6.css membuatnya flex sehingga thumbnail menciut) ---------- */
+.es-card.add{display:block}
+.es-card.add .es-thumb{display:grid;place-items:center;width:100%;min-height:120px;aspect-ratio:16/9}
+.es-card.add .es-thumb i{display:grid;place-items:center;line-height:1;font-size:28px;flex:none}
+.es-card.add .es-cap{position:absolute;left:4px;right:4px;bottom:10px;padding:0;text-align:center;color:#2f3350;font-weight:800;background:none}
+.es-grid>.es-card.add:only-child{grid-column:1/-1;width:100%;max-width:420px;margin:0 auto}
+
+/* ---------- 3. ANIMASI KLIK UNTUK SEMUA TOMBOL ---------- */
+:where(button,[role=button],[role=tab],a[href],summary,label.ac-chip,.chip,.wall,.es-card,.kc-d,.tk-d,.ad-d,[data-act],[data-a]){
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  transition-property:background-color,color,border-color,box-shadow,opacity,filter;
+  transition-duration:.2s;transition-timing-function:ease}
+:where(button,[role=button],a[href],summary):where(:not(:disabled)){cursor:pointer}
+.fx-ripple-host{position:fixed;z-index:2147483000;overflow:hidden;pointer-events:none;contain:strict}
+.fx-ripple{position:absolute;border-radius:50%;background:currentColor;opacity:.28;transform:scale(0);pointer-events:none;
+  animation:fxRipple .6s cubic-bezier(.2,.7,.2,1) forwards}
+@keyframes fxRipple{to{transform:scale(1);opacity:0}}
+/* centang / radio / switch: efek "pop" */
+@keyframes fxCheck{0%{scale:.7}55%{scale:1.22}100%{scale:1}}
+.fx-check{animation:fxCheck .3s cubic-bezier(.3,1.6,.5,1)}
+@media (prefers-reduced-motion:reduce){.fx-ripple{animation-duration:.01s}.fx-check{animation:none}}
+
+/* ---------- Putaran 2 ---------- */
+html:root .ac-ov.gq-skin:not(.ad-skin) .ac-win .gq-h{color:#8a5a00}
+html:root .ac-ov.gq-skin:not(.ad-skin) .ac-win .gq-rb{color:#06708f}
+html:root .ac-ov.gq-skin:not(.ad-skin) .ac-win .gq-qb em{color:#8a5a00}
+html:root .ac-ov .bn-col .bn-pl.p3{background:#c4513b;color:#fff}
+html:root .ac-ov .bn-pill span{text-shadow:0 1px 1px rgba(0,0,0,.28)}
+/* Dokumen */
+.rd-skin .rd-logo b{color:var(--rd-brand)}
+html:root .ac-ov.rd-skin .rd-nav span{color:color-mix(in srgb,var(--rd-ink2) 55%,var(--rd-ink))}
+/* Finance: emas lebih gelap agar teks krem terbaca */
+html:root:root:root:root [data-wx=finance],html:root:root:root:root .ac-ov[data-wx=finance]{--red:#8f6317;--red2:#755010}
+.fn-app .fn-mon button,.fn-app .fn-cats small,.fn-app .fn-sbb b{color:#7a5410}
