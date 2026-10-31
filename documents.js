@@ -57,16 +57,32 @@
   /* ---------- Thumbnail gambar (dibaca dari IndexedDB, di-cache) ---------- */
   var thumbs = {}, vis = [];
   var thumbable = function (f) { return /^image\/(png|jpe?g|webp|gif|avif)$/.test(f.type || '') && f.size < 12e6; };
+  /* Sampul dibuat dari versi KECIL gambar (maks. 360px), bukan berkas aslinya yang bisa belasan MB.
+     Didekode terkecil lewat createImageBitmap, diproses satu per satu agar halaman tidak tersendat. */
+  var tq = [], tbusy = false;
+  function mkThumb(b) {
+    if (!window.createImageBitmap) return Promise.resolve(b);
+    return createImageBitmap(b, { resizeWidth: 360, resizeQuality: 'medium' }).then(function (bm) {
+      var c = document.createElement('canvas'); c.width = bm.width; c.height = bm.height;
+      c.getContext('2d').drawImage(bm, 0, 0); if (bm.close) bm.close();
+      return new Promise(function (res) { c.toBlob(function (t) { res(t || b); }, 'image/webp', .82); });
+    }).catch(function () { return b; });
+  }
+  function pumpThumbs() {
+    if (tbusy || !tq.length) return; tbusy = true;
+    var f = tq.shift();
+    get(f.id).then(function (b) { return b ? mkThumb(b) : null; }).then(function (t) {
+      if (!t || !(f.id in thumbs)) return;
+      var u = URL.createObjectURL(t); thumbs[f.id] = u;
+      Array.prototype.forEach.call(document.querySelectorAll('.rd-cover[data-id="' + f.id + '"]'), function (n) { n.style.setProperty('--img', "url('" + u + "')"); n.classList.add('has-img'); });
+    }).catch(function () { delete thumbs[f.id]; }).then(function () { tbusy = false; setTimeout(pumpThumbs, 30); });
+  }
   function fetchThumbs() {
     vis.forEach(function (f) {
       if (!thumbable(f) || f.id in thumbs) return;
-      thumbs[f.id] = null;
-      get(f.id).then(function (b) {
-        if (!b) return;
-        var u = URL.createObjectURL(b); thumbs[f.id] = u;
-        Array.prototype.forEach.call(document.querySelectorAll('.rd-cover[data-id="' + f.id + '"]'), function (n) { n.style.setProperty('--img', "url('" + u + "')"); n.classList.add('has-img'); });
-      }).catch(function () { delete thumbs[f.id]; });
+      thumbs[f.id] = null; tq.push(f);
     });
+    pumpThumbs();
   }
   function dropThumb(id) { if (thumbs[id]) URL.revokeObjectURL(thumbs[id]); delete thumbs[id]; }
 

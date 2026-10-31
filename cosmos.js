@@ -156,10 +156,14 @@
   }
   /* Modul menggambar ulang isinya saat diklik: cari padanan elemen yang sama di DOM baru */
   function sig(el) {
-    if (!el.className || typeof el.className !== 'string' || !el.className.trim()) return null;
-    var sel = el.tagName.toLowerCase() + '.' + el.className.trim().split(/\s+/).filter(function (c) { return !/^(bnc|on|open|sel|active)$/.test(c); }).join('.');
-    var root = el.closest('.ac-ov,.ad-ov,.wo-ov,.es-ov,.fn-app,.app') || document;
-    try { return { root: root, sel: sel, i: [].indexOf.call(root.querySelectorAll(sel), el) }; } catch (x) { return null; }
+    var cls = (typeof el.className === 'string' ? el.className : '').trim().split(/\s+/).filter(function (c) { return c && !/^(bnc|on|open|sel|active)$/.test(c); });
+    var base = el.tagName.toLowerCase() + (cls.length ? '.' + cls.join('.') : ''), txt = (el.textContent || '').trim();
+    var root = el.closest('.ac-ov,.ad-ov,.wo-ov,.es-ov,.fn-ov,.fn-app,.app') || document;
+    function list(r) {
+      try { return [].filter.call(r.querySelectorAll(base), function (n) { return !txt || (n.textContent || '').trim() === txt; }); } catch (x) { return []; }
+    }
+    var i = list(root).indexOf(el);
+    return i < 0 ? null : { root: root, list: list, i: i };
   }
   function bounce(el) {
     if (!el.animate) return;
@@ -174,10 +178,13 @@
     if (reduce) return;
     var t = hitOf(e.target); if (!t) return;
     var g = sig(t); bounce(t);
-    if (g) setTimeout(function () {
-      if (t.isConnected || g.i < 0) return;
-      var n = (g.root.isConnected ? g.root : document).querySelectorAll(g.sel)[g.i]; if (n) bounce(n);
-    }, 40);
+    if (g) [30, 100].forEach(function (d) {
+      setTimeout(function () {
+        if (t.isConnected || g.done) return;
+        var r = g.root.isConnected ? g.root : document, n = g.list(r)[g.i];
+        if (n && n !== t) { g.done = 1; bounce(n); }
+      }, d);
+    });
   }, true);
 
   var lb = $('liteBtn');

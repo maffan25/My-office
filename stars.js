@@ -63,7 +63,7 @@
         }
       }
     }
-    function paused() { var ai = document.getElementById("ai-app"); return document.hidden || (ai && !ai.hidden); }
+    function paused() { var ai = document.getElementById("ai-app"); return document.hidden || document.documentElement.classList.contains("win-open") || (ai && !ai.hidden); }
     function loop(now) {
       raf = 0; if (!visible) return;
       if (paused()) { last = 0; raf = requestAnimationFrame(loop); return; }
