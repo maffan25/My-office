@@ -1,0 +1,45 @@
+/* MyOffice — icons-premium.css : ikon menu utama bergaya premium & tenang.
+   Satu bahasa visual: kotak gelap bergradasi lembut, garis tepi champagne tipis, ikon garis halus warna gading.
+   Tanpa warna neon dan tanpa glow berwarna. Dimuat paling akhir agar menggantikan gaya ikon sebelumnya. */
+html:root .nav a{--gold:226,200,150}
+html:root .nav a .ic{
+  width:20px;height:20px;padding:12px;border-radius:15px;stroke-width:1.3;
+  color:#eadfc6;filter:none;
+  background:
+    radial-gradient(120% 90% at 50% -10%,rgba(255,240,205,.14),transparent 55%),
+    linear-gradient(180deg,#1f2549 0%,#12162f 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--gold),.24),
+    inset 0 1px 0 rgba(255,246,225,.20),
+    inset 0 -8px 14px -10px rgba(0,0,0,.55),
+    0 8px 16px -10px rgba(0,0,0,.75);
+  transition:transform .28s cubic-bezier(.2,.7,.2,1),color .25s,box-shadow .25s,background .25s;
+}
+html:root .nav a:hover .ic,html:root .nav a:focus-visible .ic{
+  color:#fff6df;filter:none;transform:translateY(-2px);
+  background:
+    radial-gradient(120% 90% at 50% -10%,rgba(255,240,205,.24),transparent 58%),
+    linear-gradient(180deg,#262d58 0%,#151a37 100%);
+  box-shadow:
+    inset 0 0 0 1px rgba(var(--gold),.55),
+    inset 0 1px 0 rgba(255,246,225,.32),
+    inset 0 -8px 14px -10px rgba(0,0,0,.5),
+    0 14px 22px -12px rgba(0,0,0,.85);
+}
+html:root .nav a:active .ic{transform:translateY(0) scale(.96)}
+html:root .nav a:hover{background:rgba(255,255,255,.04)}
+html:root .nav a:focus-visible{outline:1.5px solid rgba(var(--gold),.7);outline-offset:-2px}
+
+/* Tema terang (pagi): gading hangat dengan ikon perunggu */
+html[data-theme=pagi]:root .nav a .ic{
+  color:#6b5326;
+  background:
+    radial-gradient(120% 90% at 50% -10%,rgba(255,255,255,.9),transparent 60%),
+    linear-gradient(180deg,#fffaf0 0%,#efe3c9 100%);
+  box-shadow:inset 0 0 0 1px rgba(150,115,50,.28),inset 0 1px 0 rgba(255,255,255,.9),0 8px 16px -10px rgba(90,65,20,.35);
+}
+html[data-theme=pagi]:root .nav a:hover .ic{
+  color:#4d3a14;
+  box-shadow:inset 0 0 0 1px rgba(150,115,50,.55),inset 0 1px 0 #fff,0 14px 22px -12px rgba(90,65,20,.45);
+}
+@media (max-width:640px){html:root .nav a .ic{padding:11px;border-radius:14px}}
