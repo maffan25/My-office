@@ -1,0 +1,11 @@
+/* MyOffice — academic-light.css : jendela Academic Management selalu terang (krem hangat).
+   Sebelumnya palet gelap (tema "malam") menimpa langsung .ad-win sehingga teks terang jatuh di atas
+   latar krem dan ikon/tulisan sidebar serta "Profil" tidak terbaca. Palet di bawah mengikuti latar krem dari worlds.css. */
+html:root:root:root .ad-win{
+  --ad-bg:#fcf6ea;--ad-navy:#1f2b4d;--ad-bar:#1f2b4d;--ad-yel:#efb94b;--ad-yel2:#fbecc6;
+  --ad-main:rgba(255,253,247,.94);--ad-card:#fffdf8;--ad-line:#eadfc8;--ad-ink:#1f2b4d;--ad-mute:#7d7863;
+  --ad-grn:#3f7a54;--ad-grnbg:#e1efe2;--ad-sc1:#fbecc6;--ad-sc2:#e6edf9;--ad-mint:#dcefe6;
+  --ad-shadow:0 1px 2px rgba(60,44,10,.05),0 8px 22px rgba(60,44,10,.06);--ad-hov:rgba(60,44,10,.06);
+  --ink:var(--ad-ink);--panel:var(--ad-card);--glass-line:var(--ad-line);
+  color:var(--ad-ink);color-scheme:light}
+html:root:root:root .ad-win ::placeholder{color:var(--ad-mute);opacity:1}
