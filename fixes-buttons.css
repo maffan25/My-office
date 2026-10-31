@@ -1,0 +1,10 @@
+/* MyOffice — fixes-buttons.css
+   Analytics: tab yang sedang aktif tidak boleh menjadi putih saat di-hover/diklik.
+   Penyebab: aturan ".ac-tab:hover{background:#fff}" ikut mengenai tab aktif, sementara tulisan tab aktif berwarna putih
+   dan pil ungu penandanya (.ac-ind) tertutup. Tab aktif dibuat transparan agar pil ungu tetap terlihat. */
+html:root .ac-ov.an-skin .ac-win .ac-tab[aria-selected=true],
+html:root .ac-ov.an-skin .ac-win .ac-tab[aria-selected=true]:hover,
+html:root .ac-ov.an-skin .ac-win .ac-tab[aria-selected=true]:active,
+html:root .ac-ov.an-skin .ac-win .ac-tab[aria-selected=true]:focus-visible{background:transparent!important;color:#fff!important}
+html:root .ac-ov.an-skin .ac-win .ac-tab[aria-selected=true] *{color:#fff!important}
+html:root .ac-ov.an-skin .ac-win .ac-tab:not([aria-selected=true]):active{background:rgba(255,255,255,.7)}

@@ -136,13 +136,48 @@
     setTimeout(function () { current = ''; next(); setTimeout(micro, 3000); }, 380);
   }
 
-  /* ================= Bounce ringan saat diklik ================= */
-  var HIT = 'button,.nav a,.chip,.wall,.ac-btn,.ac-tab,.ac-x,[role=button],[role=tab],[role=switch]';
+  /* ================= Bounce saat diklik: semua tombol & elemen yang bisa diklik =================
+     Memakai Web Animations (composite:add) sehingga tidak bentrok dengan transform/animasi CSS lain
+     dan tetap jalan di jendela modul. Elemen kecil memantul lebih kuat, kartu besar lebih halus. */
+  var HIT = 'button,a[href],summary,label,input[type=checkbox],input[type=radio],input[type=range],input[type=color],input[type=file],input[type=submit],[role=button],[role=tab],[role=switch],[role=checkbox],[role=menuitem],[role=option],.nav a,.chip,.wall,.ac-btn,.ac-tab,.ac-x';
+  var SKIP = '.ac-ov,.ad-ov,.ac-win,.ad-win,.app,main,[data-nobounce]';
+  function okSize(n) { var r = n.getBoundingClientRect(); return r.width && r.width <= 700 && r.height <= 420; }
+  function hitOf(n) {
+    if (!n || n.nodeType !== 1) return null;
+    var h = n.closest(HIT);                                   /* tombol/tautan terdekat */
+    if (!h || h.matches(SKIP) || h.disabled || h.getAttribute('aria-disabled') === 'true') h = null;
+    if (h) return okSize(h) ? h : null;
+    var best = null;                                          /* elemen lain yang berkursor pointer (kartu, hari kalender, dst.) */
+    for (var i = 0; n && n.nodeType === 1 && n !== document.body && i < 8; i++, n = n.parentElement) {
+      if (n.matches(SKIP)) break;
+      if (getComputedStyle(n).cursor === 'pointer') best = n; else if (best) break;
+    }
+    return best && okSize(best) ? best : null;
+  }
+  /* Modul menggambar ulang isinya saat diklik: cari padanan elemen yang sama di DOM baru */
+  function sig(el) {
+    if (!el.className || typeof el.className !== 'string' || !el.className.trim()) return null;
+    var sel = el.tagName.toLowerCase() + '.' + el.className.trim().split(/\s+/).filter(function (c) { return !/^(bnc|on|open|sel|active)$/.test(c); }).join('.');
+    var root = el.closest('.ac-ov,.ad-ov,.wo-ov,.es-ov,.fn-app,.app') || document;
+    try { return { root: root, sel: sel, i: [].indexOf.call(root.querySelectorAll(sel), el) }; } catch (x) { return null; }
+  }
+  function bounce(el) {
+    if (!el.animate) return;
+    var r = el.getBoundingClientRect(), big = r.width > 260 || r.height > 90, nav = el.matches('.nav a');
+    var s = big ? [.975, 1.012] : [.88, 1.07], ty = nav ? [2, -4] : [0, 0];
+    function f(o, sc, y) { return { offset: o, transform: 'translateY(' + y + 'px) scale(' + sc + ')', easing: 'ease-in-out' }; }
+    if (el.__bnc) el.__bnc.cancel();
+    var an = el.__bnc = el.animate([f(0, 1, 0), f(.28, s[0], ty[0]), f(.62, s[1], ty[1]), f(1, 1, 0)], { duration: 420, composite: 'add' });
+    an.onfinish = an.oncancel = function () { if (el.__bnc === an) el.__bnc = null; };
+  }
   document.addEventListener('click', function (e) {
-    var t = e.target.closest && e.target.closest(HIT);
-    if (!t || reduce) return;
-    t.classList.remove('bnc'); void t.offsetWidth; t.classList.add('bnc');
-    setTimeout(function () { t.classList.remove('bnc'); }, 460);
+    if (reduce) return;
+    var t = hitOf(e.target); if (!t) return;
+    var g = sig(t); bounce(t);
+    if (g) setTimeout(function () {
+      if (t.isConnected || g.i < 0) return;
+      var n = (g.root.isConnected ? g.root : document).querySelectorAll(g.sel)[g.i]; if (n) bounce(n);
+    }, 40);
   }, true);
 
   var lb = $('liteBtn');
