@@ -7,9 +7,9 @@
 :root{
   --tech:'Chakra Petch','Inter',system-ui,sans-serif;
   --pix:'Pixelify Sans','Chakra Petch',ui-monospace,monospace;
-  --neon-a:#4be8ff;   /* aksen utama  */
-  --neon-b:#ff4fd8;   /* aksen kedua  */
-  --neon-c:#9b7bff;
+  --neon-a:#9fd8c8;   /* aksen utama  */
+  --neon-b:#c8a8e0;   /* aksen kedua  */
+  --neon-c:#8fa6e0;
 }
 
 /* ---------- Palet gelap langit bintang ---------- */
@@ -41,10 +41,10 @@ html[data-wall=bintang] #nebula{display:block}
 #nebula{
   inset:-8%;
   background:
-    radial-gradient(38% 34% at 16% 28%,rgba(120,72,255,.28),transparent 70%),
-    radial-gradient(34% 30% at 84% 20%,rgba(40,165,255,.2),transparent 70%),
-    radial-gradient(44% 38% at 72% 88%,rgba(255,72,170,.15),transparent 70%),
-    radial-gradient(60% 46% at 28% 104%,rgba(36,96,210,.26),transparent 70%);
+    radial-gradient(38% 34% at 16% 28%,rgba(112,104,200,.16),transparent 70%),
+    radial-gradient(34% 30% at 84% 20%,rgba(72,132,190,.12),transparent 70%),
+    radial-gradient(44% 38% at 72% 88%,rgba(170,112,170,.08),transparent 70%),
+    radial-gradient(60% 46% at 28% 104%,rgba(52,92,168,.18),transparent 70%);
   animation:nebDrift 90s ease-in-out infinite alternate;will-change:transform;
 }
 @keyframes nebDrift{from{transform:translate3d(-2%,-1%,0)}to{transform:translate3d(2%,1.5%,0)}}
@@ -57,7 +57,7 @@ html[data-lite="1"] #nebula{animation:none}
   font-family:var(--tech);font-weight:600;line-height:1.18;letter-spacing:.015em;
   font-size:clamp(28px,4.6vw,66px);color:#fff;text-shadow:none}
 .glitch{position:relative;display:block;text-align:center;text-wrap:balance;
-  text-shadow:0 0 18px rgba(120,150,255,.5)}
+  text-shadow:0 0 16px rgba(150,170,230,.28)}
 .glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;pointer-events:none;opacity:0;text-shadow:none}
 .glitch::before{color:var(--neon-a)}
 .glitch::after{color:var(--neon-b)}
