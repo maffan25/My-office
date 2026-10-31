@@ -1,72 +1,79 @@
-/* MyOffice — aurora.js : rumbai aurora kecil-kecil yang berkibar seperti bendera.
-   Puluhan pita mungil menempel di pinggir kiri & kanan layar, ujungnya meruncing
-   dan berkibar bergelombang tertiup angin (hijau -> teal -> ungu pucat).
-   Ada embusan angin pelan yang membuat kibarannya naik-turun. Di belakang bintang. */
+/* MyOffice — aurora.js : tiga tirai aurora realistis yang muncul dari sisi langit.
+   Meniru aurora asli: garis dasar bergelombang (lipatan tirai) yang merambat pelan,
+   sinar-sinar halus naik dari tepi bawah yang terang (putih-hijau -> hijau -> teal -> ungu di ujung),
+   terang di sisi asal lalu memudar (perspektif), dan kecerahan yang berdenyut tak beraturan.
+   Makin jauh dari tepi, lipatannya makin "berkibar". Di belakang bintang. */
 (function () {
   'use strict';
   var host = document.querySelector('.bg .stack'); if (!host) return;
-  var root = document.documentElement, TAU = 6.2832, N = 26;
+  var root = document.documentElement, TAU = 6.2832, SP = 128;
   var reduce = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
   var cv = document.createElement('canvas'), cx = cv.getContext('2d');
   cv.setAttribute('aria-hidden', 'true');
   cv.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;z-index:-2;pointer-events:none;display:block';
   host.style.isolation = 'isolate'; host.insertBefore(cv, host.firstChild);
 
-  var G = [104, 232, 172], T = [86, 200, 214], V = [176, 148, 236];
-  var SCH = [[G, T, V], [G, T, T], [T, V, V], [G, G, T]];
-  /* deretan bendera: nilai acak tetap (deterministik) agar tata letaknya stabil */
-  var seed = 7; function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
-  var F = [];
-  [-1, 1].forEach(function (side) {
-    var n = 9;
-    for (var i = 0; i < n; i++) F.push({
-      side: side, y: (i + .5 + (rnd() - .5) * .7) / n,            /* posisi menempel di tepi (pecahan tinggi) */
-      len: .07 + rnd() * .12,                                      /* panjang (pecahan lebar) */
-      th: .016 + rnd() * .026,                                     /* lebar pangkal (pecahan tinggi) */
-      amp: .010 + rnd() * .022, k: 1.1 + rnd() * 1.3, sp: 1.5 + rnd() * 1.3, ph: rnd() * TAU,
-      lift: (rnd() - .6) * .05, c: SCH[Math.floor(rnd() * SCH.length)], a: .55 + rnd() * .4, dl: rnd() * 2.6
-    });
-  });
-  var w = 0, h = 0, t = 12, raf = 0, last = 0, t0 = 0;
+  /* sprite gradasi vertikal: atas (ujung sinar) -> bawah (tepi dasar yang terang) */
+  function sprite(top, mid, base) {
+    var s = document.createElement('canvas'); s.width = 1; s.height = SP;
+    var g = s.getContext('2d'), gr = g.createLinearGradient(0, 0, 0, SP);
+    gr.addColorStop(0, 'rgba(' + top + ',0)'); gr.addColorStop(.24, 'rgba(' + top + ',.22)');
+    gr.addColorStop(.58, 'rgba(' + mid + ',.55)'); gr.addColorStop(.90, 'rgba(' + base + ',1)'); gr.addColorStop(1, 'rgba(' + base + ',0)');
+    g.fillStyle = gr; g.fillRect(0, 0, 1, SP); return s;
+  }
+  var SPR = {
+    green: sprite('150,112,224', '84,226,152', '178,255,214'),
+    teal: sprite('120,150,232', '84,208,196', '170,250,226'),
+    rose: sprite('214,120,176', '96,224,168', '184,255,210')
+  };
+  /* side: -1 muncul dari kiri, 1 dari kanan | len = jangkauan (pecahan lebar) | y0 di tepi, y1 di ujung (pecahan tinggi) */
+  var CU = [
+    { side: -1, len: .60, y0: .52, y1: .30, hm: .36, spr: SPR.green, a: .80, f: [1.3, 2.9], v: [.34, .22], A: [.040, .018], ph: 0,   dl: 0 },
+    { side: 1,  len: .46, y0: .44, y1: .24, hm: .30, spr: SPR.rose,  a: .66, f: [1.1, 2.4], v: [.28, .40], A: [.036, .016], ph: 2.7, dl: 1.8 },
+    { side: -1, len: .38, y0: .70, y1: .52, hm: .20, spr: SPR.teal,  a: .52, f: [1.6, 3.4], v: [.40, .26], A: [.030, .014], ph: 5.1, dl: 3.4 }
+  ];
+  var w = 0, h = 0, t = 40, raf = 0, last = 0, t0 = 0;
 
   function size() {
     var r = host.getBoundingClientRect();
-    w = Math.max(240, Math.min(1100, Math.round(r.width / 1.5))); h = Math.max(140, Math.round(w * r.height / Math.max(1, r.width)));
+    w = Math.max(320, Math.min(900, Math.round(r.width / 2))); h = Math.max(180, Math.round(w * r.height / Math.max(1, r.width)));
     cv.width = w; cv.height = h; draw(99);
   }
-  function rgba(c, a) { return 'rgba(' + c[0] + ',' + c[1] + ',' + c[2] + ',' + Math.max(0, a).toFixed(3) + ')'; }
   function ease(x) { x = Math.max(0, Math.min(1, x)); return x * x * (3 - 2 * x); }
 
-  function flag(f, ts, wind) {
-    var grow = reduce ? 1 : ease((ts - f.dl) / 2.4); if (grow <= 0) return;
-    var dir = -f.side, ax = f.side < 0 ? -2 : w + 2, ay = f.y * h, L = w * f.len * grow * (.92 + .08 * wind);
-    var P = [], U = [], D = [], i, s;
-    for (i = 0; i <= N; i++) {
-      s = i / N;
-      var fl = Math.sin(s * f.k * TAU - t * f.sp + f.ph) * f.amp * h * Math.pow(s, 1.1) * (.7 + .6 * wind);   /* kibaran: makin kuat ke ujung */
-      P.push([ax - dir * -s * L * 1, ay + fl + f.lift * h * s * s]);
+  function curtain(c, ts) {
+    var grow = reduce ? 1 : ease((ts - c.dl) / 4.5); if (grow <= 0) return;
+    var L = w * c.len * (.6 + .4 * grow), step = 2, edge = c.side < 0 ? 0 : w;
+    var breath = .72 + .28 * Math.sin(t * .13 + c.ph) * Math.sin(t * .047 + c.ph * .6 + 1);     /* denyut lambat tak beraturan */
+    function base(s) {                                                                          /* garis dasar: lipatan merambat, makin liar ke ujung */
+      var amp = .35 + .95 * s;
+      return h * (c.y0 + (c.y1 - c.y0) * ease(s) + amp * (c.A[0] * Math.sin(s * c.f[0] * TAU - t * c.v[0] + c.ph) + c.A[1] * Math.sin(s * c.f[1] * TAU + t * c.v[1] + c.ph * 1.9)));
     }
-    for (i = 0; i <= N; i++) {
-      s = i / N;
-      var a = P[Math.max(0, i - 1)], b = P[Math.min(N, i + 1)], dx = b[0] - a[0], dy = b[1] - a[1], m = Math.sqrt(dx * dx + dy * dy) || 1;
-      var nx = -dy / m, ny = dx / m, th = h * f.th * Math.pow(1 - s, .85) * (.9 + .1 * Math.sin(s * 9 - t * 2 + f.ph)) * grow;
-      U.push([P[i][0] + nx * th / 2, P[i][1] + ny * th / 2]); D.push([P[i][0] - nx * th / 2, P[i][1] - ny * th / 2]);
+    cx.globalAlpha = 1;
+    for (var d = 0; d < L; d += step) {
+      var s = d / L, x = edge + c.side * -d;
+      x = c.side < 0 ? d : w - d;
+      var yb = base(s), slope = Math.abs(base(Math.min(1, s + .012)) - base(Math.max(0, s - .012))) / (.024 * h);
+      var fold = 1 + Math.min(1.1, slope * 5);                                                  /* lipatan yang dilihat dari samping tampak lebih terang */
+      var env = Math.pow(1 - s, .85) * ease(s * 14 + .15);                                      /* terang di sisi asal, memudar ke ujung */
+      var patch = .5 + .5 * Math.sin(s * 3.3 * TAU + t * .21 + c.ph * 2.2);                     /* gumpalan terang yang bergeser */
+      var ray = .78 + .14 * Math.sin(d * .55 + t * .6 + c.ph) + .08 * Math.sin(d * 1.7 - t * .9);   /* sinar halus, tidak seragam */
+      var k = .30 + .70 * Math.pow(patch, 1.3);
+      var al = c.a * env * k * ray * breath * Math.min(1.5, fold) * (reduce ? 1 : ease(grow * 1.4));
+      if (al < .012) continue;
+      var hg = h * c.hm * (.42 + .58 * k) * (1 - .4 * s) * (.8 + .2 * ray);
+      cx.globalAlpha = Math.min(.92, al);
+      cx.drawImage(c.spr, 0, 0, 1, SP, x, yb - hg, step + .8, hg * 1.1);
     }
-    var tip = P[N], al = f.a * ease(grow * 1.5);
-    var gr = cx.createLinearGradient(ax, ay, tip[0], tip[1]);
-    gr.addColorStop(0, rgba(f.c[0], al)); gr.addColorStop(.5, rgba(f.c[1], al * .8)); gr.addColorStop(1, rgba(f.c[2], 0));
-    cx.fillStyle = gr;
-    [[1.9, .13], [1, .36], [.42, .5]].forEach(function (p) {         /* halo lebar, badan, inti terang */
-      cx.globalAlpha = p[1]; cx.beginPath();
-      for (i = 0; i <= N; i++) { var x = P[i][0] + (U[i][0] - P[i][0]) * p[0], y = P[i][1] + (U[i][1] - P[i][1]) * p[0]; if (i) cx.lineTo(x, y); else cx.moveTo(x, y); }
-      for (i = N; i >= 0; i--) cx.lineTo(P[i][0] + (D[i][0] - P[i][0]) * p[0], P[i][1] + (D[i][1] - P[i][1]) * p[0]);
-      cx.closePath(); cx.fill();
-    });
+    /* kabut tipis di sisi asal supaya tirai terasa menyatu dengan langit */
+    var g = cx.createLinearGradient(edge, 0, edge + (c.side < 0 ? 1 : -1) * L * .8, 0), a = .055 * c.a * breath;
+    g.addColorStop(0, 'rgba(110,230,170,' + a.toFixed(3) + ')'); g.addColorStop(1, 'rgba(110,230,170,0)');
+    cx.globalAlpha = 1; cx.fillStyle = g; cx.fillRect(c.side < 0 ? 0 : w - L, h * (c.y1 - c.hm), L, h * (c.y0 - c.y1 + c.hm * 1.2));
   }
   function draw(ts) {
     cx.clearRect(0, 0, w, h); cx.globalCompositeOperation = 'lighter';
-    var wind = .5 + .5 * Math.sin(t * .35) * Math.sin(t * .13 + 1), lite = root.dataset.lite === '1';
-    for (var i = 0; i < F.length; i++) { if (lite && i % 2) continue; flag(F[i], ts, wind); }
+    var n = root.dataset.lite === '1' ? 2 : CU.length;
+    for (var i = 0; i < n; i++) curtain(CU[i], ts);
     cx.globalAlpha = 1; cx.globalCompositeOperation = 'source-over';
   }
   function loop(now) {
