@@ -19,7 +19,7 @@
   --ease:cubic-bezier(.16,1,.3,1);
   --disp:var(--serif);
 }
-html[data-wall=angkasa] .ac-ov,html[data-wall=pixel] .ac-ov{--disp:var(--tech)}
+html[data-wall=bintang] .ac-ov{--disp:var(--tech)}
 
 /* ---------- Latar overlay ---------- */
 .ac-ov:not(.ac-ov2){
@@ -382,10 +382,6 @@ html[data-wall] .ac-ov .ac-soon>div{border:0}
 html[data-wall] .ac-soon>div{border:0;border-radius:26px}
 
 /* Pixel: tetap punya karakter retro (sudut tegas, bayangan berundak) */
-html[data-wall=pixel] .ac-ov .ac-win:not(.ac-form):not(.vw){border-radius:14px;
-  box-shadow:0 0 0 2px var(--glass-line),0 10px 0 rgba(10,4,30,.75),0 40px 90px rgba(0,0,12,.6)}
-html[data-wall=pixel] .ac-ov .ac-ico,html[data-wall=pixel] .ac-ov .ac-tab,html[data-wall=pixel] .ac-ov .ac-btn,html[data-wall=pixel] .ac-ov .ac-ind{border-radius:8px}
-html[data-wall=pixel] .ac-ov .ac-card,html[data-wall=pixel] .ac-ov .ac-stat,html[data-wall=pixel] .ac-ov .ac-item{border-radius:10px}
 @media (max-width:700px){
   html[data-wall] .ac-ov .ac-win:not(.ac-form):not(.vw){border-radius:0}
 }

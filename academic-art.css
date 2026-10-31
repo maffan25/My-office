@@ -6,7 +6,7 @@
 .ad-ov{position:fixed;inset:0;z-index:50;display:flex;align-items:center;justify-content:center;padding:16px;
   background:rgba(70,84,112,.42);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);animation:acfade .2s ease-out}
 .ad-ov[hidden]{display:none}
-html[data-wall=angkasa] .ad-ov,html[data-wall=pixel] .ad-ov{background:rgba(3,4,14,.74);-webkit-backdrop-filter:none;backdrop-filter:none}
+html[data-wall=bintang] .ad-ov{background:rgba(3,4,14,.74);-webkit-backdrop-filter:none;backdrop-filter:none}
 
 .ad-win{
   --ad-bg:#fff;--ad-main:#f5f4f8;--ad-card:#fff;--ad-line:#ebebf2;--ad-ink:#23294d;--ad-mute:#7f7d96;

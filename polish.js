@@ -80,14 +80,4 @@
      Paket tidak menyertakan assets/bg.jpg. Hanya saat "Danau Senja" dipilih
      file diperiksa; jika ada, dipakai (lewat CSS), jika tidak, ilustrasi SVG
      tetap tampil dan tidak ada permintaan 404 saat halaman dibuka. */
-  var probed = false;
-  function probePhoto() {
-    if (probed || root.dataset.wall !== 'scene') return;
-    probed = true;
-    var im = new Image();
-    im.onload = function () { root.dataset.hasPhoto = '1'; };
-    im.src = 'assets/bg.jpg';
-  }
-  new MutationObserver(probePhoto).observe(root, { attributes: true, attributeFilter: ['data-wall'] });
-  probePhoto();
 })();

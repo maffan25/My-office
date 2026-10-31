@@ -34,7 +34,6 @@ kbd{font:500 11px/1 var(--tech);padding:4px 7px;border-radius:6px;border:1px sol
 .sp-t mark{background:none;color:var(--neon-a);text-decoration:underline;text-underline-offset:3px}
 .sp-go{font-style:normal;font-size:11.5px;font-family:var(--tech);opacity:0;transform:translateX(-6px);transition:opacity .15s,transform .15s;color:var(--neon-a)}
 .sp-r.on{background:linear-gradient(90deg,rgba(75,232,255,.14),rgba(155,123,255,.08));border-color:rgba(75,232,255,.35)}
-html[data-wall=pixel] .sp-r.on{background:rgba(124,240,138,.12);border-color:rgba(124,240,138,.45)}
 .sp-r.on .ic{opacity:1;color:var(--neon-a)}
 .sp-r.on .sp-go{opacity:1;transform:none}
 .sp-empty{padding:34px 16px;text-align:center;font-size:14px}
@@ -86,8 +85,6 @@ html[data-wall=pixel] .sp-r.on{background:rgba(124,240,138,.12);border-color:rgb
 .panel .wall:hover{transform:translateY(-2px)}
 .panel .wall[aria-pressed=true]{border-color:var(--neon-a);box-shadow:0 0 0 1px var(--neon-a),0 0 16px rgba(75,232,255,.28)}
 .panel .wall span{left:8px;bottom:6px;font-size:11px;font-family:var(--tech);letter-spacing:.04em}
-.wall[data-v=angkasa]{background-image:radial-gradient(1.5px 1.5px at 20% 30%,#fff,transparent),radial-gradient(1px 1px at 60% 20%,#fff,transparent),radial-gradient(1.5px 1.5px at 80% 60%,#bfd4ff,transparent),radial-gradient(1px 1px at 35% 75%,#fff,transparent),radial-gradient(90% 70% at 70% 20%,#2a1d6e,#0a0c2b 55%,#03040c)!important}
-.wall[data-v=pixel]{background-image:linear-gradient(180deg,transparent 62%,#2b1b4e 62%),linear-gradient(135deg,transparent 52%,#3d2b72 52%,#3d2b72 70%,transparent 70%),linear-gradient(180deg,#36227a,#b44d80 55%,#ffb868)!important;image-rendering:pixelated}
 .p-row{display:flex;align-items:center;justify-content:space-between;gap:14px;margin:14px 18px 0;padding:12px 14px;border:1px solid var(--glass-line);border-radius:12px;background:rgba(127,140,170,.08)}
 .p-row b{display:block;font-weight:500;font-size:13px}
 .p-row small{display:block;margin-top:2px;font-size:11.5px;opacity:.65;line-height:1.35}
@@ -96,53 +93,45 @@ html[data-wall=pixel] .sp-r.on{background:rgba(124,240,138,.12);border-color:rgb
 .sw[aria-checked=true]{background:var(--neon-a)}
 .sw[aria-checked=true]::after{transform:translateX(18px)}
 .panel .reset{margin:12px 18px 16px;display:block}
-html[data-wall=angkasa] #themeSec,html[data-wall=pixel] #themeSec{display:none}
+html[data-wall=bintang] #themeSec{display:none}
 .panel .chips{margin-bottom:12px}
-html[data-wall=pixel] .panel,html[data-wall=pixel] .np,html[data-wall=pixel] .sp,html[data-wall=pixel] .ac-win{border-width:2px;border-radius:8px}
-html[data-wall=pixel] .panel .wall{border-radius:6px}
 
 /* ---------- Jendela modul bergaya HUD ---------- */
-html[data-wall=angkasa] .ac-win,html[data-wall=pixel] .ac-win{
+html[data-wall=bintang] .ac-win{
   position:relative;border-color:var(--glass-line);
   box-shadow:0 30px 90px rgba(0,0,12,.65),0 0 0 1px rgba(120,150,255,.08)}
-html[data-wall=pixel] .ac-win{box-shadow:0 8px 0 rgba(10,4,30,.7),0 30px 80px rgba(0,0,12,.6)}
 /* siku bidik di empat sudut */
-html[data-wall=angkasa] .ac-win::after,html[data-wall=pixel] .ac-win::after{
+html[data-wall=bintang] .ac-win::after{
   content:"";position:absolute;inset:9px;pointer-events:none;z-index:4;opacity:.75;
   background:
     linear-gradient(var(--neon-a),var(--neon-a)) 0 0/16px 2px no-repeat,linear-gradient(var(--neon-a),var(--neon-a)) 0 0/2px 16px no-repeat,
     linear-gradient(var(--neon-a),var(--neon-a)) 100% 0/16px 2px no-repeat,linear-gradient(var(--neon-a),var(--neon-a)) 100% 0/2px 16px no-repeat,
     linear-gradient(var(--neon-a),var(--neon-a)) 0 100%/16px 2px no-repeat,linear-gradient(var(--neon-a),var(--neon-a)) 0 100%/2px 16px no-repeat,
     linear-gradient(var(--neon-a),var(--neon-a)) 100% 100%/16px 2px no-repeat,linear-gradient(var(--neon-a),var(--neon-a)) 100% 100%/2px 16px no-repeat}
-html[data-wall=angkasa] .ac-win h2,html[data-wall=pixel] .ac-win h2{font-family:var(--tech);font-weight:600;font-size:24px;letter-spacing:.03em;
+html[data-wall=bintang] .ac-win h2{font-family:var(--tech);font-weight:600;font-size:24px;letter-spacing:.03em;
   display:inline-block;padding-bottom:6px;background:linear-gradient(90deg,var(--neon-a),var(--neon-a)) 0 100%/42px 2px no-repeat}
-html[data-wall=angkasa] .ac-win header p,html[data-wall=pixel] .ac-win header p{opacity:.65}
-html[data-wall=angkasa] .ac-x,html[data-wall=pixel] .ac-x{transition:transform .25s cubic-bezier(.3,1.5,.5,1),background .2s}
-html[data-wall=angkasa] .ac-x:hover,html[data-wall=pixel] .ac-x:hover{transform:rotate(90deg);background:rgba(255,79,110,.35)}
-html[data-wall=angkasa] .ac-tabs,html[data-wall=pixel] .ac-tabs{border-bottom-color:var(--glass-line)}
-html[data-wall=angkasa] .ac-tab,html[data-wall=pixel] .ac-tab,
-html[data-wall=angkasa] .ac-chip,html[data-wall=pixel] .ac-chip{border-color:var(--glass-line);font-family:var(--tech);letter-spacing:.02em;transition:background .2s,border-color .2s,color .2s,transform .2s}
-html[data-wall=angkasa] .ac-tab:hover,html[data-wall=pixel] .ac-tab:hover{border-color:var(--neon-a);transform:translateY(-1px)}
-html[data-wall=angkasa] .ac-tab[aria-selected=true],html[data-wall=pixel] .ac-tab[aria-selected=true],
-html[data-wall=angkasa] .ac-chip[aria-pressed=true],html[data-wall=pixel] .ac-chip[aria-pressed=true]{
+html[data-wall=bintang] .ac-win header p{opacity:.65}
+html[data-wall=bintang] .ac-x{transition:transform .25s cubic-bezier(.3,1.5,.5,1),background .2s}
+html[data-wall=bintang] .ac-x:hover{transform:rotate(90deg);background:rgba(255,79,110,.35)}
+html[data-wall=bintang] .ac-tabs{border-bottom-color:var(--glass-line)}
+html[data-wall=bintang] .ac-tab,html[data-wall=bintang] .ac-chip{border-color:var(--glass-line);font-family:var(--tech);letter-spacing:.02em;transition:background .2s,border-color .2s,color .2s,transform .2s}
+html[data-wall=bintang] .ac-tab:hover{border-color:var(--neon-a);transform:translateY(-1px)}
+html[data-wall=bintang] .ac-tab[aria-selected=true],html[data-wall=bintang] .ac-chip[aria-pressed=true]{
   background:rgba(75,232,255,.14);border-color:var(--neon-a);color:#fff;box-shadow:0 0 14px rgba(75,232,255,.22)}
-html[data-wall=pixel] .ac-tab[aria-selected=true],html[data-wall=pixel] .ac-chip[aria-pressed=true]{background:rgba(124,240,138,.14);box-shadow:0 0 0 rgba(0,0,0,0)}
-html[data-wall=angkasa] .ac-btn.pri,html[data-wall=pixel] .ac-btn.pri{background:linear-gradient(135deg,var(--neon-a),var(--neon-c));color:#07102a;font-weight:600;border:0}
-html[data-wall=angkasa] .ac-btn:hover,html[data-wall=pixel] .ac-btn:hover{border-color:var(--neon-a)}
-html[data-wall=angkasa] .ac-card,html[data-wall=pixel] .ac-card{border-color:var(--glass-line);transition:border-color .2s,transform .2s}
-html[data-wall=angkasa] .ac-card:hover,html[data-wall=pixel] .ac-card:hover{border-color:rgba(75,232,255,.45);transform:translateY(-1px)}
-html[data-wall=angkasa] .ac-item,html[data-wall=pixel] .ac-item{transition:transform .2s,border-color .2s}
-html[data-wall=angkasa] .ac-item:hover,html[data-wall=pixel] .ac-item:hover{transform:translateX(3px);border-color:rgba(75,232,255,.4)}
-html[data-wall=angkasa] .ac-win input:focus,html[data-wall=pixel] .ac-win input:focus,
-html[data-wall=angkasa] .ac-win select:focus,html[data-wall=pixel] .ac-win select:focus,
-html[data-wall=angkasa] .ac-win textarea:focus,html[data-wall=pixel] .ac-win textarea:focus{outline:0;border-color:var(--neon-a);box-shadow:0 0 0 3px rgba(75,232,255,.18)}
-html[data-wall=angkasa] .ac-body,html[data-wall=pixel] .ac-body,html[data-wall=angkasa] .sp-list,html[data-wall=pixel] .sp-list{scrollbar-width:thin;scrollbar-color:rgba(155,170,220,.35) transparent}
+html[data-wall=bintang] .ac-btn.pri{background:linear-gradient(135deg,var(--neon-a),var(--neon-c));color:#07102a;font-weight:600;border:0}
+html[data-wall=bintang] .ac-btn:hover{border-color:var(--neon-a)}
+html[data-wall=bintang] .ac-card{border-color:var(--glass-line);transition:border-color .2s,transform .2s}
+html[data-wall=bintang] .ac-card:hover{border-color:rgba(75,232,255,.45);transform:translateY(-1px)}
+html[data-wall=bintang] .ac-item{transition:transform .2s,border-color .2s}
+html[data-wall=bintang] .ac-item:hover{transform:translateX(3px);border-color:rgba(75,232,255,.4)}
+html[data-wall=bintang] .ac-win input:focus,html[data-wall=bintang] .ac-win select:focus,html[data-wall=bintang] .ac-win textarea:focus{outline:0;border-color:var(--neon-a);box-shadow:0 0 0 3px rgba(75,232,255,.18)}
+html[data-wall=bintang] .ac-body,html[data-wall=bintang] .sp-list{scrollbar-width:thin;scrollbar-color:rgba(155,170,220,.35) transparent}
 /* isi tab muncul halus saat berpindah */
-html[data-wall=angkasa] .ac-body>*,html[data-wall=pixel] .ac-body>*{animation:bodyIn .3s ease-out both}
+html[data-wall=bintang] .ac-body>*{animation:bodyIn .3s ease-out both}
 @keyframes bodyIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 /* toast "Coming soon" lama ikut gaya HUD */
-html[data-wall=angkasa] .ac-soon>div,html[data-wall=pixel] .ac-soon>div{border:1px solid var(--glass-line);background:var(--panel)}
+html[data-wall=bintang] .ac-soon>div{border:1px solid var(--glass-line);background:var(--panel)}
 
 @media (prefers-reduced-motion:reduce){
   .sp,.np,.sp-r,.np-i,.sp-ov,html[data-wall] .ac-body>*{animation:none!important}

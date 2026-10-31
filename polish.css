@@ -204,7 +204,6 @@ html.is-hidden *,html.is-hidden *::before,html.is-hidden *::after{animation-play
 }
 
 /* Foto latar "Danau Senja" (opsional) — aktif hanya bila assets/bg.jpg ada */
-html[data-has-photo="1"][data-wall=scene] .stack .photo{background-image:url("assets/bg.jpg")}
 
 /* ---- Penyelarasan akhir beranda ---- */
 .hero .quote{color:rgba(236,240,255,.94);font-weight:400}
