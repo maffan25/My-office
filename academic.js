@@ -141,8 +141,8 @@
   var ov, body, sideEl, subEl, hiEl, dotEl, tab = 'dash', tf = 'Semua', ef = 'Semua', cf = 'Semua', rng = 'Hari ini', q = '', draft = null;
   var T0 = new Date(), cal = { y: T0.getFullYear(), m: T0.getMonth() }, sel = today();
   var TABS = [['dash', 'Dashboard', 'dash'], ['course', 'Mata Kuliah', 'book'], ['sem', 'Semester', 'cal'], ['task', 'Tugas', 'task'],
-    ['exam', 'Ujian', 'exam'], ['ana', 'Analitik', 'chart'], ['cfg', 'Formula Nilai', 'set']];
-  var PAGE = { course: 'Mata Kuliah', sem: 'Semester', task: 'Tugas', exam: 'Ujian', ana: 'Analitik', cfg: 'Formula Nilai' };
+    ['exam', 'Ujian', 'exam'], ['exam2', 'Exam', 'quiz'], ['ana', 'Analitik', 'chart'], ['cfg', 'Formula Nilai', 'set']];
+  var PAGE = { course: 'Mata Kuliah', sem: 'Semester', task: 'Tugas', exam: 'Ujian', exam2: 'Exam', ana: 'Analitik', cfg: 'Formula Nilai' };
   var PALETTE = ['#ffe24a', '#cfe6ff', '#ffd3d3', '#d6f0c4', '#e4d8ff', '#ffe0bd', '#c9f0e8'];
   var ICO = {
     dash: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/>',
@@ -152,6 +152,7 @@
     exam: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M8 13h8M8 17h5"/>',
     chart: '<path d="M3 3v18h18"/><path d="m7 15 4-4 3 3 5-6"/>',
     set: '<path d="M4 6h10M18 6h2M4 12h4M12 12h8M4 18h12M20 18h0"/><circle cx="16" cy="6" r="2"/><circle cx="10" cy="12" r="2"/><circle cx="18" cy="18" r="2"/>',
+    quiz: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M8 9h8M8 13h4"/><circle cx="16.5" cy="16.5" r="2"/>',
     search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
     pen: '<path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>',
@@ -266,7 +267,7 @@
   function renderBody() {
     var top = body.scrollTop;
     ov.querySelectorAll('.ad-nl[data-t]').forEach(function (b) { if (b.dataset.t === tab && !q) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-    var v = q ? vSearch() : tab === 'dash' ? vDash() : '<div class="ad-sh"><h2 class="ad-h">' + PAGE[tab] + '</h2></div>' + ({ course: vCourse, sem: vSem, task: vTask, exam: vExam, ana: vAna, cfg: vCfg })[tab]();
+    var v = q ? vSearch() : tab === 'dash' ? vDash() : '<div class="ad-sh"><h2 class="ad-h">' + PAGE[tab] + '</h2></div>' + ({ course: vCourse, sem: vSem, task: vTask, exam: vExam, exam2: function () { return MO.examView ? MO.examView() : ''; }, ana: vAna, cfg: vCfg })[tab]();
     body.innerHTML = v; body.scrollTop = q ? 0 : top;
   }
   var warn = function () {
@@ -604,6 +605,7 @@
     dlg.hidden = false; clearTimeout(tm); tm = setTimeout(function () { dlg.hidden = true; }, 2200);
   }
   MO.msg = function (t, x) { msg(t, x); };
+  MO.acadRender = function () { if (ov && !ov.hidden) renderBody(); };
   function soon(label) {
     if (!dlg) msg('', '');
     msg(label || '', 'Coming s0000000n');
