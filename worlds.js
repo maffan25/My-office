@@ -15,7 +15,8 @@ analytics:{b:[['#b7a8f5',.45,'12%','10%',580,18,150,80],['#f6a99a',.34,'88%','55
 settings:{b:[['#a9c1d9',.5,'12%','10%',560,20,120,70]],f:[4,'#e9f1f8',.75]}};
 function el(c,s,t){var e=D.createElement(t||'div');e.className=c;for(var k in s)e.style.setProperty(k,s[k]);return e}
 function r(a,b){return a+Math.random()*(b-a)}
-function add(a,n,c,f){for(var i=0;i<n;i++)a.appendChild(el(c,f(i)))}
+function K(){return D.documentElement.dataset.lite==='1'||matchMedia('(pointer:coarse)').matches?.5:1}
+function add(a,n,c,f){n=Math.max(1,Math.round(n*K()));for(var i=0;i<n;i++)a.appendChild(el(c,f(i)))}
 function build(n){
   var w=Wd[n],a=el('wx-amb');if(!w)return a;
   w.b.forEach(function(b){var e=el('wx-b'+(b[8]?' wx-breathe':''),{'--c':b[0],'--o':b[1],'--x':b[2],'--y':b[3],'--s':b[4]+'px','--t':b[5]+'s','--dx':b[6]+'px','--dy':b[7]+'px'});a.appendChild(e)});

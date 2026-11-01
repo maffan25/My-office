@@ -3,8 +3,16 @@
 (function () {
   "use strict";
   var reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
-  var DPR = Math.min(window.devicePixelRatio || 1, 1.5);
+  var DPR = Math.min(window.devicePixelRatio || 1, 1.25);
   var TINT = ["255,255,255", "255,255,255", "255,255,255", "248,210,74", "248,210,74", "150,230,205"];
+
+  var SPR = {};
+  function sprite(c) {                              /* titik bulat dipra-render sekali per warna */
+    if (SPR[c]) return SPR[c];
+    var k = document.createElement("canvas"); k.width = k.height = 32;
+    var g = k.getContext("2d"); g.fillStyle = "rgb(" + c + ")"; g.beginPath(); g.arc(16, 16, 15, 0, 6.2832); g.fill();
+    return (SPR[c] = k);
+  }
 
   function Field(host, density, shoot, cap) {
     var cv = document.createElement("canvas"), cx = cv.getContext("2d");
@@ -44,8 +52,7 @@
         s.x += s.v * dt * 0.8; s.y -= s.v * dt * 0.45;      /* melayang pelan ke kanan atas */
         if (s.x > W + 4) s.x = -4; if (s.y < -4) { s.y = H + 4; s.x = Math.random() * W; }
         var a = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(s.ph + t * s.sp));
-        cx.fillStyle = "rgba(" + s.c + "," + (a * (0.55 + s.z * 0.45)).toFixed(3) + ")";
-        cx.beginPath(); cx.arc(s.x, s.y, s.r, 0, 6.2832); cx.fill();
+        cx.globalAlpha = a * (0.55 + s.z * 0.45); cx.drawImage(sprite(s.c), s.x - s.r, s.y - s.r, s.r * 2, s.r * 2); cx.globalAlpha = 1;
         if (s.sparkle) {
           var L = 3 + 4 * a; cx.strokeStyle = "rgba(" + s.c + "," + (a * 0.55).toFixed(3) + ")"; cx.lineWidth = 0.8;
           cx.beginPath(); cx.moveTo(s.x - L, s.y); cx.lineTo(s.x + L, s.y); cx.moveTo(s.x, s.y - L); cx.lineTo(s.x, s.y + L); cx.stroke();
@@ -69,7 +76,8 @@
       if (paused()) { last = 0; raf = requestAnimationFrame(loop); return; }
       var dt = last ? Math.min(0.05, (now - last) / 1000) : 0; last = now;
       acc += dt;
-      if (acc >= 1 / 40) { draw(acc); acc = 0; }               /* ~40 gambar per detik */
+      var fps = document.documentElement.dataset.lite === "1" ? 20 : 30;
+      if (acc >= 1 / fps) { draw(acc); acc = 0; }              /* 30 gambar/detik cukup untuk gerak pelan */
       raf = requestAnimationFrame(loop);
     }
     function start() { if (!raf && !reduce) { last = 0; raf = requestAnimationFrame(loop); } }

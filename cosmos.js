@@ -40,8 +40,9 @@
   function paused() { return document.hidden || document.body.style.overflow === 'hidden'; }
 
   function loop(now) {
+    if (!cur) { raf = 0; return; }                 // tanpa engine: hentikan loop (hemat CPU)
     raf = requestAnimationFrame(loop);
-    if (!cur || paused()) { last = now; return; }
+    if (paused()) { last = now; return; }
     var step = lite === '1' ? 50 : 33;
     if (now - last < step - 2) return;
     var dt = Math.min(.06, (now - last) / 1000); last = now;
@@ -64,6 +65,7 @@
     cv.classList.remove('ready', 'px');
     if (cur) {
       cur.start();
+      if (!raf && !reduce) raf = requestAnimationFrame(loop);
       if (reduce) cur.frame(performance.now(), 0);
       requestAnimationFrame(function () { cv.classList.add('ready'); });
     }
@@ -73,7 +75,6 @@
     var rt; window.addEventListener('resize', function () {
       clearTimeout(rt); rt = setTimeout(function () { if (cur && cur.resize) { cur.resize(); if (reduce) cur.frame(performance.now(), 0); } }, 160);
     });
-    if (!reduce) raf = requestAnimationFrame(loop);
   }
 
 
@@ -136,56 +137,7 @@
     setTimeout(function () { current = ''; next(); setTimeout(micro, 3000); }, 380);
   }
 
-  /* ================= Bounce saat diklik: semua tombol & elemen yang bisa diklik =================
-     Memakai Web Animations (composite:add) sehingga tidak bentrok dengan transform/animasi CSS lain
-     dan tetap jalan di jendela modul. Elemen kecil memantul lebih kuat, kartu besar lebih halus. */
-  var HIT = 'button,a[href],summary,label,input[type=checkbox],input[type=radio],input[type=range],input[type=color],input[type=file],input[type=submit],[role=button],[role=tab],[role=switch],[role=checkbox],[role=menuitem],[role=option],.nav a,.chip,.wall,.ac-btn,.ac-tab,.ac-x';
-  var SKIP = '.ac-ov,.ad-ov,.ac-win,.ad-win,.app,main,[data-nobounce]';
-  function okSize(n) { var r = n.getBoundingClientRect(); return r.width && r.width <= 700 && r.height <= 420; }
-  function hitOf(n) {
-    if (!n || n.nodeType !== 1) return null;
-    var h = n.closest(HIT);                                   /* tombol/tautan terdekat */
-    if (!h || h.matches(SKIP) || h.disabled || h.getAttribute('aria-disabled') === 'true') h = null;
-    if (h) return okSize(h) ? h : null;
-    var best = null;                                          /* elemen lain yang berkursor pointer (kartu, hari kalender, dst.) */
-    for (var i = 0; n && n.nodeType === 1 && n !== document.body && i < 8; i++, n = n.parentElement) {
-      if (n.matches(SKIP)) break;
-      if (getComputedStyle(n).cursor === 'pointer') best = n; else if (best) break;
-    }
-    return best && okSize(best) ? best : null;
-  }
-  /* Modul menggambar ulang isinya saat diklik: cari padanan elemen yang sama di DOM baru */
-  function sig(el) {
-    var cls = (typeof el.className === 'string' ? el.className : '').trim().split(/\s+/).filter(function (c) { return c && !/^(bnc|on|open|sel|active)$/.test(c); });
-    var base = el.tagName.toLowerCase() + (cls.length ? '.' + cls.join('.') : ''), txt = (el.textContent || '').trim();
-    var root = el.closest('.ac-ov,.ad-ov,.wo-ov,.es-ov,.fn-ov,.fn-app,.app') || document;
-    function list(r) {
-      try { return [].filter.call(r.querySelectorAll(base), function (n) { return !txt || (n.textContent || '').trim() === txt; }); } catch (x) { return []; }
-    }
-    var i = list(root).indexOf(el);
-    return i < 0 ? null : { root: root, list: list, i: i };
-  }
-  function bounce(el) {
-    if (!el.animate) return;
-    var r = el.getBoundingClientRect(), big = r.width > 260 || r.height > 90, nav = el.matches('.nav a');
-    var s = big ? [.975, 1.012] : [.88, 1.07], ty = nav ? [2, -4] : [0, 0];
-    function f(o, sc, y) { return { offset: o, transform: 'translateY(' + y + 'px) scale(' + sc + ')', easing: 'ease-in-out' }; }
-    if (el.__bnc) el.__bnc.cancel();
-    var an = el.__bnc = el.animate([f(0, 1, 0), f(.28, s[0], ty[0]), f(.62, s[1], ty[1]), f(1, 1, 0)], { duration: 420, composite: 'add' });
-    an.onfinish = an.oncancel = function () { if (el.__bnc === an) el.__bnc = null; };
-  }
-  document.addEventListener('click', function (e) {
-    if (reduce) return;
-    var t = hitOf(e.target); if (!t) return;
-    var g = sig(t); bounce(t);
-    if (g) [30, 100].forEach(function (d) {
-      setTimeout(function () {
-        if (t.isConnected || g.done) return;
-        var r = g.root.isConnected ? g.root : document, n = g.list(r)[g.i];
-        if (n && n !== t) { g.done = 1; bounce(n); }
-      }, d);
-    });
-  }, true);
+  /* Efek klik (tekan + riak + pantul) ditangani fx.js — duplikat di sini dihapus. */
 
   var lb = $('liteBtn');
   if (lb) { lb.setAttribute('aria-checked', lite === '1'); lb.addEventListener('click', function () { setLite(lite !== '1', true); }); }

@@ -1,0 +1,21 @@
+/* perf.css — lapisan terakhir: hanya aturan yang menurunkan biaya render, tanpa mengubah tampilan utama */
+html{-webkit-tap-highlight-color:transparent}
+body{overscroll-behavior:none}
+
+/* partikel kecil tidak perlu layer permanen sendiri-sendiri */
+.wx-p,.wx-l,.wx-sp,.wx-s{will-change:auto}
+
+/* sorotan kursor tidak berguna di layar sentuh */
+@media (hover:none){.wx-spot{display:none!important}}
+
+/* mode hemat / perangkat sentuh: tanpa blur kaca sama sekali */
+html[data-lite="1"] *,html[data-lite="1"] *::before,html[data-lite="1"] *::after,
+html.touch .nav,html.touch .info,html.touch .panel,html.touch [class$="-ov"],html.touch [class*="-ov "]{
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important}
+
+/* saat jendela modul terbuka: kaca beranda tidak perlu blur */
+html.win-open .nav,html.win-open .info,html.win-open .panel{-webkit-backdrop-filter:none;backdrop-filter:none}
+
+@media (prefers-reduced-motion:reduce){
+  .wx-amb *,#nebula{animation:none!important}
+}
