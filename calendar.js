@@ -13,7 +13,7 @@
   var tmin = function (t) { var a = (t || '0:0').split(':'); return +a[0] * 60 + +a[1]; };
   var hhmm = function (m) { return pad(Math.floor(m / 60) % 24) + ':' + pad(m % 60); };
   var CF = { wk: 1, tz: 'auto', mode: 'both', hij: 0 };
-  var PAL = [['', 'Ikuti kategori'], ['#4f7cff', 'Biru'], ['#2f9e6b', 'Hijau'], ['#d99a2b', 'Kuning'], ['#d0443e', 'Merah'], ['#8a5fb5', 'Ungu'], ['#d4608f', 'Pink'], ['#5f6b7a', 'Abu-abu']];
+  var PAL = [['', 'Ikuti jenis & kategori'], ['#4f7cff', 'Biru'], ['#2f9e6b', 'Hijau'], ['#d99a2b', 'Kuning'], ['#d0443e', 'Merah'], ['#8a5fb5', 'Ungu'], ['#d4608f', 'Pink'], ['#5f6b7a', 'Abu-abu']];
 
   /* ---------- Zona waktu & Hijriah ---------- */
   function nowP() {
@@ -43,7 +43,44 @@
   }, function (app) {
     var D = app.D, st = app.st; D.set = Object.assign({ wk: 1, tz: 'auto', mode: 'both', hij: 0 }, D.set); CF = D.set;
     var projects = function () { return ls('mo-proj-v1').proj || []; }, courses = function () { return ls('mo-acad-v1').course || []; }, TK = [];
-    var color = function (e) { return e.color || (by(D.cat, e.catId) || {}).color || '#4f7cff'; };
+    /* ---------- Jenis kegiatan, warna blok & api pengingat ---------- */
+    var KD = { ujian: { n: 'Ujian', c: '#e5484d', p: 3 }, presentasi: { n: 'Presentasi', c: '#8b5cf6', p: 2 }, penting: { n: 'Kegiatan penting', c: '#f59e0b', p: 1 } };
+    var RX = {
+      ujian: /\b(ujian|uts|uas|ujikom|kuis|quiz|ulangan|exam|midterm|sidang)\b/i,
+      presentasi: /\b(presentasi|presentation|pitch|seminar|paparan|demo day|sempro|semhas|defense)\b/i,
+      penting: /\b(penting|urgent|deadline|wajib|interview|wawancara|krusial)\b/i
+    };
+    var kindOf = function (e) {
+      if (e.kind === 'biasa') return '';
+      if (KD[e.kind]) return e.kind;
+      var s = (e.title || '') + ' ' + ((by(D.cat, e.catId) || {}).name || '');
+      return ['ujian', 'presentasi', 'penting'].filter(function (k) { return RX[k].test(s); })[0] || '';
+    };
+    var color = function (e) { var k = kindOf(e); return e.color || (k && KD[k].c) || (by(D.cat, e.catId) || {}).color || '#4f7cff'; };
+    var lo = function (e) {                       /* sisa hari sampai mulai (0 = hari ini / sedang berlangsung), -1 = sudah lewat */
+      var t0 = dn(today()), left = dn(e.start) - t0;
+      return left >= 0 ? left : (dn(e.end || e.start) >= t0 ? 0 : -1);
+    };
+    var fl = function (e) { var n = kindOf(e) ? lo(e) : -1; return n >= 0 && n <= 3 ? n : -1; };   /* api hanya H-3 .. hari-H */
+    var hLbl = function (n) { return n === 0 ? 'Hari ini' : 'H-' + n; };
+    var FIRE = '<svg viewBox="0 0 24 30" aria-hidden="true"><path class="fo" d="M12 0C12 6 20 10 20 20a8 8 0 0 1-16 0C4 15 7 12 8 8c1 2 2 3 2.5 4C11.5 9 11 4 12 0z"/><path class="fm" d="M12 11c0 4 5 6 5 10.500a5 5 0 0 1-10 0C7 19 8.500 17.500 9.500 16c1 1 1.500 1.500 1.800 2 .5-2.500.5-5 .7-7z"/><path class="fi" d="M12 19c0 2 2.500 3 2.500 5a2.500 2.500 0 0 1-5 0c0-1.200 1-2 1.500-3 .5.500.7.800.8 1 .2-1 .2-2 .2-3z"/></svg>';
+    var fireEl = function (n) { return '<em class="fire l' + n + '" role="img" aria-label="Api pengingat ' + hLbl(n) + '" title="' + hLbl(n) + '">' + FIRE + '</em>'; };
+    var tag = function (e) { var n = fl(e); return n < 0 ? '' : fireEl(n); };
+    var kindLbl = function (e) {
+      var k = kindOf(e); if (!k) return ''; var n = lo(e);
+      return '<span class="kc-tag" style="--b:' + KD[k].c + '">' + KD[k].n + (n >= 0 ? ' · ' + hLbl(n) : '') + '</span>';
+    };
+    var legend = function () {
+      return '<div class="kc-leg"><span>' + fireEl(2).replace('class="fire l2"', 'class="fire l2" style="--fd:1.2s"') + 'Api = H-3 s/d hari-H</span>' +
+        Object.keys(KD).map(function (k) { return '<span><s style="--b:' + KD[k].c + '"></s>' + KD[k].n + '</span>'; }).join('') + '<span><s style="--b:#4f7cff"></s>Lainnya (warna kategori)</span></div>';
+    };
+    function fireBar() {
+      var list = D.ev.filter(function (e) { return fl(e) >= 0; }).sort(function (x, y) { return fl(x) - fl(y) || rng(x)[0] - rng(y)[0]; });
+      if (!list.length) return '';
+      var now = today();
+      return '<div class="fire-bar" role="status">' + fireEl(fl(list[0])) + '<div><b>' + list.length + ' kegiatan menyala dalam 3 hari ke depan</b><div class="fb-c">' +
+        list.slice(0, 6).map(function (e) { return '<button class="fb-chip" style="--b:' + color(e) + '" data-act="firego" data-d="' + (e.start > now ? e.start : now) + '">' + esc(KD[kindOf(e)].n + ': ' + e.title) + ' · ' + hLbl(fl(e)) + '</button>'; }).join('') + '</div></div></div>';
+    }
     var rng = function (e) {
       var s = dn(e.start) * 1440 + (e.allDay ? 0 : tmin(e.startTime)), en = e.allDay ? (dn(e.end || e.start) + 1) * 1440 : (e.endTime ? dn(e.end || e.start) * 1440 + tmin(e.endTime) : s);
       return [s, en];
@@ -71,6 +108,7 @@
         { k: 'title', l: 'Judul acara', t: 'text', req: 1, full: 1 },
         { k: 'catId', l: 'Kategori', t: 'select', o: function () { return [['', '—']].concat(D.cat.map(function (c) { return [c.id, c.name]; })); } },
         { k: 'color', l: 'Warna', t: 'select', o: PAL },
+        { k: 'kind', l: 'Jenis kegiatan (api H-3 & warna blok)', t: 'select', o: [['', 'Otomatis (dari judul / kategori)'], ['ujian', 'Ujian'], ['presentasi', 'Presentasi'], ['penting', 'Kegiatan penting'], ['biasa', 'Biasa (tanpa api)']] },
         { k: 'allDay', l: 'Seharian?', t: 'select', bool: 1, o: [['false', 'Tidak (ada jam)'], ['true', 'Ya, seharian']] },
         { k: 'remind', l: 'Pengingat', t: 'select', o: [['', 'Tanpa pengingat'], ['0', 'Tepat waktu'], ['5', '5 menit sebelum'], ['15', '15 menit sebelum'], ['30', '30 menit sebelum'], ['60', '1 jam sebelum'], ['1440', '1 hari sebelum']] },
         { k: 'start', l: 'Tanggal mulai', t: 'date', req: 1 }, { k: 'startTime', l: 'Jam mulai', t: 'time' },
@@ -84,7 +122,7 @@
     };
     function item(e, cls) {
       var rel = [(by(projects(), e.projId) || {}).name, (by(courses(), e.courseId) || {}).name].filter(Boolean).join(' · ');
-      return '<button class="ev" style="--c:' + color(e) + '" data-act="edit" data-e="ev" data-id="' + e.id + '" title="' + esc(e.title + ' · ' + tl(e) + (e.location ? ' · ' + e.location : '') + (rel ? ' · ' + rel : '')) + '">' + (e.allDay ? '' : esc(e.startTime) + ' ') + esc(e.title) + '</button>';
+      return '<button class="ev" style="--c:' + color(e) + '" data-act="edit" data-e="ev" data-id="' + e.id + '" title="' + esc(e.title + ' · ' + tl(e) + (e.location ? ' · ' + e.location : '') + (rel ? ' · ' + rel : '')) + '">' + tag(e) + (e.allDay ? '' : esc(e.startTime) + ' ') + esc(e.title) + '</button>';
     }
     var taskBtn = function (t) { return '<button class="ev tk' + (t.status === 'Done' ? ' dn' : '') + '" style="--c:#8a94a6" data-act="gotask" title="Tenggat tugas' + (t.dueTime ? ' ' + t.dueTime : '') + '">☑ ' + esc(t.title) + '</button>'; };
 
@@ -95,14 +133,24 @@
       h += '</div><div class="kc-days">';
       for (i = 0; i < lead; i++) h += '<span class="kc-d out"></span>';
       for (i = 0; i < mi.len; i++) {
-        var d = addD(first, i), busy = onDay(d).length + tasksOn(d).length > 0;
-        h += '<button class="kc-d' + (d === now ? ' td' : '') + (d === sel ? ' sel' : '') + '" data-act="selday" data-d="' + d + '" aria-label="' + fd(d) + (busy ? ', ada kegiatan' : '') + '"' + (d === sel ? ' aria-pressed="true"' : '') + '>' + dayNum(d) + (busy ? '<u class="kc-dot"></u>' : '') + '</button>';
+        var d = addD(first, i), evs = onDay(d), tks = tasksOn(d), busy = evs.length + tks.length > 0, fn = -1, tint = null, bars = [];
+        evs.forEach(function (e) {
+          var c = color(e), k = kindOf(e), n = fl(e);
+          if (bars.indexOf(c) < 0) bars.push(c);
+          if (k && (!tint || KD[k].p > tint.p)) tint = { c: c, p: KD[k].p };
+          if (n >= 0 && d === (e.start > now ? e.start : now) && (fn < 0 || n < fn)) fn = n;   /* api di tanggal mulai (atau hari ini jika sedang berlangsung) */
+        });
+        if (!tint && evs.length) tint = { c: color(evs[0]), p: 0 };
+        h += '<button class="kc-d' + (d === now ? ' td' : '') + (d === sel ? ' sel' : '') + (d < now ? ' pst' : '') + '" data-act="selday" data-d="' + d + '" aria-label="' + fd(d) + (busy ? ', ada kegiatan' : '') + (fn >= 0 ? ', api pengingat ' + hLbl(fn) : '') + '"' + (d === sel ? ' aria-pressed="true"' : '') + '>' +
+          (fn >= 0 ? '<s class="kc-glow l' + fn + '"></s>' : tint ? '<s class="kc-blk" style="--b:' + tint.c + '"></s>' : '') +
+          dayNum(d) + (fn >= 0 ? fireEl(fn) : '') +
+          (bars.length ? '<span class="kc-bars">' + bars.slice(0, 4).map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</span>' : (tks.length ? '<u class="kc-dot"></u>' : '')) + '</button>';
       }
-      h += '</div><div class="kc-foot"><span><i></i>Ada kegiatan</span><button class="kc-today" data-act="cnav" data-d="0">Kembali ke hari ini</button></div></div>';
+      h += '</div><div class="kc-foot">' + legend() + '<button class="kc-today" data-act="cnav" data-d="0">Kembali ke hari ini</button></div></div>';
       var ev = onDay(sel).sort(function (x, y) { return rng(x)[0] - rng(y)[0]; }), tk = tasksOn(sel);
       h += '<aside class="kc-side" aria-live="polite"><small>' + DL[dow(sel)] + ', ' + (+sel.slice(8)) + ' ' + MN[+sel.slice(5, 7) - 1] + ' ' + sel.slice(0, 4) + '</small>';
       if (!ev.length && !tk.length) h += '<p>Belum ada kegiatan pada tanggal ini.</p>';
-      ev.forEach(function (e) { h += '<button class="kc-ev" style="--c:' + color(e) + '" data-act="edit" data-e="ev" data-id="' + e.id + '"><i></i><div><b>' + esc(e.title) + '</b><small>' + esc(tl(e)) + (e.location ? ' · ' + esc(e.location) : '') + '</small></div></button>'; });
+      ev.forEach(function (e) { h += '<button class="kc-ev" style="--c:' + color(e) + '" data-act="edit" data-e="ev" data-id="' + e.id + '"><i></i><div><b>' + tag(e) + esc(e.title) + '</b><small>' + kindLbl(e) + esc(tl(e)) + (e.location ? ' · ' + esc(e.location) : '') + '</small></div></button>'; });
       tk.forEach(function (t) { h += '<button class="kc-ev" style="--c:#8a94a6" data-act="gotask"><i></i><div><b>' + esc(t.title) + '</b><small>Tenggat tugas · ' + esc(t.status) + (t.dueTime ? ' · ' + t.dueTime : '') + '</small></div></button>'; });
       return h + '<button class="kc-add" data-act="newday" data-d="' + sel + '">+ Tambah kegiatan</button></aside></div>';
     }
@@ -130,7 +178,7 @@
         lanes(S);
         h += '<div class="col" data-act="slot" data-d="' + d + '">' + S.map(function (x) {
           var hgt = Math.max(20, (x.en - x.s) * 0.8);
-          return '<button class="ev" style="--c:' + color(x.e) + ';top:' + (x.s * 0.8) + 'px;height:' + hgt + 'px;left:' + (x.l * 100 / x.n) + '%;width:calc(' + (100 / x.n) + '% - 3px)" data-act="edit" data-e="ev" data-id="' + x.e.id + '"><b>' + esc(x.e.title) + '</b>' + (hgt > 34 ? '<br>' + tl(x.e) + (x.e.location ? ' · ' + esc(x.e.location) : '') : '') + '</button>';
+          return '<button class="ev" style="--c:' + color(x.e) + ';top:' + (x.s * 0.8) + 'px;height:' + hgt + 'px;left:' + (x.l * 100 / x.n) + '%;width:calc(' + (100 / x.n) + '% - 3px)" data-act="edit" data-e="ev" data-id="' + x.e.id + '"><b>' + tag(x.e) + esc(x.e.title) + '</b>' + (hgt > 34 ? '<br>' + tl(x.e) + (x.e.location ? ' · ' + esc(x.e.location) : '') : '') + '</button>';
         }).join('') + (d === np.date ? '<div class="now" style="top:' + (np.min * 0.8) + 'px"></div>' : '') + '</div>';
       });
       return h + '</div></div><p class="ac-hint" style="margin-top:8px">Acara tanpa jam selesai ditampilkan sebagai penanda singkat. Tugas yang hanya punya tenggat muncul di baris "Seharian", bukan sebagai blok jam.</p>';
@@ -144,7 +192,7 @@
         h += '<div class="dayh">' + DL[dow(d)] + ', ' + fd(d) + (CF.mode !== 'masehi' && hh ? '<small>' + hh.d + ' ' + HM[hh.m - 1] + ' ' + hh.y + ' H</small>' : '') + '</div>';
         ev.forEach(function (e) {
           var c = by(D.cat, e.catId), rel = [(by(projects(), e.projId) || {}).name, (by(courses(), e.courseId) || {}).name].filter(Boolean).join(' · ');
-          h += '<div class="aitem" style="--c:' + color(e) + ';cursor:pointer" data-act="edit" data-e="ev" data-id="' + e.id + '"><span class="tm">' + tl(e) + '</span><div><b>' + esc(e.title) + '</b><small>' + [c && c.name, e.location, rel, e.remind !== '' && e.remind != null ? '🔔 ' + (+e.remind ? e.remind + ' mnt sebelum' : 'tepat waktu') : ''].filter(Boolean).map(esc).join(' · ') + '</small></div></div>';
+          h += '<div class="aitem" style="--c:' + color(e) + ';cursor:pointer" data-act="edit" data-e="ev" data-id="' + e.id + '"><span class="tm">' + tl(e) + '</span><div><b>' + tag(e) + esc(e.title) + '</b><small>' + kindLbl(e) + [c && c.name, e.location, rel, e.remind !== '' && e.remind != null ? '🔔 ' + (+e.remind ? e.remind + ' mnt sebelum' : 'tepat waktu') : ''].filter(Boolean).map(esc).join(' · ') + '</small></div></div>';
         });
         tk.forEach(function (t) { h += '<div class="aitem" style="--c:#8a94a6;cursor:pointer" data-act="gotask"><span class="tm">Tenggat</span><div>☑ ' + esc(t.title) + '<small>' + esc(t.status) + (t.dueTime ? ' · ' + t.dueTime : '') + '</small></div></div>'; });
       }
@@ -163,7 +211,8 @@
       } else if (v === 'Daily') {
         var hh = hij(a); ttl = DL[dow(a)] + ', ' + fd(a) + (CF.mode !== 'masehi' && hh ? ' <small style="opacity:.6">' + hh.d + ' ' + HM[hh.m - 1] + ' ' + hh.y + ' H</small>' : ''); body = grid([a]);
       } else { ttl = 'Agenda 30 hari dari ' + fd(a); body = agenda(a); }
-      if (v === 'Monthly') return '<div class="kc-top"><h3>Kalender kegiatan</h3><p>Pilih tanggal untuk melihat detail kegiatan. Titik emas menandai hari yang memiliki agenda.</p></div><div class="kc-tools">' +
+      body = fireBar() + body;
+      if (v === 'Monthly') return '<div class="kc-top"><h3>Kalender kegiatan</h3><p>Pilih tanggal untuk melihat detail kegiatan. Blok warna menandai jenis kegiatan; api menyala 3 hari sebelum ujian, presentasi, atau kegiatan penting.</p></div><div class="kc-tools">' +
         chips(['Daily', 'Weekly', 'Monthly', 'Agenda List'].map(function (x) { return x === 'Agenda List' ? 'Agenda' : x; }), 'Monthly', 'v') + add('ev', 'Acara') + '</div>' + body;
       return '<div class="ac-bar"><div class="ac-acts"><button class="ac-btn sm" data-act="cnav" data-d="-1" aria-label="Sebelumnya">←</button><button class="ac-btn sm" data-act="cnav" data-d="0">Hari ini</button><button class="ac-btn sm" data-act="cnav" data-d="1" aria-label="Berikutnya">→</button></div><b style="font-size:15px">' + ttl + '</b>' + add('ev', 'Acara') + '</div>' +
         chips(['Daily', 'Weekly', 'Monthly', 'Agenda List'].map(function (x) { return x === 'Agenda List' ? 'Agenda' : x; }), v === 'Agenda List' ? 'Agenda' : v, 'v') + body;
@@ -204,6 +253,7 @@
         }
         if (a === 'filt' && d.f === 'v') st.v = d.v === 'Agenda' ? 'Agenda List' : d.v;
         if (a === 'selday') st.sel = d.d;
+        if (a === 'firego') { st.d = d.d; st.sel = d.d; }
         if (a === 'goday') { st.d = d.d; st.v = 'Daily'; }
         if (a === 'newday') app.form('ev', null, { start: d.d, end: d.d, allDay: true });
         if (a === 'slot') {
