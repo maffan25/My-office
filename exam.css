@@ -104,3 +104,12 @@
   .ex-hd{flex-wrap:wrap}.ex-modes{grid-template-columns:1fr}.ex-q{font-size:19px}
 }
 @media (prefers-reduced-motion:reduce){.ex-tm.low,.ex-exp{animation:none}}
+
+/* folder mata kuliah */
+.ex-fd{display:flex;flex-direction:column;align-items:flex-start;gap:6px;padding:18px;border-radius:20px;background:var(--ad-card);border:1px solid var(--ad-line);box-shadow:var(--ad-shadow);color:var(--ad-ink);text-align:left;cursor:pointer;transition:border-color .15s,transform .15s}
+.ex-fd:hover{border-color:var(--ad-ink);transform:translateY(-2px)}
+.ex-fd:focus-visible{outline:2px solid var(--ad-ink);outline-offset:2px}
+.ex-fi{display:grid;place-items:center;width:46px;height:46px;margin-bottom:8px;border-radius:14px;background:var(--ad-yel2);color:var(--ad-ink)}
+.ex-fd b{font-size:15px;line-height:1.35}.ex-fd small{font-size:11.5px;color:var(--ad-mute)}
+.ex-fh{font-size:20px;letter-spacing:-.2px;margin:0 0 6px}
+@media (prefers-reduced-motion:reduce){.ex-fd{transition:none}.ex-fd:hover{transform:none}}

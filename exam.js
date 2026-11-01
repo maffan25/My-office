@@ -9,7 +9,7 @@
   var wr = function (k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { say('Peringatan', 'Data tidak bisa disimpan di browser ini.'); } };
   var p2 = function (n) { return ('0' + n).slice(-2); };
   var clock = function (s) { s = Math.max(0, Math.round(s)); return (s >= 3600 ? Math.floor(s / 3600) + ':' : '') + p2(Math.floor(s % 3600 / 60)) + ':' + p2(s % 60); };
-  var hist = rd(HK), mine = rd(BK), view = 'lib', cfg = null, S = null, R = null, tm = null;
+  var hist = rd(HK), mine = rd(BK), view = 'lib', cfg = null, S = null, R = null, tm = null, folder = null;
   var gid = function (i) { return document.getElementById(i); };
 
   function shuf(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
@@ -38,19 +38,33 @@
     return { n: h.length, best: h.length ? Math.max.apply(null, h.map(function (x) { return x.pct; })) : 0 };
   }
 
-  /* ---------- Tampilan: daftar bank ---------- */
+  /* ---------- Tampilan: folder mata kuliah & daftar bank ---------- */
+  var FI = '<svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>';
+  function groups() {
+    var g = {}, order = [];
+    banks().forEach(function (b) { var c = b.course || 'Lainnya'; if (!g[c]) { g[c] = []; order.push(c); } g[c].push(b); });
+    return order.map(function (c) { return { name: c, banks: g[c] }; });
+  }
   function vLib() {
-    var bs = banks(), h = '<div class="ac-bar"><p class="ac-hint">Latihan dan ujian pilihan ganda dari bank soal. Pilih satu bank soal, atur mode, lalu mulai.</p><button class="ac-btn pri" data-ex="import">+ Impor soal</button></div>';
+    var bs = banks(), gs = groups(), cur = folder && gs.filter(function (g) { return g.name === folder; })[0];
+    if (!cur) folder = null;
+    var h = '<div class="ac-bar"><p class="ac-hint">' + (cur ? 'Pilih bank soal, atur mode, lalu mulai.' : 'Pilih folder mata kuliah untuk mulai berlatih.') + '</p><button class="ac-btn pri" data-ex="import">+ Impor soal</button></div>';
     if (S) {
       var dn = S.ans.filter(function (x) { return x >= 0; }).length;
       h += '<div class="ex-resume"><span>Sesi <b>' + esc(S.title) + '</b> masih berjalan, ' + dn + ' dari ' + S.qs.length + ' soal terjawab.</span><button class="ac-btn pri sm" data-ex="resume">Lanjutkan</button></div>';
     }
     if (!bs.length) return h + '<div class="ac-empty">Belum ada bank soal. Impor file JSON untuk mulai berlatih.</div>';
-    h += '<div class="ex-bg">' + bs.map(function (b) {
-      var s = stat(b.id);
-      return '<article class="ex-bk"><div class="ex-bt"><b>' + esc(b.title) + '</b><small>' + (b.course ? esc(b.course) + ', ' : '') + b.questions.length + ' soal</small></div>' +
-        '<div class="ex-bs">' + (s.n ? '<div class="ex-bar" role="img" aria-label="Skor terbaik ' + s.best + '"><i style="width:' + s.best + '%"></i></div><small>Skor terbaik <b>' + s.best + '</b>, dikerjakan ' + s.n + 'x</small>' : '<small>Belum pernah dikerjakan</small>') + '</div>' +
-        '<div class="ex-ba"><button class="ac-btn pri sm" data-ex="setup" data-id="' + esc(b.id) + '">Mulai</button>' + (b.builtin ? '' : '<button class="ac-btn sm danger" data-ex="delbank" data-id="' + esc(b.id) + '">Hapus</button>') + '</div></article>';
+    if (cur) {
+      return h + '<button class="ex-back" data-ex="folders">‹ Semua mata kuliah</button><h3 class="ex-fh">' + esc(cur.name) + '</h3><div class="ex-bg">' + cur.banks.map(function (b) {
+        var s = stat(b.id);
+        return '<article class="ex-bk"><div class="ex-bt"><b>' + esc(b.title) + '</b><small>' + b.questions.length + ' soal</small></div>' +
+          '<div class="ex-bs">' + (s.n ? '<div class="ex-bar" role="img" aria-label="Skor terbaik ' + s.best + '"><i style="width:' + s.best + '%"></i></div><small>Skor terbaik <b>' + s.best + '</b>, dikerjakan ' + s.n + 'x</small>' : '<small>Belum pernah dikerjakan</small>') + '</div>' +
+          '<div class="ex-ba"><button class="ac-btn pri sm" data-ex="setup" data-id="' + esc(b.id) + '">Mulai</button>' + (b.builtin ? '' : '<button class="ac-btn sm danger" data-ex="delbank" data-id="' + esc(b.id) + '">Hapus</button>') + '</div></article>';
+      }).join('') + '</div>';
+    }
+    h += '<div class="ex-bg">' + gs.map(function (g) {
+      var n = g.banks.reduce(function (t, b) { return t + b.questions.length; }, 0);
+      return '<button class="ex-fd" data-ex="folder" data-c="' + esc(g.name) + '"><span class="ex-fi">' + FI + '</span><b>' + esc(g.name) + '</b><small>' + g.banks.length + ' bank soal, ' + n + ' soal</small></button>';
     }).join('') + '</div>';
     if (hist.length) {
       h += '<div class="ad-sh"><h2 class="ad-h sm">Riwayat terakhir</h2></div><div class="ex-hist">' + hist.slice(0, 6).map(function (x) {
@@ -65,7 +79,7 @@
     var b = bankOf(cfg.id); if (!b) { view = 'lib'; return vLib(); }
     var N = b.questions.length, ns = [10, 20, 30, 50].filter(function (n) { return n < N; }), cnt = cfg.n === 'all' ? N : Math.min(+cfg.n, N);
     var M = [['latihan', 'Latihan', 'Jawaban benar dan pembahasan langsung muncul setelah kamu memilih.'], ['ujian', 'Ujian', 'Berwaktu. Jawaban bisa diubah, hasil dan pembahasan muncul setelah selesai.']];
-    return '<button class="ex-back" data-ex="lib">‹ Semua bank soal</button><div class="ex-set"><h3>' + esc(b.title) + '</h3><p class="ac-hint">' + N + ' soal tersedia</p>' +
+    return '<button class="ex-back" data-ex="lib">‹ Kembali ke folder</button><div class="ex-set"><h3>' + esc(b.title) + '</h3><p class="ac-hint">' + N + ' soal tersedia</p>' +
       '<div class="ex-modes">' + M.map(function (m) { return '<button class="ex-mode" data-ex="mode" data-v="' + m[0] + '" aria-pressed="' + (cfg.mode === m[0]) + '"><b>' + m[1] + '</b><span>' + m[2] + '</span></button>'; }).join('') + '</div>' +
       '<div class="ex-row"><label class="ex-f"><span>Jumlah soal</span><select id="exN"><option value="all"' + (cfg.n === 'all' ? ' selected' : '') + '>Semua (' + N + ')</option>' + ns.map(function (n) { return '<option value="' + n + '"' + (String(cfg.n) === String(n) ? ' selected' : '') + '>' + n + ' soal</option>'; }).join('') + '</select></label>' +
       (cfg.mode === 'ujian' ? '<label class="ex-f"><span>Waktu (menit)</span><input id="exMin" type="number" min="1" step="1" value="' + (cfg.min || cnt) + '"' + (cfg.min ? ' data-t="1"' : '') + '></label>' : '') + '</div>' +
@@ -170,7 +184,9 @@
     var a = b.dataset.ex, d = b.dataset;
     if (a === 'import') return openImport();
     if (a === 'lib') { view = 'lib'; return rerender(); }
-    if (a === 'setup') { cfg = { id: d.id, mode: 'latihan', n: 'all', min: '', sh: true, so: false }; view = 'setup'; return rerender(); }
+    if (a === 'folders') { folder = null; view = 'lib'; return rerender(); }
+    if (a === 'folder') { folder = d.c; view = 'lib'; return rerender(); }
+    if (a === 'setup') { var sb = bankOf(d.id); if (sb) folder = sb.course || 'Lainnya'; cfg = { id: d.id, mode: 'latihan', n: 'all', min: '', sh: true, so: false }; view = 'setup'; return rerender(); }
     if (a === 'mode') { readCfg(); cfg.mode = d.v; return rerender(false); }
     if (a === 'start') {
       readCfg(); var bk = bankOf(cfg.id); if (!bk) return;
