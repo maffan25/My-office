@@ -1,0 +1,71 @@
+/* MyOffice — OPS layer: rel navigasi tetap + beranda "Hari ini". Hanya tampilan; tidak mengubah data modul. */
+:root{--ro-w:72px;--ro-bg:rgba(9,13,30,.86);--ro-line:rgba(255,255,255,.09);--ro-ink:#eef2ff;--ro-mute:#9eabcc;--ro-acc:#7ee0c3;--ro-surf:rgba(15,21,44,.7);--ro-late:#ff7b7b}
+.nav-wrap,.hero,.foot-l,.brand{display:none!important}
+.app{padding-left:var(--ro-w)}
+.top{justify-content:flex-end;padding-right:28px}
+
+/* ---------- Rel navigasi ---------- */
+.rail{position:fixed;z-index:100000;left:0;top:0;bottom:0;width:var(--ro-w);display:flex;flex-direction:column;align-items:center;gap:4px;padding:16px 0;background:var(--ro-bg);border-right:1px solid var(--ro-line);-webkit-backdrop-filter:blur(16px);backdrop-filter:blur(16px)}
+.rail .mk{width:30px;height:30px;margin:2px 0 14px;color:var(--ro-acc)}
+.rail button{position:relative;width:46px;height:46px;border:0;border-radius:14px;background:none;color:var(--ro-mute);display:grid;place-items:center;cursor:pointer;font:inherit;transition:background .15s,color .15s}
+.rail button svg{width:21px;height:21px;stroke-width:1.6}
+.rail button span{display:none}
+.rail button:hover{background:rgba(255,255,255,.07);color:var(--ro-ink)}
+.rail button[aria-current=page]{background:rgba(126,224,195,.14);color:var(--ro-acc)}
+.rail button[aria-current=page]::before{content:"";position:absolute;left:-13px;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;background:var(--ro-acc)}
+.rail button.last{margin-top:auto}
+.rail button::after{content:attr(data-l);position:absolute;left:calc(100% + 12px);top:50%;transform:translateY(-50%);padding:5px 10px;border-radius:8px;background:#0b1024;border:1px solid var(--ro-line);color:var(--ro-ink);font-size:12px;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .15s}
+.rail button:hover::after,.rail button:focus-visible::after{opacity:1}
+.rail button:focus-visible{outline:2px solid var(--ro-acc);outline-offset:2px}
+
+/* Jendela modul duduk di sebelah rel, bukan menimpanya */
+.ac-ov,.ad-ov,.wo-ov,.es-ov,.fn-ov,.sp-ov{padding-left:var(--ro-w)!important}
+
+/* ---------- Beranda "Hari ini" ---------- */
+.ro{width:min(1100px,calc(100% - 56px));margin:6px auto 48px;color:var(--ro-ink)}
+.ro button{font:inherit;color:inherit}
+.ro-head{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;padding:18px 0 26px}
+.ro-head h1{font-size:clamp(22px,2.6vw,32px);font-weight:600;letter-spacing:-.01em;line-height:1.2}
+.ro-head p{margin-top:6px;color:var(--ro-mute);font-size:14px}
+.ro-clock{font:500 clamp(40px,5.4vw,64px)/1 'Chakra Petch',Inter,sans-serif;font-variant-numeric:tabular-nums;letter-spacing:.01em;text-align:right}
+.ro-clock small{display:block;margin-top:6px;font:400 12px Inter,sans-serif;color:var(--ro-mute);letter-spacing:0}
+.ro-quick{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:20px}
+.ro-quick button{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:12px;border:1px solid var(--ro-line);background:var(--ro-surf);cursor:pointer;font-size:13.5px;font-weight:500;transition:border-color .15s,background .15s}
+.ro-quick button:first-child{background:var(--ro-acc);border-color:transparent;color:#07261d;font-weight:600}
+.ro-quick button:hover{border-color:rgba(126,224,195,.5)}
+.ro-quick svg{width:16px;height:16px}
+.ro-grid{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(0,1fr);gap:18px;align-items:start}
+.ro-col{display:grid;gap:18px}
+.ro-card{padding:18px 18px 10px;border-radius:18px;background:var(--ro-surf);border:1px solid var(--ro-line);-webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px)}
+.ro-card h2{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-size:14.5px;font-weight:600}
+.ro-card h2 em{font-style:normal;min-width:24px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.08);color:var(--ro-mute);font-size:12px;font-weight:500;text-align:center}
+.ro-card h2 em.hot{background:rgba(255,123,123,.16);color:var(--ro-late)}
+.ro-row{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:8px 6px;border:0;border-top:1px solid var(--ro-line);background:none;text-align:left;cursor:pointer;border-radius:0}
+.ro-row:first-of-type{border-top:0}
+.ro-row:hover{background:rgba(255,255,255,.04)}
+.ro-row:focus-visible{outline:2px solid var(--ro-acc);outline-offset:-2px;border-radius:8px}
+.ro-row i{flex:none;width:4px;align-self:stretch;min-height:28px;border-radius:4px;background:var(--c,#8aa0b8)}
+.ro-row span{flex:1;min-width:0}
+.ro-row b{display:block;font-weight:500;font-size:14px;line-height:1.35;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ro-row small{display:block;margin-top:2px;font-size:12px;color:var(--ro-mute)}
+.ro-row small.late{color:var(--ro-late)}
+.ro-row time{flex:none;font-size:12.5px;color:var(--ro-mute);font-variant-numeric:tabular-nums}
+.ro-empty{padding:6px 6px 14px;font-size:13px;line-height:1.55;color:var(--ro-mute)}
+.ro-empty button{display:block;margin-top:8px;padding:0;border:0;background:none;color:var(--ro-acc);cursor:pointer;font-size:13px;font-weight:500;text-decoration:underline;text-underline-offset:3px}
+
+/* ---------- HP: rel pindah ke bawah ---------- */
+@media (max-width:820px){
+  .app{padding-left:0;padding-bottom:76px}
+  .top{padding-right:16px}
+  .rail{top:auto;width:auto;right:0;height:64px;flex-direction:row;justify-content:flex-start;gap:2px;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));height:auto;border-right:0;border-top:1px solid var(--ro-line);overflow-x:auto;scrollbar-width:none}
+  .rail::-webkit-scrollbar{display:none}
+  .rail .mk{display:none}
+  .rail button{flex:none;width:62px;height:52px;gap:2px;align-content:center}
+  .rail button span{display:block;font-size:10px;line-height:1.1}
+  .rail button::after,.rail button[aria-current=page]::before{display:none}
+  .rail button.last{margin-top:0}
+  .ac-ov,.ad-ov,.wo-ov,.es-ov,.fn-ov,.sp-ov{padding-left:0!important;padding-bottom:70px!important}
+  .ro{width:calc(100% - 32px)}
+  .ro-grid{grid-template-columns:1fr}
+  .ro-head{padding-top:6px}.ro-clock{text-align:left}
+}
