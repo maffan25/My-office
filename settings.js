@@ -9,7 +9,7 @@
   function apply() {
     var s = ls('mo-settings-v1'), i = document.querySelector('.avatar i'), h = document.getElementById('hiName');
     if (i) i.style.background = s.photo ? 'url("' + s.photo + '") center/cover no-repeat' : '';
-    if (h) h.textContent = 'Assalamu’alaikum,' + (s.nick ? ' ' + s.nick + ',' : '');
+    if (h) h.textContent = 'Hi,' + (s.nick ? ' ' + s.nick : '') + ' 👋';
   }
   apply();
 

@@ -88,16 +88,15 @@
     return h < 4 ? 'Selamat dini hari' : h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 18 ? 'Selamat sore' : 'Selamat malam';
   }
   function phrases() {
-    var raw = (src && src.textContent || 'Assalamu’alaikum,').trim().replace(/,\s*$/, '');
-    var m = raw.match(/^Assalamu’alaikum,?\s*(.*)$/), name = m ? m[1].trim() : '';
+    var raw = (src && src.textContent || 'Hi, 👋').trim();
+    var m = raw.match(/^Hi,?\s*(.*?)\s*👋?$/), name = m ? m[1].trim() : '';
     var pix = false;
-    return [raw, 'Semangat hari ini!', dayWord() + (name ? ', ' + name : ''),
-      pix ? 'Ayo lari, jangan lompat sendiri' : 'Siap meluncur?', 'Selamat datang di MyOffice', 'Plan · Execute · Achieve'];
+    return [raw, dayWord() + (name ? ', ' + name : '') + ' ☀️', 'Semangat hari ini! ✨', 'Yuk selesaikan satu langkah kecil', 'Plan · Execute · Achieve'];
   }
   function setText(t) { gl.textContent = t; gl.setAttribute('data-text', t); }
 
   function scramble(to, done) {
-    if (reduce) { setText(to); current = to; return done && done(); }
+    if (true) { setText(to); current = to; return done && done(); }
     busy = true;
     var from = current, len = Math.max(from.length, to.length), t0 = performance.now(), dur = 600 + len * 8, lastDraw = 0;
     gl.classList.add('on'); greet.classList.remove('scan'); void greet.offsetWidth; greet.classList.add('scan');

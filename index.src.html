@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@600;700;800&family=Chakra+Petch:wght@400;500;600&family=EB+Garamond:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@600;700;800&family=Chakra+Petch:wght@400;500;600&family=EB+Garamond:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap"></noscript>
-<meta name="theme-color" content="#0a0c2b">
+<meta name="theme-color" content="#fde4ee">
 <style>
 :root{
   --ink:#1f2f4d;
@@ -150,6 +150,7 @@ body{overflow-x:hidden;overflow-y:auto}
 <link rel="stylesheet" href="academic-light.css">
 <link rel="stylesheet" href="fixes-buttons.css">
 <link rel="stylesheet" href="exam.css">
+<link rel="stylesheet" href="candy.css">
 </head>
 <body>
 
@@ -218,7 +219,7 @@ body{overflow-x:hidden;overflow-y:auto}
   </div>
 
   <main class="hero">
-    <h1 class="greet" id="greet"><span id="hiName" class="sr-only">Assalamu’alaikum,</span><span class="glitch" id="glitch" aria-hidden="true" data-text=""></span></h1>
+    <h1 class="greet" id="greet"><span id="hiName" class="sr-only">Hi, 👋</span><span class="glitch" id="glitch" aria-hidden="true" data-text=""></span></h1>
     <div class="greet-dots" id="greetDots" aria-hidden="true"></div>
     <p class="quote">“Setiap langkah kecil yang kamu lakukan hari ini, <br>adalah bagian dari impian besar yang sedang kamu bangun.”</p>
     <div class="info">
@@ -275,7 +276,7 @@ body{overflow-x:hidden;overflow-y:auto}
   tick();setInterval(tick,1000);
 
   /* ---------- Tampilan: satu suasana, langit bintang ---------- */
-  root.dataset.theme='malam';root.dataset.wall='bintang';
+  root.dataset.theme='pagi';root.dataset.wall='bintang';
   ['mo-wall','mo-theme','mo-custom','mo-gn'].forEach(function(k){S.del(k)});
 
   /* ---------- Panel ---------- */
