@@ -7,7 +7,7 @@ rd = lambda f: open(os.path.join(S, f), encoding='utf-8').read()
 src = rd('index.src.html')
 css = re.findall(r'<link rel="stylesheet" href="([^"]+\.css)">', src)
 css.append('perf.css')
-css = [f for f in css if f not in ('soft.css','final.css')] + ['soft.css','final.css']   # soft lalu final (perbaikan layout & kontras) selalu paling akhir
+css = [f for f in css if f not in ('soft.css','final.css','fresh.css')] + ['soft.css','final.css','fresh.css']   # soft lalu final (perbaikan layout & kontras) selalu paling akhir
 core = re.findall(r'<script src="([^"]+\.js)"></script>', src)
 banks = [f for f in core if f.startswith('exam-bank')]
 core = [f for f in core if f not in banks and f != 'soft.js'] + ['perf.js', 'soft.js']
