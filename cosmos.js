@@ -83,7 +83,12 @@
   function paintGreet() {
     if (!gl) return;
     var t = (src && src.textContent || 'Hai, Sobat').trim().replace(/,\s*$/, '');
-    gl.textContent = t + ' 👋🏻'; gl.setAttribute('data-text', t);
+    var name = t.replace(/^Hai,?\s*/i, '') || 'Sobat';
+    gl.textContent = '';
+    var sm = document.createElement('small'); sm.textContent = 'Hai, 👋🏻';
+    var b = document.createElement('b'); b.textContent = name;
+    gl.appendChild(sm); gl.appendChild(b);
+    gl.setAttribute('data-text', t);
   }
   paintGreet();
   if (src && window.MutationObserver) new MutationObserver(paintGreet).observe(src, { childList: true, characterData: true, subtree: true });

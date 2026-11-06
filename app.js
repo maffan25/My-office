@@ -83,7 +83,12 @@
   function paintGreet() {
     if (!gl) return;
     var t = (src && src.textContent || 'Hai, Sobat').trim().replace(/,\s*$/, '');
-    gl.textContent = t + ' 👋🏻'; gl.setAttribute('data-text', t);
+    var name = t.replace(/^Hai,?\s*/i, '') || 'Sobat';
+    gl.textContent = '';
+    var sm = document.createElement('small'); sm.textContent = 'Hai, 👋🏻';
+    var b = document.createElement('b'); b.textContent = name;
+    gl.appendChild(sm); gl.appendChild(b);
+    gl.setAttribute('data-text', t);
   }
   paintGreet();
   if (src && window.MutationObserver) new MutationObserver(paintGreet).observe(src, { childList: true, characterData: true, subtree: true });
@@ -4723,6 +4728,28 @@ sched();
   /* MyOffice: satu langit bintang di belakang seluruh aplikasi */
   var sky = document.querySelector(".bg .stack");
   if (sky) Field(sky, 6500, true, 240);
+})();
+;
+/* TEMA PASTEL — menandai menu yang sedang dibuka di <html data-menu="...">
+   supaya CSS tema-pastel.css bisa memberi warna karakter tiap menu. */
+(function () {
+  function wire() {
+    var M = window.MyOffice;
+    if (!M || !M.routes) return;
+    Object.keys(M.routes).forEach(function (k) {
+      var fn = M.routes[k];
+      if (typeof fn !== 'function' || fn.__tema) return;
+      var name = k.replace(/^#/, '');
+      var wrapped = function () {
+        document.documentElement.setAttribute('data-menu', name);
+        return fn.apply(this, arguments);
+      };
+      wrapped.__tema = true;
+      M.routes[k] = wrapped;
+    });
+  }
+  wire();
+  document.addEventListener('DOMContentLoaded', wire);
 })();
 ;
 /* perf.js — penjaga kelancaran: deteksi FPS otomatis, class .touch, dan pemuatan bank soal saat idle. */
