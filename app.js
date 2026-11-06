@@ -4841,7 +4841,7 @@ sched();
     var cl = el.classList, k = null;
     if (cl.contains('ac-ov')) k = el.dataset.mod || null;
     else for (var c in BY_CLASS) if (cl.contains(c)) { k = BY_CLASS[c]; break; }
-    if (!k && (cl.contains('ac-ov2') || /-ov2?$/.test(el.className.split(' ')[0] || ''))) {
+    if (!k && (cl.contains('ac-ov2') || /-ov2?$/.test(String(typeof el.className === 'string' ? el.className : (el.getAttribute && el.getAttribute('class')) || '').split(' ')[0] || ''))) {
       var open = document.querySelector('[data-sf]:not([hidden]):not(.ac-ov2)'); k = open ? open.dataset.sf : null;
     }
     if (k && el.dataset.sf !== k) el.dataset.sf = k;
