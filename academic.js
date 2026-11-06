@@ -100,6 +100,7 @@
         { k: 'semId', l: 'Semester (hanya semester aktif)', t: 'select', req: 1, o: activeSems, full: 1 },
         { k: 'targetGrade', l: 'Target nilai (huruf)', t: 'select', o: function () { return [['', '—']].concat(D.cfg.scale.map(function (r) { return [r.l, r.l]; })); } },
         { k: 'manual', l: 'Nilai akhir manual (0–100, opsional)', t: 'number', min: 0, max: 100 },
+        { k: 'logo', l: 'Logo mata kuliah', t: 'logo', full: 1 },
         { k: 'notes', l: 'Catatan', t: 'textarea', full: 1 }]
     },
     task: {
@@ -140,9 +141,9 @@
   function el(cls, html) { var d = document.createElement('div'); d.className = cls; d.innerHTML = html; return d; }
   var ov, body, sideEl, subEl, hiEl, dotEl, tab = 'dash', tf = 'Semua', ef = 'Semua', cf = 'Semua', rng = 'Hari ini', q = '', draft = null;
   var T0 = new Date(), cal = { y: T0.getFullYear(), m: T0.getMonth() }, sel = today();
-  var TABS = [['dash', 'Dashboard', 'dash'], ['course', 'Mata Kuliah', 'book'], ['sem', 'Semester', 'cal'], ['task', 'Tugas', 'task'],
+  var TABS = [['dash', 'Dashboard', 'dash'], ['course', 'Mata Kuliah', 'book'], ['trk', 'Jejak Semester', 'route'], ['sem', 'Semester', 'cal'], ['task', 'Tugas', 'task'],
     ['exam', 'Ujian', 'exam'], ['exam2', 'Exam', 'quiz'], ['ana', 'Analitik', 'chart'], ['cfg', 'Formula Nilai', 'set']];
-  var PAGE = { course: 'Mata Kuliah', sem: 'Semester', task: 'Tugas', exam: 'Ujian', exam2: 'Exam', ana: 'Analitik', cfg: 'Formula Nilai' };
+  var PAGE = { course: 'Mata Kuliah', trk: 'Jejak Semester', sem: 'Semester', task: 'Tugas', exam: 'Ujian', exam2: 'Exam', ana: 'Analitik', cfg: 'Formula Nilai' };
   var PALETTE = ['#ffe24a', '#cfe6ff', '#ffd3d3', '#d6f0c4', '#e4d8ff', '#ffe0bd', '#c9f0e8'];
   var ICO = {
     dash: '<rect x="3" y="3" width="7" height="7" rx="2"/><rect x="14" y="3" width="7" height="7" rx="2"/><rect x="14" y="14" width="7" height="7" rx="2"/><rect x="3" y="14" width="7" height="7" rx="2"/>',
@@ -157,6 +158,8 @@
     bell: '<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>',
     pen: '<path d="M17 3a2.85 2.85 0 0 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>',
     l: '<path d="m15 18-6-6 6-6"/>', r: '<path d="m9 18 6-6-6-6"/>',
+    route: '<circle cx="6" cy="19" r="2.2"/><circle cx="18" cy="5" r="2.2"/><path d="M8.2 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.8"/>',
+    flag: '<path d="M5 22V4M5 4h11l-2 4 2 4H5"/>',
     clock: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     check: '<path d="M20 6 9 17l-5-5"/>',
     up: '<path d="M7 17 17 7M8 7h9v9"/>', down: '<path d="M17 7 7 17M16 17H7V8"/>',
@@ -193,7 +196,15 @@
     ov.addEventListener('click', onClick);
     ov.addEventListener('mousedown', function (e) { if (e.target === ov) close(); });
     var qt; ov.addEventListener('input', function (e) { if (e.target.id === 'acQ') { q = e.target.value.trim(); clearTimeout(qt); qt = setTimeout(renderBody, 140); } });
-    ov.addEventListener('change', function (e) { if (e.target.id === 'acRng') { rng = e.target.value; renderBody(); } });
+    ov.addEventListener('change', function (e) {
+      if (e.target.id === 'acRng') { rng = e.target.value; renderBody(); }
+      var ds = e.target.dataset || {};
+      if (ds.act === 'mdate' || ds.act === 'tstart') {
+        var c = by(D.course, ds.id); if (!c) return; var t = trk(c);
+        if (ds.act === 'mdate') t.m[+ds.i].d = e.target.value; else t.start = e.target.value;
+        save(); renderBody();
+      }
+    });
     ov.addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && e.target.getAttribute && e.target.getAttribute('role') === 'button') e.target.click();
     });
@@ -203,6 +214,10 @@
 
   /* ---------- Data turunan untuk dashboard ---------- */
   var colOf = function (c) { var i = D.course.indexOf(c); return PALETTE[(i < 0 ? 0 : i) % PALETTE.length]; };
+  function tile(c, cls) {
+    return '<i class="ad-tile' + (cls ? ' ' + cls : '') + (c.logo ? ' has-logo' : '') + '" style="background:' + (c.logo ? '#fff' : colOf(c)) + '">' +
+      (c.logo ? '<img src="' + esc(c.logo) + '" alt="" loading="lazy">' : esc(ini(c))) + '</i>';
+  }
   function ini(c) {
     var s = (c.code || '').replace(/[^A-Za-z0-9]/g, '');
     if (s.length >= 2) return s.slice(0, 2).toUpperCase();
@@ -267,7 +282,7 @@
   function renderBody() {
     var top = body.scrollTop;
     ov.querySelectorAll('.ad-nl[data-t]').forEach(function (b) { if (b.dataset.t === tab && !q) b.setAttribute('aria-current', 'page'); else b.removeAttribute('aria-current'); });
-    var v = q ? vSearch() : tab === 'dash' ? vDash() : '<div class="ad-sh"><h2 class="ad-h">' + PAGE[tab] + '</h2></div>' + ({ course: vCourse, sem: vSem, task: vTask, exam: vExam, exam2: function () { return MO.examView ? MO.examView() : ''; }, ana: vAna, cfg: vCfg })[tab]();
+    var v = q ? vSearch() : tab === 'dash' ? vDash() : '<div class="ad-sh"><h2 class="ad-h">' + PAGE[tab] + '</h2></div>' + ({ course: vCourse, trk: vTrk, sem: vSem, task: vTask, exam: vExam, exam2: function () { return MO.examView ? MO.examView() : ''; }, ana: vAna, cfg: vCfg })[tab]();
     body.innerHTML = v; body.scrollTop = q ? 0 : top;
   }
   var warn = function () {
@@ -285,7 +300,7 @@
     var lab = done ? 'Selesai 🎉' : L ? 'Nilai ' + L.l + ' · ' + fmt(f) : p.n ? 'Sedang berjalan' : 'Belum ada tugas';
     var lc = done || L ? 'ok' : p.n ? 'blue' : 'mute';
     return '<div class="ad-cc' + (done ? ' fin' : '') + '" role="button" tabindex="0" data-act="edit" data-e="course" data-id="' + c.id + '" aria-label="Edit ' + esc(c.name) + '">' +
-      '<div class="ad-cct"><i class="ad-tile" style="background:' + colOf(c) + '">' + esc(ini(c)) + '</i><div><b>' + esc(c.name) + '</b><small>' + esc(c.lecturer || 'Dosen belum diisi') + '</small></div></div>' +
+      '<div class="ad-cct">' + tile(c) + '<div><b>' + esc(c.name) + '</b><small>' + esc(c.lecturer || 'Dosen belum diisi') + '</small></div></div>' +
       '<div class="ad-lv ' + lc + '">' + lab + '</div>' +
       '<div class="ad-c3" title="SKS · tugas selesai · jam belajar"><span>' + ic('book') + esc(c.sks || 0) + ' SKS</span><span>' + ic('check') + p.d + '/' + p.n + '</span><span>' + ic('clock') + hrs(c.id) + '</span></div>' +
       '<div class="ad-pbar" role="progressbar" aria-valuenow="' + p.p + '" aria-valuemin="0" aria-valuemax="100"><i style="width:' + p.p + '%"></i></div>' +
@@ -308,7 +323,7 @@
     h += '<div class="ad-sh"><h2 class="ad-h sm">Tugas Mendatang</h2>' + (up.length > 3 ? '<button class="ad-more" data-act="tab" data-t="task">Lihat semua (' + up.length + ')</button>' : '') + '</div>';
     h += up.length ? up.slice(0, 3).map(function (t) {
       var c = by(D.course, t.courseId);
-      return '<div class="ad-as"><i class="ad-tile big" style="background:' + (c ? colOf(c) : PALETTE[0]) + '">' + (c ? esc(ini(c)) : ic('task')) + '</i>' +
+      return '<div class="ad-as">' + (c ? tile(c, 'big') : '<i class="ad-tile big" style="background:' + PALETTE[0] + '">' + ic('task') + '</i>') +
         '<div class="ad-tt"><b>' + esc(t.title) + '</b><small>' + esc(cname(t.courseId)) + ' · ' + esc(t.type) + '</small></div>' +
         '<div class="ad-mm"><small>Tenggat</small><b>' + fshort(t.deadline) + '</b></div><div class="ad-mm"><small>Sisa waktu</small><b>' + left(t.deadline) + '</b></div>' +
         '<div class="ad-bt"><button class="ad-bo" data-act="edit" data-e="task" data-id="' + t.id + '">Ubah jadwal</button><button class="ad-bg" data-act="done" data-id="' + t.id + '">Tandai selesai</button></div></div>';
@@ -342,6 +357,110 @@
     if (!D.course.length) return h + empty('Belum ada mata kuliah.');
     if (!L.length) return h + empty('Tidak ada mata kuliah di filter ini.');
     return h + '<div class="ad-cg">' + L.map(function (c) { return cCard(c, true); }).join('') + '</div>';
+  }
+
+  /* ---------- Jejak Semester: cek ricek 16 pertemuan, absensi, ujian & presentasi (tersambung ke Kalender) ---------- */
+  var NM = 16, trkOpen = null, ATT = [['H', 'Hadir'], ['I', 'Izin'], ['S', 'Sakit'], ['A', 'Alpa']];
+  function trk(c) {
+    var t = c.trk; if (!t || !t.m) t = c.trk = { start: '', m: [] };
+    for (var i = 0; i < NM; i++) if (!t.m[i]) t.m[i] = { n: 0, a: '', d: '' };
+    return t;
+  }
+  function trkStat(c) {
+    var t = trk(c), n = 0, h = 0, rec = 0, met = 0;
+    t.m.forEach(function (m) { if (m.n) n++; if (m.a) { rec++; if (m.a === 'H') h++; } if (m.n || m.a) met++; });
+    return { n: n, h: h, rec: rec, met: met, pct: rec ? Math.round(h / rec * 100) : null };
+  }
+  var exOf = function (cid) { return D.exam.filter(function (e) { return e.courseId === cid; }).sort(function (a, b) { return (a.date || '9').localeCompare(b.date || '9'); }); };
+  var isPres = function (e) { return e.type === 'Presentasi'; };
+  function exRow(e) {
+    var past = e.date && e.date.slice(0, 10) < today() && !e.done;
+    return '<div class="tr-ex' + (e.done ? ' done' : '') + '"><label class="tr-ck"><input type="checkbox" data-act="exdone" data-id="' + e.id + '"' + (e.done ? ' checked' : '') + ' aria-label="Tandai selesai"><span></span></label>' +
+      '<span class="tr-kind ' + (isPres(e) ? 'pr' : 'ex') + '">' + esc(e.type) + '</span>' +
+      '<div class="tr-exm"><b>' + (e.date ? fshort(e.date) : 'Belum dijadwalkan') + '</b><small>' + (e.date ? '<i class="tr-cal">' + ic('cal') + 'Di Kalender</i>' : 'Isi tanggal agar muncul di Kalender') + (past ? ' · <em>lewat</em>' : '') + (e.room ? ' · ' + esc(e.room) : '') + '</small></div>' +
+      '<button class="ac-btn sm" data-act="edit" data-e="exam" data-id="' + e.id + '">Atur</button></div>';
+  }
+  function milestone(c, type, label) {
+    var xs = exOf(c.id).filter(function (e) { return e.type === type; });
+    return '<div class="tr-ms"><span class="tr-flag">' + ic('flag') + '</span><div><b>' + label + '</b><small>' + (xs.length ? xs.map(function (e) { return e.date ? fshort(e.date) : 'belum dijadwalkan'; }).join(' · ') : 'Belum ada jadwal') + '</small></div>' +
+      (xs.length ? '<button class="ac-btn sm" data-act="edit" data-e="exam" data-id="' + xs[0].id + '">Atur</button>' : '<button class="ac-btn sm" data-act="add" data-e="exam" data-course="' + c.id + '" data-type="' + type + '">+ Jadwalkan</button>') + '</div>';
+  }
+  function meet(c, i) {
+    var m = trk(c).m[i], ok = m.n || m.a;
+    return '<div class="tr-mt' + (ok ? ' on' : '') + '"><span class="tr-no">' + (i + 1) + '</span>' +
+      '<label class="tr-ck"><input type="checkbox" data-act="mn" data-id="' + c.id + '" data-i="' + i + '"' + (m.n ? ' checked' : '') + ' title="Catatan sudah ada" aria-label="Catatan pertemuan ' + (i + 1) + '"><span></span></label>' +
+      '<div class="tr-att" role="group" aria-label="Absensi pertemuan ' + (i + 1) + '">' + ATT.map(function (a) {
+        return '<button data-act="ma" data-id="' + c.id + '" data-i="' + i + '" data-v="' + a[0] + '" data-k="' + a[0] + '" title="' + a[1] + '" aria-pressed="' + (m.a === a[0]) + '">' + a[0] + '</button>';
+      }).join('') + '</div>' +
+      '<input type="date" class="tr-dt" data-act="mdate" data-id="' + c.id + '" data-i="' + i + '" value="' + esc(m.d || '') + '" aria-label="Tanggal pertemuan ' + (i + 1) + '"></div>';
+  }
+  function trkCard(c) {
+    var st = trkStat(c), open = trkOpen === c.id, ex = exOf(c.id), pres = ex.filter(isPres), t = trk(c);
+    var low = st.pct != null && st.pct < 75, nxt = ex.filter(function (e) { return e.date && !e.done && e.date.slice(0, 10) >= today(); })[0];
+    var h = '<article class="tr-cc' + (open ? ' open' : '') + '"><header class="tr-hd" data-act="tx" data-id="' + c.id + '" role="button" tabindex="0" aria-expanded="' + open + '">' +
+      '<span class="tr-tl" data-act="tlogo" data-id="' + c.id + '" role="button" tabindex="0" title="Ganti logo mata kuliah">' + tile(c, 'big') + '<u>' + ic('pen') + '</u></span>' +
+      '<div class="tr-nm"><b>' + esc(c.name) + '</b><small>' + esc(c.lecturer || 'Dosen belum diisi') + (c.schedule ? ' · ' + esc(c.schedule) : '') + '</small></div>' +
+      '<div class="tr-sm"><div class="tr-r"><small>Pertemuan</small><b>' + st.met + '<i>/' + NM + '</i></b></div>' +
+      '<div class="tr-r"><small>Catatan</small><b>' + st.n + '<i>/' + NM + '</i></b></div>' +
+      '<div class="tr-r' + (low ? ' warn' : '') + '"><small>Kehadiran</small><b>' + (st.pct == null ? '—' : st.pct + '<i>%</i>') + '</b></div></div>' +
+      '<span class="tr-chev">' + ic('r') + '</span></header>' +
+      '<div class="tr-pb" role="progressbar" aria-valuenow="' + Math.round(st.met / NM * 100) + '" aria-valuemin="0" aria-valuemax="100"><i style="width:' + (st.met / NM * 100) + '%"></i></div>';
+    if (!open) return h + '<div class="tr-peek">' + (nxt ? '<span class="tr-kind ' + (isPres(nxt) ? 'pr' : 'ex') + '">' + esc(nxt.type) + '</span> ' + fshort(nxt.date) : 'Belum ada ujian/presentasi mendatang') + (low ? ' · <em>Kehadiran di bawah 75%</em>' : '') + '</div></article>';
+    h += '<div class="tr-body"><div class="tr-tools"><label>Mulai kuliah <input type="date" data-act="tstart" data-id="' + c.id + '" value="' + esc(t.start || '') + '"></label>' +
+      '<button class="ac-btn sm" data-act="mfill" data-id="' + c.id + '">Isi tanggal mingguan</button>' +
+      '<button class="ac-btn sm" data-act="mall" data-id="' + c.id + '">Centang semua catatan</button>' +
+      '<button class="ac-btn sm danger" data-act="mclr" data-id="' + c.id + '">Reset</button></div>' +
+      '<div class="tr-leg"><span><i class="ck"></i>Kotak = catatan sudah ada</span><span><i class="h"></i>H = Hadir</span><span><i class="i"></i>I = Izin</span><span><i class="s"></i>S = Sakit</span><span><i class="a"></i>A = Alpa</span></div>' +
+      '<div class="tr-grid"><div>';
+    for (var i = 0; i < 8; i++) h += meet(c, i);
+    h += milestone(c, 'UTS', 'UTS · Ujian Tengah Semester') + '</div><div>';
+    for (i = 8; i < NM; i++) h += meet(c, i);
+    h += milestone(c, 'UAS', 'UAS · Ujian Akhir Semester') + '</div></div>' +
+      '<div class="tr-sec"><h4>' + ic('flag') + 'Presentasi &amp; ujian lainnya</h4><div><button class="ac-btn sm" data-act="add" data-e="exam" data-course="' + c.id + '" data-type="Presentasi">+ Presentasi</button> <button class="ac-btn sm" data-act="add" data-e="exam" data-course="' + c.id + '" data-type="Kuis">+ Kuis / ujian</button></div></div>';
+    var rest = ex.filter(function (e) { return e.type !== 'UTS' && e.type !== 'UAS'; });
+    h += rest.length ? '<div class="tr-exl">' + rest.map(exRow).join('') + '</div>' : '<p class="tr-none">Belum ada presentasi atau ujian lain. Tambahkan, lalu otomatis muncul di Kalender.</p>';
+    var fix = ex.filter(function (e) { return e.type === 'UTS' || e.type === 'UAS'; });
+    if (fix.length) h += '<div class="tr-exl">' + fix.map(exRow).join('') + '</div>';
+    return h + '</div></article>';
+  }
+  function vTrk() {
+    var L = D.course.filter(inActive), act = D.sem.filter(function (x) { return x.active; });
+    var h = '<div class="tr-hero"><div><small>Cek ricek perjalanan</small><h3>16 pertemuan, satu layar.</h3><p>Centang catatan, catat absensi, dan jadwalkan ujian atau presentasi. Semua yang bertanggal otomatis tampil di Kalender.</p></div>';
+    if (L.length) {
+      var all = L.map(trkStat), pc = all.filter(function (x) { return x.pct != null; }), avg = pc.length ? Math.round(pc.reduce(function (a, x) { return a + x.pct; }, 0) / pc.length) : null;
+      var nt = all.reduce(function (a, x) { return a + x.n; }, 0), up = 0;
+      L.forEach(function (c) { exOf(c.id).forEach(function (e) { if (e.date && !e.done && e.date.slice(0, 10) >= today()) up++; }); });
+      h += '<div class="tr-kp"><div><b>' + L.length + '</b><small>Mata kuliah</small></div><div><b>' + nt + '<i>/' + L.length * NM + '</i></b><small>Catatan</small></div><div><b>' + (avg == null ? '—' : avg + '%') + '</b><small>Rata-rata hadir</small></div><div><b>' + up + '</b><small>Ujian/presentasi</small></div></div>';
+    }
+    h += '</div>';
+    if (!act.length) return h + empty('Belum ada semester aktif. Aktifkan semester di menu Semester.');
+    if (!L.length) return h + empty('Belum ada mata kuliah di semester aktif. Tambahkan lewat menu Mata Kuliah.');
+    if (trkOpen === null) trkOpen = L[0].id;
+    return h + '<div class="tr-list">' + L.map(trkCard).join('') + '</div>';
+  }
+  function readLogo(file, cb) {
+    if (!file || !/^image\//.test(file.type)) return msg('Logo', 'Pilih file gambar.');
+    var fr = new FileReader();
+    fr.onload = function () {
+      var im = new Image();
+      im.onload = function () {
+        var S = 160, cv = document.createElement('canvas'), x = cv.getContext('2d'), r = Math.min(im.width, im.height) || 1, sx = (im.width - r) / 2, sy = (im.height - r) / 2;
+        cv.width = cv.height = S; x.drawImage(im, sx, sy, r, r, 0, 0, S, S);
+        var u = cv.toDataURL('image/webp', .9); if (u.indexOf('data:image/webp') !== 0) u = cv.toDataURL('image/png');
+        cb(u);
+      };
+      im.onerror = function () { msg('Logo', 'Gambar tidak bisa dibaca.'); };
+      im.src = fr.result;
+    };
+    fr.readAsDataURL(file);
+  }
+  var lgIn;
+  function pickLogo(cid) {
+    if (!lgIn) { lgIn = document.createElement('input'); lgIn.type = 'file'; lgIn.accept = 'image/*'; lgIn.hidden = true; document.body.appendChild(lgIn); }
+    lgIn.value = ''; lgIn.onchange = function () {
+      readLogo(lgIn.files[0], function (u) { var c = by(D.course, cid); if (c) { c.logo = u; save(); render(); msg('Logo diganti', c.name); } });
+    };
+    lgIn.click();
   }
   function vSearch() {
     var s = q.toLowerCase(), m = function () { for (var i = 0; i < arguments.length; i++) if (String(arguments[i] || '').toLowerCase().indexOf(s) >= 0) return true; return false; };
@@ -508,6 +627,15 @@
   /* ---------- Form modal ---------- */
   function fld(f, v) {
     var at = 'id="f_' + f.k + '" name="' + f.k + '"' + (f.req ? ' required' : ''), inp;
+    if (f.t === 'logo') {
+      return '<div class="full ad-logofld"><span>' + f.l + '</span><div class="ad-lgrow">' +
+        '<i class="ad-tile big" id="lgPrev">' + (v ? '<img src="' + esc(v) + '" alt="">' : '—') + '</i>' +
+        '<div><input type="hidden" id="f_logo" name="logo" value="' + esc(v) + '">' +
+        '<input type="file" id="lgFile" accept="image/*" hidden>' +
+        '<button type="button" class="ac-btn sm" data-lg="pick">Unggah gambar</button> ' +
+        '<button type="button" class="ac-btn sm danger" data-lg="clear">Hapus logo</button>' +
+        '<small>PNG/JPG/SVG. Otomatis diperkecil agar hemat memori.</small></div></div></div>';
+    }
     if (f.t === 'textarea') inp = '<textarea ' + at + ' rows="3">' + esc(v) + '</textarea>';
     else if (f.t === 'select') {
       var o = typeof f.o === 'function' ? f.o(v) : f.o;
@@ -527,7 +655,16 @@
     document.body.appendChild(m);
     var off = function () { m.remove(); };
     m.addEventListener('mousedown', function (e) { if (e.target === m) off(); });
-    m.addEventListener('click', function (e) { if (e.target.hasAttribute('data-x')) off(); });
+    m.addEventListener('click', function (e) {
+      if (e.target.hasAttribute('data-x')) off();
+      var lg = e.target.getAttribute && e.target.getAttribute('data-lg'), hid = m.querySelector('#f_logo'), pv = m.querySelector('#lgPrev'), fi = m.querySelector('#lgFile');
+      if (lg === 'pick') fi.click();
+      if (lg === 'clear') { hid.value = ''; pv.textContent = '—'; }
+    });
+    var lf = m.querySelector('#lgFile');
+    if (lf) lf.addEventListener('change', function () {
+      readLogo(lf.files[0], function (u) { m.querySelector('#f_logo').value = u; m.querySelector('#lgPrev').innerHTML = '<img src="' + u + '" alt="">'; });
+    });
     m.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); off(); } });
     m.querySelector('form').addEventListener('submit', function (e) {
       e.preventDefault();
@@ -567,6 +704,22 @@
     if (a === 'help') { tab = 'cfg'; q = ''; render(); body.scrollTop = 0; return; }
     if (a === 'bell') { if (tab === 'cfg') readCfg(); tab = 'task'; tf = 'Semua'; q = ''; var q2 = ov.querySelector('#acQ'); if (q2) q2.value = ''; render(); body.scrollTop = 0; return; }
     if (a === 'cf') { cf = d.v; return renderBody(); }
+    if (a === 'tx') { trkOpen = trkOpen === d.id ? '' : d.id; return renderBody(); }
+    if (a === 'tlogo') { e.stopPropagation(); return pickLogo(d.id); }
+    if (a === 'mn' || a === 'ma') {
+      var mc = by(D.course, d.id); if (!mc) return; var mm = trk(mc).m[+d.i];
+      if (a === 'mn') mm.n = mm.n ? 0 : 1; else mm.a = mm.a === d.v ? '' : d.v;
+      save(); return renderBody();
+    }
+    if (a === 'mdate' || a === 'tstart') return;
+    if (a === 'mall') { var ac = by(D.course, d.id), tt = trk(ac), allOn = tt.m.every(function (x) { return x.n; }); tt.m.forEach(function (x) { x.n = allOn ? 0 : 1; }); save(); return renderBody(); }
+    if (a === 'mclr') { if (!confirm('Reset catatan, absensi, dan tanggal 16 pertemuan mata kuliah ini?')) return; var rc = by(D.course, d.id); rc.trk = null; trk(rc); save(); return renderBody(); }
+    if (a === 'mfill') {
+      var fc = by(D.course, d.id), ft = trk(fc); if (!ft.start) return msg('Isi dulu', 'Tentukan tanggal mulai kuliah.');
+      var b0 = new Date(ft.start + 'T00:00:00'); ft.m.forEach(function (x, i) { if (!x.d) { var z = new Date(b0); z.setDate(z.getDate() + 7 * i); x.d = dstr(z.getFullYear(), z.getMonth(), z.getDate()); } });
+      save(); return renderBody();
+    }
+    if (a === 'exdone') { var xe = by(D.exam, d.id); if (xe) { xe.done = !xe.done; save(); } return renderBody(); }
     if (a === 'done') { var dt = by(D.task, d.id); if (dt) { dt.status = 'Selesai'; save(); } return render(); }
     if (a === 'day') { sel = d.v; var dd = new Date(d.v + 'T00:00:00'); cal = { y: dd.getFullYear(), m: dd.getMonth() }; return renderSide(); }
     if (a === 'calnav') { var nd = new Date(cal.y, cal.m + (+d.v), 1); cal = { y: nd.getFullYear(), m: nd.getMonth() }; return renderSide(); }
@@ -574,7 +727,7 @@
     if (a === 'add') {
       if (d.e === 'course' && !D.sem.some(function (s) { return s.active; })) return msg('Belum ada semester aktif', 'Aktifkan atau buat semester terlebih dahulu.');
       if ((d.e === 'task' || d.e === 'exam' || d.e === 'study') && !D.course.length) return msg('Belum ada mata kuliah', 'Tambahkan mata kuliah terlebih dahulu.');
-      return openForm(d.e, null, d.sem ? { semId: d.sem } : null);
+      return openForm(d.e, null, d.sem ? { semId: d.sem } : d.course ? { courseId: d.course, type: d.type || 'UTS' } : null);
     }
     if (a === 'edit') return openForm(d.e, d.id);
     if (a === 'del') return del(d.e, d.id);
@@ -605,6 +758,7 @@
     dlg.hidden = false; clearTimeout(tm); tm = setTimeout(function () { dlg.hidden = true; }, 2200);
   }
   MO.msg = function (t, x) { msg(t, x); };
+  MO.acadGo = function (t) { if (!ov) build(); tab = t || 'dash'; q = ''; open(); };
   MO.acadRender = function () { if (ov && !ov.hidden) renderBody(); };
   function soon(label) {
     if (!dlg) msg('', '');

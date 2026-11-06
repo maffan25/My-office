@@ -42,7 +42,7 @@
     return { ev: [], cat: [{ id: 'c1', name: 'Kuliah', color: '#4f7cff' }, { id: 'c2', name: 'Pekerjaan', color: '#d99a2b' }, { id: 'c3', name: 'Organisasi', color: '#8a5fb5' }, { id: 'c4', name: 'Pribadi', color: '#2f9e6b' }, { id: 'c5', name: 'Ibadah', color: '#d4608f' }], set: { wk: 1, tz: 'auto', mode: 'both', hij: 0 } };
   }, function (app) {
     var D = app.D, st = app.st; D.set = Object.assign({ wk: 1, tz: 'auto', mode: 'both', hij: 0 }, D.set); CF = D.set;
-    var projects = function () { return ls('mo-proj-v1').proj || []; }, courses = function () { return ls('mo-acad-v1').course || []; }, TK = [];
+    var projects = function () { return ls('mo-proj-v1').proj || []; }, courses = function () { return ls('mo-acad-v1').course || []; }, TK = [], AXE = [];
     /* ---------- Jenis kegiatan, warna blok & api pengingat ---------- */
     var KD = { ujian: { n: 'Ujian', c: '#e5484d', p: 3 }, presentasi: { n: 'Presentasi', c: '#8b5cf6', p: 2 }, penting: { n: 'Kegiatan penting', c: '#f59e0b', p: 1 } };
     var RX = {
@@ -50,6 +50,31 @@
       presentasi: /\b(presentasi|presentation|pitch|seminar|paparan|demo day|sempro|semhas|defense)\b/i,
       penting: /\b(penting|urgent|deadline|wajib|interview|wawancara|krusial)\b/i
     };
+
+    /* ---------- Agenda akademik (ujian, presentasi, tenggat tugas, pertemuan) dibaca langsung dari modul Academic ---------- */
+    function AX() {
+      var A = ls('mo-acad-v1'), cs = {}, out = [];
+      (A.course || []).forEach(function (c) { cs[c.id] = c; });
+      (A.exam || []).forEach(function (x) {
+        var c = cs[x.courseId]; if (!x.date || !c) return;
+        var d = String(x.date).slice(0, 10), t = String(x.date).length > 10 ? String(x.date).slice(11, 16) : '';
+        out.push({ id: 'ax-e-' + x.id, ax: 'exam', title: (x.done ? '\u2713 ' : '') + x.type + ' \u00b7 ' + c.name, start: d, end: d, startTime: t, endTime: '', allDay: !t, catId: 'c1', courseId: c.id, location: x.room || '', kind: x.done ? 'biasa' : (x.type === 'Presentasi' ? 'presentasi' : 'ujian') });
+      });
+      (A.task || []).forEach(function (x) {
+        var c = cs[x.courseId]; if (!x.deadline || !c || x.status === 'Selesai') return;
+        var d = String(x.deadline).slice(0, 10), t = String(x.deadline).slice(11, 16);
+        out.push({ id: 'ax-t-' + x.id, ax: 'task', title: 'Tenggat \u00b7 ' + x.title + ' (' + c.name + ')', start: d, end: d, startTime: t, endTime: '', allDay: !t, catId: 'c1', courseId: c.id, kind: 'penting' });
+      });
+      (A.course || []).forEach(function (c) {
+        ((c.trk && c.trk.m) || []).forEach(function (m, i) {
+          if (!m || !m.d) return;
+          out.push({ id: 'ax-m-' + c.id + '-' + i, ax: 'trk', title: 'Kuliah \u00b7 ' + c.name + ' (P' + (i + 1) + (m.a ? ' \u00b7 ' + m.a : '') + ')', start: m.d, end: m.d, startTime: '', endTime: '', allDay: true, catId: 'c1', courseId: c.id, kind: 'biasa' });
+        });
+      });
+      return out;
+    }
+    var evAll = function () { return D.ev.concat(AXE); };
+    var eact = function (e) { return e.ax ? 'data-act="goacad" data-t="' + e.ax + '"' : '' + eact(e) + ''; };
     var kindOf = function (e) {
       if (e.kind === 'biasa') return '';
       if (KD[e.kind]) return e.kind;
@@ -75,7 +100,7 @@
         Object.keys(KD).map(function (k) { return '<span><s style="--b:' + KD[k].c + '"></s>' + KD[k].n + '</span>'; }).join('') + '<span><s style="--b:#4f7cff"></s>Lainnya (warna kategori)</span></div>';
     };
     function fireBar() {
-      var list = D.ev.filter(function (e) { return fl(e) >= 0; }).sort(function (x, y) { return fl(x) - fl(y) || rng(x)[0] - rng(y)[0]; });
+      var list = evAll().filter(function (e) { return fl(e) >= 0; }).sort(function (x, y) { return fl(x) - fl(y) || rng(x)[0] - rng(y)[0]; });
       if (!list.length) return '';
       var now = today();
       return '<div class="fire-bar" role="status">' + fireEl(fl(list[0])) + '<div><b>' + list.length + ' kegiatan menyala dalam 3 hari ke depan</b><div class="fb-c">' +
@@ -85,7 +110,7 @@
       var s = dn(e.start) * 1440 + (e.allDay ? 0 : tmin(e.startTime)), en = e.allDay ? (dn(e.end || e.start) + 1) * 1440 : (e.endTime ? dn(e.end || e.start) * 1440 + tmin(e.endTime) : s);
       return [s, en];
     };
-    var onDay = function (day) { var a = dn(day) * 1440, b = a + 1440; return D.ev.filter(function (e) { var r = rng(e); return r[0] < b && (r[1] > a || (r[1] === r[0] && r[0] >= a)); }); };
+    var onDay = function (day) { var a = dn(day) * 1440, b = a + 1440; return evAll().filter(function (e) { var r = rng(e); return r[0] < b && (r[1] > a || (r[1] === r[0] && r[0] >= a)); }); };
     var tasksOn = function (day) { return TK.filter(function (t) { return t.due === day; }); };
     var today = function () { return nowP().date; };
     var tl = function (e) { if (e.allDay) return 'Seharian'; return e.startTime + (e.endTime ? '–' + e.endTime : '') + (e.end && e.end !== e.start ? ' (s/d ' + fd(e.end) + ')' : ''); };
@@ -122,7 +147,7 @@
     };
     function item(e, cls) {
       var rel = [(by(projects(), e.projId) || {}).name, (by(courses(), e.courseId) || {}).name].filter(Boolean).join(' · ');
-      return '<button class="ev" style="--c:' + color(e) + '" data-act="edit" data-e="ev" data-id="' + e.id + '" title="' + esc(e.title + ' · ' + tl(e) + (e.location ? ' · ' + e.location : '') + (rel ? ' · ' + rel : '')) + '">' + tag(e) + (e.allDay ? '' : esc(e.startTime) + ' ') + esc(e.title) + '</button>';
+      return '<button class="ev" style="--c:' + color(e) + '" ' + eact(e) + ' title="' + esc(e.title + ' · ' + tl(e) + (e.location ? ' · ' + e.location : '') + (rel ? ' · ' + rel : '')) + '">' + tag(e) + (e.allDay ? '' : esc(e.startTime) + ' ') + esc(e.title) + '</button>';
     }
     var taskBtn = function (t) { return '<button class="ev tk' + (t.status === 'Done' ? ' dn' : '') + '" style="--c:#8a94a6" data-act="gotask" title="Tenggat tugas' + (t.dueTime ? ' ' + t.dueTime : '') + '">☑ ' + esc(t.title) + '</button>'; };
 
@@ -150,7 +175,7 @@
       var ev = onDay(sel).sort(function (x, y) { return rng(x)[0] - rng(y)[0]; }), tk = tasksOn(sel);
       h += '<aside class="kc-side" aria-live="polite"><small>' + DL[dow(sel)] + ', ' + (+sel.slice(8)) + ' ' + MN[+sel.slice(5, 7) - 1] + ' ' + sel.slice(0, 4) + '</small>';
       if (!ev.length && !tk.length) h += '<p>Belum ada kegiatan pada tanggal ini.</p>';
-      ev.forEach(function (e) { h += '<button class="kc-ev" style="--c:' + color(e) + '" data-act="edit" data-e="ev" data-id="' + e.id + '"><i></i><div><b>' + tag(e) + esc(e.title) + '</b><small>' + kindLbl(e) + esc(tl(e)) + (e.location ? ' · ' + esc(e.location) : '') + '</small></div></button>'; });
+      ev.forEach(function (e) { h += '<button class="kc-ev" style="--c:' + color(e) + '" ' + eact(e) + '><i></i><div><b>' + tag(e) + esc(e.title) + '</b><small>' + kindLbl(e) + esc(tl(e)) + (e.location ? ' · ' + esc(e.location) : '') + '</small></div></button>'; });
       tk.forEach(function (t) { h += '<button class="kc-ev" style="--c:#8a94a6" data-act="gotask"><i></i><div><b>' + esc(t.title) + '</b><small>Tenggat tugas · ' + esc(t.status) + (t.dueTime ? ' · ' + t.dueTime : '') + '</small></div></button>'; });
       return h + '<button class="kc-add" data-act="newday" data-d="' + sel + '">+ Tambah kegiatan</button></aside></div>';
     }
@@ -178,7 +203,7 @@
         lanes(S);
         h += '<div class="col" data-act="slot" data-d="' + d + '">' + S.map(function (x) {
           var hgt = Math.max(20, (x.en - x.s) * 0.8);
-          return '<button class="ev" style="--c:' + color(x.e) + ';top:' + (x.s * 0.8) + 'px;height:' + hgt + 'px;left:' + (x.l * 100 / x.n) + '%;width:calc(' + (100 / x.n) + '% - 3px)" data-act="edit" data-e="ev" data-id="' + x.e.id + '"><b>' + tag(x.e) + esc(x.e.title) + '</b>' + (hgt > 34 ? '<br>' + tl(x.e) + (x.e.location ? ' · ' + esc(x.e.location) : '') : '') + '</button>';
+          return '<button class="ev" style="--c:' + color(x.e) + ';top:' + (x.s * 0.8) + 'px;height:' + hgt + 'px;left:' + (x.l * 100 / x.n) + '%;width:calc(' + (100 / x.n) + '% - 3px)" ' + eact(x.e) + '><b>' + tag(x.e) + esc(x.e.title) + '</b>' + (hgt > 34 ? '<br>' + tl(x.e) + (x.e.location ? ' · ' + esc(x.e.location) : '') : '') + '</button>';
         }).join('') + (d === np.date ? '<div class="now" style="top:' + (np.min * 0.8) + 'px"></div>' : '') + '</div>';
       });
       return h + '</div></div><p class="ac-hint" style="margin-top:8px">Acara tanpa jam selesai ditampilkan sebagai penanda singkat. Tugas yang hanya punya tenggat muncul di baris "Seharian", bukan sebagai blok jam.</p>';
@@ -192,13 +217,14 @@
         h += '<div class="dayh">' + DL[dow(d)] + ', ' + fd(d) + (CF.mode !== 'masehi' && hh ? '<small>' + hh.d + ' ' + HM[hh.m - 1] + ' ' + hh.y + ' H</small>' : '') + '</div>';
         ev.forEach(function (e) {
           var c = by(D.cat, e.catId), rel = [(by(projects(), e.projId) || {}).name, (by(courses(), e.courseId) || {}).name].filter(Boolean).join(' · ');
-          h += '<div class="aitem" style="--c:' + color(e) + ';cursor:pointer" data-act="edit" data-e="ev" data-id="' + e.id + '"><span class="tm">' + tl(e) + '</span><div><b>' + tag(e) + esc(e.title) + '</b><small>' + kindLbl(e) + [c && c.name, e.location, rel, e.remind !== '' && e.remind != null ? '🔔 ' + (+e.remind ? e.remind + ' mnt sebelum' : 'tepat waktu') : ''].filter(Boolean).map(esc).join(' · ') + '</small></div></div>';
+          h += '<div class="aitem" style="--c:' + color(e) + ';cursor:pointer" ' + eact(e) + '><span class="tm">' + tl(e) + '</span><div><b>' + tag(e) + esc(e.title) + '</b><small>' + kindLbl(e) + [c && c.name, e.location, rel, e.remind !== '' && e.remind != null ? '🔔 ' + (+e.remind ? e.remind + ' mnt sebelum' : 'tepat waktu') : ''].filter(Boolean).map(esc).join(' · ') + '</small></div></div>';
         });
         tk.forEach(function (t) { h += '<div class="aitem" style="--c:#8a94a6;cursor:pointer" data-act="gotask"><span class="tm">Tenggat</span><div>☑ ' + esc(t.title) + '<small>' + esc(t.status) + (t.dueTime ? ' · ' + t.dueTime : '') + '</small></div></div>'; });
       }
       return any ? h : empty('Tidak ada agenda dalam 30 hari ke depan.');
     }
     function vCal() {
+      AXE = AX();
       TK = (ls('mo-task-v1').task || []).filter(function (t) { return t.due && t.status !== 'Archived'; });
       var a = st.d || today(), v = st.v || 'Monthly', ttl = '', body;
       if (v === 'Monthly') {
@@ -261,6 +287,7 @@
           app.form('ev', null, { start: d.d, end: d.d, startTime: hhmm(m), endTime: hhmm(m + 60), allDay: false });
         }
         if (a === 'gotask' && MO.routes['#task']) MO.routes['#task']();
+        if (a === 'goacad' && MO.acadGo) MO.acadGo(d.t === 'task' ? 'task' : d.t === 'trk' ? 'trk' : 'exam');
         if (a === 'notif' && window.Notification) Notification.requestPermission().then(function (p) { MO.msg('Notifikasi', p === 'granted' ? 'Aktif' : 'Tidak diizinkan'); });
       }
     };

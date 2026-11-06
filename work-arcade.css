@@ -256,3 +256,6 @@ html:root .ac-ov.wo-skin .ac-win footer{border-top:1px solid #1d1d25}
   .wo-hero h1{font-size:34px}
 }
 @media (prefers-reduced-motion:reduce){.wo-card,.wo-frame,.wo-world{transition:none!important;animation:none!important}}
+
+/* judul tunggal "Work Office" — emas & tinta elegan */
+.wo-hero h1.wo-brand{font-family:var(--hd);font-weight:800;margin-top:8px;letter-spacing:-.8px}
