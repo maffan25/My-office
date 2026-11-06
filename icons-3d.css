@@ -1,44 +1,9 @@
-/* icons-3d.css — gerak ikon 3D baru (lembar ikon pengguna). Lapisan dibuat oleh gen_icons3d.py.
+/* icons-3d.css — semua ikon: satu gambar utuh, bergerak naik-turun pelan (tanpa putar/gerak lain).
    --k = pengali durasi (1 normal, .32 saat diklik). Hanya jalan saat ikon terlihat (.lv-on). */
-.lv .n-body{transform-origin:50px 90px}
-.lv-on .n-sp{animation:nTw calc(2.2s*var(--k,1)) ease-in-out infinite;transform-origin:50% 50%}
-@keyframes nTw{0%,100%{opacity:.25;transform:scale(.88)}50%{opacity:1;transform:scale(1.06)}}
-@keyframes nHop{0%,56%,100%{transform:none}62%{transform:scale(1.06,.92)}72%{transform:translateY(-9px) scale(.97,1.04)}84%{transform:scale(1.04,.96)}92%{transform:none}}
-@keyframes nSway{0%,100%{transform:rotate(-3.5deg)}50%{transform:rotate(3.5deg)}}
-@keyframes nBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-4px) scale(1.02)}}
-@keyframes nPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
-@keyframes nSwing{0%,100%{transform:rotate(-12deg)}50%{transform:rotate(12deg)}}
-@keyframes nRing{0%,55%,100%{transform:rotate(0)}6%{transform:rotate(-14deg)}12%{transform:rotate(12deg)}18%{transform:rotate(-9deg)}24%{transform:rotate(7deg)}30%{transform:rotate(-4deg)}38%{transform:rotate(2deg)}}
-@keyframes nPop{0%,60%,100%{transform:scale(1)}68%{transform:scale(1.35)}78%{transform:scale(.92)}86%{transform:scale(1)}}
-@keyframes nShoot{0%,55%,100%{transform:none}64%{transform:translate(5px,-5px)}78%{transform:translate(-2px,2px)}90%{transform:none}}
-@keyframes nCap{0%,52%,100%{transform:none}22%{transform:translateY(-1.5px) rotate(-2deg)}66%{transform:translateY(-4px) rotate(-4deg)}80%{transform:translateY(.5px) rotate(1.5deg)}90%{transform:none}}
-@keyframes nGrow{0%,6%{transform:scaleY(.3)}30%,82%{transform:scaleY(1)}92%,100%{transform:scaleY(.3)}}
-@keyframes nLine{0%,10%{opacity:0;transform:scale(.85)}20%,82%{opacity:1;transform:none}92%,100%{opacity:0;transform:scale(.85)}}
-@keyframes nTilt{0%,100%{transform:rotate(0)}25%{transform:rotate(-4deg) translateY(-2px)}75%{transform:rotate(4deg) translateY(-2px)}}
-@keyframes nBadge{0%,100%{transform:scale(1)}50%{transform:scale(1.18)}}
-.lv-on.lv-academic .n-body{animation:nBob calc(4.6s*var(--k,1)) ease-in-out infinite}
-.lv-on .n-cap{animation:nCap calc(4.6s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-work .n-body{animation:nHop calc(4.2s*var(--k,1)) ease-in-out infinite}
-.lv-on .n-tag{animation:nSwing calc(2.4s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-org .n-body{animation:nBob calc(2.4s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-project .n-body{animation:nSway calc(5s*var(--k,1)) ease-in-out infinite}
-.lv-on .n-gear{animation:lvSpin calc(6s*var(--k,1)) linear infinite}
-.lv-on.lv-task .n-body{animation:nTilt calc(3.6s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-cal .n-body{animation:nSway calc(4.4s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-fin .n-body{animation:nHop calc(3.8s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-goal .n-body{animation:nPulse calc(3.4s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-goal .n-arrow{animation:nShoot calc(3.4s*var(--k,1)) cubic-bezier(.3,1.4,.5,1) infinite}
-.lv-on.lv-doc .n-body{animation:nBob calc(3.2s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-chart .n-body{animation:none}
-.lv-on.lv-chart .n-b0,.lv-on.lv-chart .n-b1,.lv-on.lv-chart .n-b2,.lv-on.lv-chart .n-b3{animation:nGrow calc(4.4s*var(--k,1)) cubic-bezier(.3,1.3,.5,1) infinite}
-.lv-on.lv-chart .n-b1{animation-delay:.15s}.lv-on.lv-chart .n-b2{animation-delay:.3s}.lv-on.lv-chart .n-b3{animation-delay:.45s}
-.lv-on.lv-chart .n-arrow{transform-origin:20% 80%;animation:nLine calc(4.4s*var(--k,1)) ease-out .5s infinite}
-.lv-on.lv-set .n-gear{animation:lvSpin calc(9s*var(--k,1)) linear infinite}
-.lv-on.lv-bell .n-body{transform-origin:50px 16px;animation:nRing calc(3.6s*var(--k,1)) ease-in-out infinite}
-.lv-on .n-badge{animation:nBadge calc(1.8s*var(--k,1)) ease-in-out infinite}
-.lv-on.lv-clock .n-body{animation:nTilt calc(3s*var(--k,1)) ease-in-out infinite}
-.lv-on .n-hh{animation:lvSpin calc(48s*var(--k,1)) linear infinite}
-.lv-on .n-hm{animation:lvSpin calc(8s*var(--k,1)) linear infinite}
-.lv-on .n-hs{animation:lvSpin calc(2.4s*var(--k,1)) steps(12) infinite}
-.lv-on.lv-book .n-body{animation:nTilt calc(4.2s*var(--k,1)) ease-in-out infinite}
+.lv .n-body{transform-origin:50% 90%}
+@keyframes nFloat{0%,100%{transform:translateY(2px)}50%{transform:translateY(-4px)}}
+.lv-on .n-body{animation:nFloat calc(3.4s*var(--k,1)) ease-in-out infinite}
+.lv-on.lv-work .n-body,.lv-on.lv-task .n-body,.lv-on.lv-chart .n-body,.lv-on.lv-bell .n-body{animation-delay:-.6s}
+.lv-on.lv-org .n-body,.lv-on.lv-cal .n-body,.lv-on.lv-set .n-body,.lv-on.lv-book .n-body{animation-delay:-1.2s}
+.lv-on.lv-project .n-body,.lv-on.lv-fin .n-body,.lv-on.lv-doc .n-body{animation-delay:-1.9s}
 @media (prefers-reduced-motion:reduce){.lv *{animation:none!important}}
