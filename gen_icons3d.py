@@ -14,19 +14,20 @@ dist = lambda cx, cy, r: (xx - cx) ** 2 + (yy - cy) ** 2 <= r * r
 navy = (np.maximum(np.maximum(R, G), B) < 125) & (B >= R)
 gold = (R > 200) & (G > 140) & (B < 130)
 red = (R > 200) & (G < 120)
-orange = (R > 215) & (G > 110) & (G < 205) & (B < 110)
+_hsv = cv2.cvtColor(sheet, cv2.COLOR_RGB2HSV); hh, ss, vv = [_hsv[..., i].astype(int) for i in range(3)]
+orange = (hh >= 5) & (hh <= 22) & (ss > 110) & (vv > 170)   # hue OpenCV 0-179: oranye
 blue = (B > R + 60) & (B > 150)
 purple = (B > 190) & (R < 200) & (G < 150) & (B > G + 50)
-sat = (np.max(sheet, 2).astype(int) - np.min(sheet, 2)) > 70
 # parts: ikon -> [(nama, mask, titik-putar sheet, clear_alpha)]
 P = {
- 'academic': [('cap', box(95, 45, 410, 228) & (navy | gold), (255, 205), 0)],
- 'work': [('tag', box(612, 95, 705, 280) & ((B > R + 10) | (np.min(sheet, 2) > 225)), (655, 105), 0)],
- 'project': [('gear', box(1300, 165, 1455, 315) & orange, (1380, 238), 0)],
- 'goal': [('arrow', box(1070, 360, 1215, 500) & blue, (1075, 490), 0)],
- 'bell': [('badge', dist(1138, 745, 40), (1138, 745), 0)],
- 'chart': [('arrow', box(80, 655, 268, 790) & purple, (90, 775), 0)] +
-          [('b%d' % i, box(a, 700, b, 902) & sat, ((a + b) // 2, 902), 1) for i, (a, b) in enumerate([(56, 118), (118, 180), (180, 238), (238, 298)])],
+ 'academic': [('cap', 'hull:214', box(95, 45, 410, 228) & (navy | gold), (255, 205), 0)],
+ 'work': [('tag', '', box(612, 95, 705, 280) & ((B > R + 10) | (np.min(sheet, 2) > 225)), (655, 105), 0)],
+ 'project': [('gear', 'close', box(1300, 165, 1455, 315) & orange, (1380, 238), 0)],
+ 'set': [('gear', '', box(0, 0, SW_, SH_) & ~box(559, 0, SW_, 742), (502, 810), 1)],
+ 'goal': [('arrow', '', box(1070, 360, 1215, 500) & blue, (1075, 490), 0)],
+ 'bell': [('badge', '', dist(1138, 745, 40), (1138, 745), 0)],
+ 'chart': [('arrow', '', box(80, 655, 268, 790) & purple, (90, 775), 0)] +
+          [('b%d' % i, '', box(a, 700, b, 905), ((a + b) // 2, 898), 1) for i, (a, b) in enumerate([(57, 117), (117, 178), (178, 237), (237, 297)])],
 }
 CLOCK = (788, 820)
 out = {}
@@ -38,8 +39,21 @@ for name, (x0, y0, w, h) in meta.items():
     rgb = a8[..., :3].copy(); al = a8[..., 3].astype(np.float32) / 255
     sl = (slice(y0, y0 + h), slice(x0, x0 + w))
     parts = []   # (cls, mask_local, origin_local)
-    for cls, m, org, clr in P.get(name, []):
-        parts.append((cls, m[sl] & (al > .3), (org[0] - x0, org[1] - y0), clr))
+    for cls, mode, m, org, clr in P.get(name, []):
+        m = m[sl] & (al > .3)
+        if cls != 'arrow' or name == 'goal':
+            pass
+        if mode.startswith('hull'):      # cangkang cembung seluruh bagian (menangkap sorotan/bayangan), kecuali bagian bawah yang bukan milik bagian ini
+            cut = int(mode.split(':')[1]) - y0
+            cs, _ = cv2.findContours(ndi.binary_dilation(m, iterations=3).astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+            hm = np.zeros(m.shape, np.uint8); cv2.fillPoly(hm, [cv2.convexHull(np.vstack(cs))], 1)
+            book = (np.arange(h)[:, None] + y0 >= 190) & ((B[sl] > R[sl] + 60) & (B[sl] > 160))   # sampul buku biru bukan bagian topi
+            m = (hm.astype(bool) & (al > .3) & ~book) & ((np.arange(h)[:, None] < cut) | ndi.binary_dilation(m, iterations=2))
+        elif mode == 'close':
+            m = ndi.binary_closing(ndi.binary_dilation(m, iterations=1), structure=cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)).astype(bool))
+            l2, k = ndi.label(m)
+            if k > 1: sz = ndi.sum(m, l2, range(1, k + 1)); m = l2 == 1 + int(np.argmax(sz))
+        parts.append((cls, m, (org[0] - x0, org[1] - y0), clr))
     if name == 'clock':
         d = dist(*CLOCK, 66)[sl] & (np.max(sheet, 2)[sl] < 120) & ~dist(*CLOCK, 9)[sl]
         parts.append(('hands', d, None, 0))
@@ -47,13 +61,13 @@ for name, (x0, y0, w, h) in meta.items():
     lab, n = ndi.label(al > .5)
     if n > 1:
         sz = ndi.sum(al > .5, lab, range(1, n + 1)); big = 1 + int(np.argmax(sz))
-        sp = np.isin(lab, [i + 1 for i in range(n) if i + 1 != big and sz[i] > 100 and sz[i] < .15 * sz[big - 1]])
+        sp = np.isin(lab, [i + 1 for i in range(n) if i + 1 != big and sz[i] > 100 and sz[i] < .15 * sz[big - 1] and (np.ptp(rgb[lab == i + 1], axis=1).mean() > 90)])
         if sp.any(): parts.append(('sp', ndi.binary_dilation(sp, iterations=2), None, 1))
     base_rgb, base_al = rgb.copy(), al.copy()
     for cls, m, org, clr in parts:
         md = ndi.binary_dilation(m, iterations=3)
         base_rgb = cv2.inpaint(base_rgb, md.astype(np.uint8) * 255, 6, cv2.INPAINT_TELEA)
-        if clr: base_al[md] = 0
+        if clr: base_al[md & (np.arange(h)[:, None] + y0 < 898 if cls[0] == 'b' and name == 'chart' else True)] = 0
     s = 92.0 / max(w, h); ox = (100 - w * s) / 2; oy = (100 - h * s) / 2 - 1
     sc = 230.0 / max(w, h)
     def img(rgb_, al_, x, y, ww, hh):

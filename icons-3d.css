@@ -32,7 +32,7 @@
 .lv-on.lv-chart .n-b0,.lv-on.lv-chart .n-b1,.lv-on.lv-chart .n-b2,.lv-on.lv-chart .n-b3{animation:nGrow calc(4.4s*var(--k,1)) cubic-bezier(.3,1.3,.5,1) infinite}
 .lv-on.lv-chart .n-b1{animation-delay:.15s}.lv-on.lv-chart .n-b2{animation-delay:.3s}.lv-on.lv-chart .n-b3{animation-delay:.45s}
 .lv-on.lv-chart .n-arrow{animation:nLine calc(4.4s*var(--k,1)) ease-out .5s infinite}
-.lv-on.lv-set .n-body{animation:lvSpin calc(9s*var(--k,1)) linear infinite;transform-origin:50% 50%}
+.lv-on.lv-set .n-gear{animation:lvSpin calc(9s*var(--k,1)) linear infinite}
 .lv-on.lv-bell .n-body{transform-origin:50px 16px;animation:nRing calc(3.6s*var(--k,1)) ease-in-out infinite}
 .lv-on .n-badge{animation:nBadge calc(1.8s*var(--k,1)) ease-in-out infinite}
 .lv-on.lv-clock .n-body{animation:nTilt calc(3s*var(--k,1)) ease-in-out infinite}
