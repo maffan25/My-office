@@ -4,16 +4,14 @@
   const MO = window.MyOffice, K = MO.kit, esc = K.esc, rp = K.rp, uid = K.uid, by = K.by, fd = K.fd, today = K.todayS;
   const KEY = 'mo-fin-v1', pad = n => ('0' + n).slice(-2);
   let D; try { D = JSON.parse(localStorage.getItem(KEY)); } catch (e) { }
-  D = D || {}; ['acc', 'tx', 'bud', 'goal', 'con', 'cat', 'item', 'rcp', 'cart'].forEach(k => D[k] = D[k] || []);
+  D = D || {}; ['acc', 'tx', 'bud', 'goal', 'con', 'cat', 'item', 'rcp', 'cart', 'tag'].forEach(k => D[k] = D[k] || []);
   const mkc = (k, a) => a.forEach(n => D.cat.push({ id: uid(), name: n, kind: k, archived: false }));
-  if (!D.cat.length) { mkc('Pemasukan', ['Uang saku', 'Gaji', 'Freelance', 'Beasiswa', 'Bisnis', 'Lainnya']); mkc('Pengeluaran', ['Makanan', 'Transportasi', 'Pendidikan', 'Kebutuhan pribadi', 'Hiburan', 'Langganan', 'Kesehatan', 'Organisasi', 'Tabungan', 'Lainnya']); }
-  const ICO = { Makanan: '🍜', Transportasi: '🛵', Pendidikan: '📚', 'Kebutuhan pribadi': '🧴', Hiburan: '🎬', Langganan: '📱', Kesehatan: '💊', Organisasi: '🤝', Tabungan: '🐷', Lainnya: '🧾', 'Uang saku': '👛', Gaji: '💼', Freelance: '💻', Beasiswa: '🎓', Bisnis: '🏪' };
+  if (!D.cat.length) { mkc('Pemasukan', ['Uang saku', 'Gaji', 'Freelance', 'Beasiswa', 'Bisnis', 'Lainnya']); mkc('Pengeluaran', ['Makanan', 'Minuman', 'Transportasi', 'Pendidikan', 'Kebutuhan pribadi', 'Hiburan', 'Langganan', 'Kesehatan', 'Organisasi', 'Tabungan', 'Lainnya']); }
+  const ICO = { Makanan: '🍜', Minuman: '🥤', Transportasi: '🛵', Pendidikan: '📚', 'Kebutuhan pribadi': '🧴', Hiburan: '🎬', Langganan: '📱', Kesehatan: '💊', Organisasi: '🤝', Tabungan: '🐷', Lainnya: '🧾', 'Uang saku': '👛', Gaji: '💼', Freelance: '💻', Beasiswa: '🎓', Bisnis: '🏪' };
   const ic = c => (c && (c.icon || ICO[c.name])) || '🧾';
-  if (!D.seeded) {
-    const cid = n => (D.cat.find(x => x.name === n) || {}).id;
-    [['Nasi + lauk', 'Makanan', 15000], ['Kopi susu', 'Makanan', 18000], ['Makan siang', 'Makanan', 25000], ['Ojek online', 'Transportasi', 20000], ['Bensin', 'Transportasi', 30000], ['Fotokopi', 'Pendidikan', 5000], ['Buku catatan', 'Pendidikan', 25000], ['Kuota internet', 'Langganan', 50000], ['Tiket bioskop', 'Hiburan', 50000], ['Obat warung', 'Kesehatan', 15000], ['Iuran organisasi', 'Organisasi', 10000], ['Sabun & sampo', 'Kebutuhan pribadi', 30000]]
-      .forEach(([n, c, p]) => cid(c) && D.item.push({ id: uid(), name: n, catId: cid(c), price: p, uses: 0 })); D.seeded = 1;
-  }
+  /* katalog = KATEGORI saja; nama item, harga, jumlah & label diisi sendiri saat mencatat */
+  if (!D.mig2) { if (!D.cat.some(c => c.kind === 'Pengeluaran' && c.name === 'Minuman')) D.cat.splice(Math.max(0, D.cat.findIndex(c => c.name === 'Makanan') + 1), 0, { id: uid(), name: 'Minuman', kind: 'Pengeluaran', archived: false }); D.mig2 = 1; }
+  if (!D.tagSeeded) { [['Penting', '⭐'], ['Mendesak', '⚡'], ['Kebutuhan', '🧺'], ['Keinginan', '🎁'], ['Hiburan', '🎉'], ['Bisa ditunda', '⏳']].forEach(([n, e]) => D.tag.push({ id: uid(), name: n, icon: e })); D.tagSeeded = 1; }
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(D)); } catch (e) { MO.msg('Peringatan', 'Data tidak bisa disimpan di browser ini.'); } };
   const st = { tab: 'home', sub: { riw: 'tx', dom: 'acc' }, m: today().slice(0, 7), cat: '', q: '', tt: '', rng: 6 };
   const mlab = ym => new Date(ym + '-01T00:00:00').toLocaleDateString('id-ID', { month: 'long', year: 'numeric' });
@@ -27,7 +25,9 @@
   const got = g => D.con.filter(c => c.goalId === g.id).reduce((a, c) => a + (+c.amount || 0), 0);
   const expCats = () => D.cat.filter(c => c.kind === 'Pengeluaran' && !c.archived);
   const cartN = () => D.cart.reduce((a, l) => a + l.qty, 0), cartT = () => D.cart.reduce((a, l) => a + l.qty * l.price, 0);
-  const qtyOf = k => (D.cart.find(l => l.k === k) || {}).qty || 0;
+  const tg = id => by(D.tag, id), tgi = t => t ? ci(t, '🏷️') : '';
+  const tgChip = id => { const t = tg(id); return t ? `<span class="fn-lb" style="--h:${hue(t.name)}">${tgi(t)} ${esc(t.name)}</span>` : ''; };
+  const tagBy = m => { const o = {}; D.tx.filter(t => t.type === 'Expense' && t.date.slice(0, 7) === m).forEach(t => { const k = tg(t.tagId) ? t.tagId : ''; o[k] = (o[k] || 0) + (+t.amount || 0); }); return o; };
   const hue = s => { let h = 0; String(s).split('').forEach(c => h = (h * 31 + c.charCodeAt(0)) % 360); return h; };
   /* gambar/logo kustom: o.img (data URL) menang atas emoji */
   const ci = (o, fb) => (o && o.img) ? '<img class="fn-im" src="' + o.img + '" alt="" draggable="false">' : (o && o.icon ? esc(o.icon) : fb);
@@ -61,35 +61,31 @@
   const seg = (k, list) => `<div class="fn-seg">${list.map(([v, l]) => `<button aria-pressed="${st.sub[k] === v}" data-a="sub" data-k="${k}" data-v="${v}">${l}</button>`).join('')}</div>`;
   const txRow = t => {
     const tr = t.type === 'Transfer', c = by(D.cat, t.catId), nm = t.desc || (tr ? 'Transfer' : c ? c.name : 'Transaksi');
-    return `<button class="fn-row" data-a="edit" data-e="tx" data-id="${t.id}"><i class="fn-ico">${tr ? '🔁' : cic(c)}</i><div><b>${esc(nm)}</b><small>${tr ? esc(an(t.accId)) + ' → ' + esc(an(t.toAccId)) : esc(c ? c.name : '') + ' · ' + esc(an(t.accId))} · ${fd(t.date)}${t.rcpId ? ' · resi' : ''}</small></div><strong class="${tr ? '' : t.type === 'Income' ? 'pos' : 'neg'}">${tr ? '' : t.type === 'Income' ? '+' : '−'}${rp(t.amount)}</strong></button>`;
+    return `<button class="fn-row" data-a="edit" data-e="tx" data-id="${t.id}"><i class="fn-ico">${tr ? '🔁' : cic(c)}</i><div><b>${esc(nm)}</b><small>${tr ? esc(an(t.accId)) + ' → ' + esc(an(t.toAccId)) : esc(c ? c.name : '') + ' · ' + esc(an(t.accId))} · ${fd(t.date)}${t.rcpId ? ' · resi' : ''}${t.tagId && tg(t.tagId) ? ' · ' + esc(tg(t.tagId).name) : ''}</small></div><strong class="${tr ? '' : t.type === 'Income' ? 'pos' : 'neg'}">${tr ? '' : t.type === 'Income' ? '+' : '−'}${rp(t.amount)}</strong></button>`;
   };
-  const itemCard = i => {
-    const c = by(D.cat, i.catId), q = qtyOf(i.id);
-    return `<article class="fn-it"><button class="fn-ed" data-a="edit" data-e="item" data-id="${i.id}" aria-label="Ubah ${esc(i.name)}">✎</button><div class="fn-art${i.img ? ' has' : ''}" style="--h:${hue(i.name)}">${ci(i, cic(c))}</div><b>${esc(i.name)}</b><small>${esc(c ? c.name : '')}</small><div class="fn-pr"><span>${rp(i.price)}</span>${q ? `<div class="fn-st"><button data-a="dec" data-k="${i.id}" aria-label="Kurangi">−</button><i>${q}</i><button data-a="inc" data-k="${i.id}" aria-label="Tambah">+</button></div>` : `<button class="fn-plus" data-a="inc" data-k="${i.id}" aria-label="Tambah ${esc(i.name)}">+</button>`}</div></article>`;
+  const katCard = c => {
+    const n = D.tx.filter(t => t.type === 'Expense' && t.catId === c.id && t.date.slice(0, 7) === st.m), v = n.reduce((a, t) => a + (+t.amount || 0), 0);
+    return `<article class="fn-it fn-kc"><button class="fn-ed" data-a="edit" data-e="cat" data-id="${c.id}" aria-label="Ubah kategori ${esc(c.name)}">✎</button><button class="fn-kb" data-a="pick" data-id="${c.id}" aria-label="Catat pengeluaran ${esc(c.name)}"><span class="fn-art${c.img ? ' has' : ''}" style="--h:${hue(c.name)}">${cic(c)}</span><b>${esc(c.name)}</b><small>${v ? rp(v) + ' · ' + n.length + 'x bulan ini' : 'Belum ada bulan ini'}</small><span class="fn-go">+ Catat</span></button></article>`;
   };
   function home() {
     const m = st.m, act = D.acc.filter(a => a.active), total = act.reduce((a, x) => a + bal(x), 0), inc = sum('Income', m), exp = sum('Expense', m), eb = expBy(m);
-    const pop = D.item.slice().sort((a, b) => (b.uses || 0) - (a.uses || 0)).slice(0, 8);
+    const tb = tagBy(m), tk = Object.keys(tb).sort((a, b) => tb[b] - tb[a]), tsum = tk.reduce((a, k) => a + tb[k], 0);
     let bL = 0, bS = 0; expCats().forEach(c => { const b = budFor(c.id, m); if (b) { bL += +b.limit || 0; bS += eb[c.id] || 0; } });
     const gs = D.goal.filter(g => g.status === 'Aktif'), g0 = gs[0];
     const recent = D.tx.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
     return mon() + `<div class="fn-hm"><div class="fn-hm-a"><section class="fn-ban"><div><h1>Catat.<br>Hemat.<br>Tenang.</h1><p>Saldo <b>${rp(total)}</b><br>Keluar bulan ini ${rp(exp)} · masuk ${rp(inc)}</p><button class="fn-btn w" data-a="tab" data-t="menu">Catat pengeluaran</button></div>${ART}</section>
-    <div class="fn-cats" role="list">${expCats().map(c => `<button role="listitem" class="${st.cat === c.id ? 'on' : ''}" data-a="gocat" data-id="${c.id}"><i>${cic(c)}</i><span>${esc(c.name)}</span><small>${eb[c.id] ? rp(eb[c.id]).replace('Rp ', '') : '–'}</small></button>`).join('')}</div>
-    <div class="fn-sec"><h3>Pilihan populer</h3><button class="fn-lnk" data-a="tab" data-t="menu">Lihat semua →</button></div>
-    ${pop.length ? `<div class="fn-hs">${pop.map(itemCard).join('')}</div>` : empty('Katalog masih kosong. Tambahkan item pengeluaran yang sering kamu beli.', '<button class="fn-btn" data-a="add" data-e="item">Tambah item</button>')}
+    <div class="fn-cats" role="list">${expCats().map(c => `<button role="listitem" data-a="pick" data-id="${c.id}"><i>${cic(c)}</i><span>${esc(c.name)}</span><small>${eb[c.id] ? rp(eb[c.id]).replace('Rp ', '') : '–'}</small></button>`).join('')}</div>
+    <div class="fn-sec"><h3>Pengeluaran per label</h3><button class="fn-lnk" data-a="tab" data-t="menu">Katalog →</button></div>
+    ${tk.length ? '<div class="fn-lst">' + tk.map(k => { const t = tg(k); return `<div class="fn-bud"><i class="fn-ico">${t ? tgi(t) : '🏷️'}</i><div><b>${t ? esc(t.name) : 'Tanpa label'}</b><small>${rp(tb[k])} dari ${rp(tsum)}</small>${meter(pc(tb[k], tsum))}</div><em>${Math.round(pc(tb[k], tsum))}%</em></div>`; }).join('') + '</div>' : empty('Pilih kategori di atas, lalu isi nama item, harga, jumlah & label sesukamu. Ringkasan per label muncul di sini.')}
     </div><aside class="fn-hm-b"><section class="fn-rw"><span class="fn-seal">${bL ? '📊' : g0 ? '🎯' : '⭐'}</span><div><b>${bL ? 'Anggaran ' + mlab(m) : g0 ? esc(g0.name) : 'Belum ada anggaran'}</b><small>${bL ? 'Terpakai ' + rp(bS) + ' dari ' + rp(bL) : g0 ? 'Terkumpul ' + rp(got(g0)) + ' dari ' + rp(g0.target) : 'Pasang batas belanja supaya uang tidak bocor.'}</small>${bL ? meter(pc(bS, bL)) : g0 ? meter(pc(got(g0), +g0.target)) : ''}</div><button class="fn-btn" data-a="godom" data-v="${bL || !g0 ? 'bud' : 'goal'}">${bL || g0 ? 'Lihat' : 'Atur'}</button></section>
     <div class="fn-sec"><h3>Transaksi terbaru</h3><button class="fn-lnk" data-a="tab" data-t="riw">Riwayat →</button></div>
-    ${recent.length ? recent.map(txRow).join('') : empty('Belum ada transaksi. Pilih pengeluaran di Katalog lalu catat.')}</aside></div>`;
-  }
-  function gridHTML() {
-    const q = st.q.toLowerCase(), L = D.item.filter(i => (!st.cat || i.catId === st.cat) && (!q || i.name.toLowerCase().includes(q)));
-    return L.length ? L.map(itemCard).join('') : '<div class="fn-empty" style="grid-column:1/-1"><i>🔍</i><p>Tidak ada item yang cocok.</p></div>';
+    ${recent.length ? recent.map(txRow).join('') : empty('Belum ada transaksi. Pilih kategori di Katalog lalu catat.')}</aside></div>`;
   }
   function menu() {
-    return `<div class="fn-search"><input data-in="q" type="search" placeholder="Cari item pengeluaran…" value="${esc(st.q)}" aria-label="Cari item"></div>
-    <div class="fn-chips"><button aria-pressed="${!st.cat}" data-a="cat" data-id="">Semua</button>${expCats().map(c => `<button aria-pressed="${st.cat === c.id}" data-a="cat" data-id="${c.id}">${cic(c)} ${esc(c.name)}</button>`).join('')}</div>
-    <div class="fn-grid" id="fng">${gridHTML()}</div>
-    <div class="fn-two"><button class="fn-btn ghost" data-a="custom">+ Pengeluaran lain</button><button class="fn-btn ghost" data-a="add" data-e="item">+ Item katalog</button></div>
+    const L = expCats();
+    return `<p class="fn-hint">Pilih <b>kategori</b>, lalu isi sendiri nama item, harga, jumlah &amp; label (Penting, Mendesak, Hiburan, dll). Kategori bisa kamu ubah lewat tombol ✎.</p>
+    <div class="fn-grid" id="fng">${L.map(katCard).join('')}<button class="fn-it fn-kc fn-new" data-a="add" data-e="cat"><span class="fn-art">＋</span><b>Kategori baru</b><small>Mis. Minuman, Parkir, Donasi</small></button></div>
+    <div class="fn-two"><button class="fn-btn ghost" data-a="godom" data-v="cat">🏷️ Atur label prioritas</button></div>
     ${cartN() ? `<button class="fn-pill" data-a="cart">${I.cart}<span>${cartN()} item</span><b>${rp(cartT())}</b></button>` : ''}`;
   }
   function riw() {
@@ -132,7 +128,8 @@
     if (s === 'goal') {
       return h + '<div class="fn-two"><button class="fn-btn" data-a="add" data-e="goal">+ Target</button></div>' + (D.goal.length ? '<div class="fn-lst">' + D.goal.map(g => { const c = got(g), p = pc(c, +g.target), left = g.date ? Math.round((new Date(g.date) - new Date(today())) / 864e5) : null; return `<article class="fn-goal"><button data-a="edit" data-e="goal" data-id="${g.id}"><b>${esc(g.name)}</b><span class="fn-tag">${esc(g.status)}</span><small>${rp(c)} dari ${rp(g.target)} · ${Math.round(p)}%${left != null ? ' · ' + (left >= 0 ? left + ' hari lagi' : 'lewat ' + (-left) + ' hari') : ''}</small>${meter(Math.min(p, 99.9))}</button><button class="fn-btn sm" data-a="add" data-e="con" data-pk="goalId" data-pv="${g.id}">+ Setor</button></article>`; }).join('') + '</div>' : empty('Belum ada target tabungan.'));
     }
-    return h + '<div class="fn-two"><button class="fn-btn" data-a="add" data-e="cat">+ Kategori</button></div>' + ['Pengeluaran', 'Pemasukan'].map(k => `<div class="fn-sec"><h3>${k}</h3></div>` + '<div class="fn-lst">' + D.cat.filter(c => c.kind === k).map(c => `<button class="fn-row ${c.archived ? 'off' : ''}" data-a="edit" data-e="cat" data-id="${c.id}"><i class="fn-ico">${cic(c)}</i><div><b>${esc(c.name)}</b>${c.archived ? '<small>Diarsipkan</small>' : ''}</div></button>`).join('') + '</div>').join('');
+    return h + '<div class="fn-two"><button class="fn-btn" data-a="add" data-e="cat">+ Kategori</button><button class="fn-btn ghost" data-a="add" data-e="tag">+ Label</button></div>' + ['Pengeluaran', 'Pemasukan'].map(k => `<div class="fn-sec"><h3>${k}</h3></div>` + '<div class="fn-lst">' + D.cat.filter(c => c.kind === k).map(c => `<button class="fn-row ${c.archived ? 'off' : ''}" data-a="edit" data-e="cat" data-id="${c.id}"><i class="fn-ico">${cic(c)}</i><div><b>${esc(c.name)}</b>${c.archived ? '<small>Diarsipkan</small>' : ''}</div></button>`).join('') + '</div>').join('') +
+      '<div class="fn-sec"><h3>Label prioritas</h3></div><p class="fn-hint">Dipakai saat mencatat pengeluaran, mis. Penting, Mendesak, Hiburan. Sesuaikan dengan caramu menyusun anggaran.</p><div class="fn-lst">' + (D.tag.length ? D.tag.map(t => `<button class="fn-row" data-a="edit" data-e="tag" data-id="${t.id}"><i class="fn-ico">${tgi(t)}</i><div><b>${esc(t.name)}</b></div></button>`).join('') : '<div class="fn-empty"><p>Belum ada label.</p></div>') + '</div>';
   }
   const VIEWS = { home, menu, riw, dom, ana: () => (X.views.ana ? X.views.ana() : empty('Modul analisis belum termuat.')) };
   const TT = { home: 'Beranda', menu: 'Katalog', ana: 'Analisis Keuangan', riw: 'Riwayat', dom: 'Dompet' };
@@ -164,9 +161,9 @@
   const catO = (kind, v) => [['', '— Pilih kategori —']].concat(D.cat.filter(c => (!kind || c.kind === kind) && (!c.archived || c.id === v)).map(c => [c.id, (kind ? '' : c.kind + ' · ') + c.name]));
   const SP = {
     acc: { t: 'Akun', def: { type: 'Cash', currency: 'IDR', opening: 0, active: true }, f: [['name', 'Nama akun', 'text', 0, 1, 1], ['type', 'Jenis', 'select', O(AT)], ['holder', 'Nama di kartu', 'text', 0, 0, 0], ['no', 'Nomor kartu / rekening (opsional)', 'text'], ['net', 'Logo jaringan', 'select', [['', 'Otomatis'], ['visa', 'Visa'], ['mc', 'Mastercard'], ['gpn', 'GPN'], ['none', 'Tanpa logo']]], ['img', 'Gambar kartu (foto ATM / dompet)', 'cimg'], ['ov', 'Teks & chip di atas gambar', 'select', [['', 'Tampilkan'], ['off', 'Sembunyikan (gambar polos)']]], ['opening', 'Saldo awal (Rp)', 'number'], ['active', 'Status', 'bool', [['true', 'Aktif'], ['false', 'Nonaktif']]]] },
-    tx: { t: 'Transaksi', def: { type: 'Expense', date: today(), scope: 'Pribadi' }, f: [['date', 'Tanggal', 'date', 0, 1], ['type', 'Jenis', 'select', O(['Income', 'Expense', 'Transfer']), 1], ['amount', 'Jumlah (Rp)', 'number', 0, 1], ['accId', 'Akun (asal)', 'select', accO, 1], ['toAccId', 'Akun tujuan (Transfer)', 'select', accO], ['catId', 'Kategori', 'select', v => catO('', v)], ['desc', 'Deskripsi', 'text', 0, 0, 1], ['method', 'Metode', 'select', [['', '—']].concat(O(PM))], ['scope', 'Cakupan', 'select', O(['Pribadi', 'Pekerjaan'])], ['notes', 'Catatan', 'textarea', 0, 0, 1]] },
+    tx: { t: 'Transaksi', def: { type: 'Expense', date: today(), scope: 'Pribadi' }, f: [['date', 'Tanggal', 'date', 0, 1], ['type', 'Jenis', 'select', O(['Income', 'Expense', 'Transfer']), 1], ['amount', 'Jumlah (Rp)', 'number', 0, 1], ['accId', 'Akun (asal)', 'select', accO, 1], ['toAccId', 'Akun tujuan (Transfer)', 'select', accO], ['catId', 'Kategori', 'select', v => catO('', v)], ['tagId', 'Label prioritas', 'select', v => [['', '— Tanpa label —']].concat(D.tag.map(t => [t.id, t.name]))], ['desc', 'Deskripsi', 'text', 0, 0, 1], ['method', 'Metode', 'select', [['', '—']].concat(O(PM))], ['scope', 'Cakupan', 'select', O(['Pribadi', 'Pekerjaan'])], ['notes', 'Catatan', 'textarea', 0, 0, 1]] },
     cat: { t: 'Kategori', def: { kind: 'Pengeluaran', archived: false }, f: [['name', 'Nama kategori', 'text', 0, 1, 1], ['icon', 'Ikon (emoji)', 'text'], ['img', 'Logo / gambar kategori', 'img'], ['kind', 'Jenis', 'select', O(['Pemasukan', 'Pengeluaran'])], ['archived', 'Status', 'bool', [['false', 'Aktif'], ['true', 'Diarsipkan']]]] },
-    item: { t: 'Item katalog', def: {}, f: [['name', 'Nama item', 'text', 0, 1, 1], ['catId', 'Kategori', 'select', v => catO('Pengeluaran', v), 1], ['price', 'Harga biasa (Rp)', 'number', 0, 1], ['img', 'Gambar / logo item', 'img'], ['icon', 'Emoji cadangan (opsional)', 'text']] },
+    tag: { t: 'Label prioritas', def: {}, f: [['name', 'Nama label', 'text', 0, 1, 1], ['icon', 'Emoji (opsional)', 'text']] },
     bud: { t: 'Anggaran', def: { month: st.m }, f: [['catId', 'Kategori pengeluaran', 'select', v => catO('Pengeluaran', v), 1, 1], ['limit', 'Batas (Rp)', 'number', 0, 1], ['month', 'Bulan (kosong = tiap bulan)', 'month']] },
     goal: { t: 'Target tabungan', def: { status: 'Aktif' }, f: [['name', 'Nama target', 'text', 0, 1, 1], ['target', 'Jumlah target (Rp)', 'number', 0, 1], ['date', 'Target tanggal', 'date'], ['status', 'Status', 'select', O(['Aktif', 'Tercapai', 'Dibatalkan'])]] },
     con: { t: 'Setoran', def: { date: today() }, f: [['goalId', 'Target', 'select', () => [['', '— Pilih —']].concat(D.goal.map(g => [g.id, g.name])), 1, 1], ['date', 'Tanggal', 'date', 0, 1], ['amount', 'Jumlah (Rp, negatif = tarik)', 'number', 0, 1], ['notes', 'Catatan', 'text', 0, 0, 1]] }
@@ -226,7 +223,7 @@
   }
   function canDel(e, id) {
     if (e === 'acc' && D.tx.some(t => t.accId === id || t.toAccId === id)) return 'Akun ini punya transaksi. Ubah statusnya jadi nonaktif.';
-    if (e === 'cat' && (D.tx.some(t => t.catId === id) || D.bud.some(b => b.catId === id) || D.item.some(i => i.catId === id))) return 'Kategori ini masih dipakai. Arsipkan saja.';
+    if (e === 'cat' && (D.tx.some(t => t.catId === id) || D.bud.some(b => b.catId === id))) return 'Kategori ini masih dipakai. Arsipkan saja.';
   }
   function validate(e, r) {
     if (e === 'tx') {
@@ -236,44 +233,45 @@
     }
     if (e === 'bud' && !(+r.limit > 0)) return 'Batas anggaran harus lebih dari 0.';
     if (e === 'goal' && !(+r.target > 0)) return 'Jumlah target harus lebih dari 0.';
-    if (e === 'item' && !(+r.price >= 0)) return 'Harga tidak valid.';
+    if (e === 'tag' && D.tag.some(t => t.id !== r.id && t.name.toLowerCase() === String(r.name).toLowerCase())) return 'Label dengan nama itu sudah ada.';
+    if (e === 'cat' && D.cat.some(c => c.id !== r.id && c.kind === r.kind && c.name.toLowerCase() === String(r.name).toLowerCase())) return 'Kategori dengan nama itu sudah ada.';
     if (e === 'con' && !(+r.amount)) return 'Jumlah tidak boleh 0.';
   }
   function onEnt(f) {
     const e = f.dataset.e, id = f.dataset.id, sp = SP[e], it = id ? by(D[e], id) : null, rec = it ? Object.assign({}, it) : { id: uid() };
     sp.f.forEach(([k, , t]) => { const v = f.elements[k].value.trim(); rec[k] = t === 'bool' ? v === 'true' : t === 'number' ? (v === '' ? '' : +v) : v; });
     const err = validate(e, rec); if (err) return MO.msg('Periksa data', err);
-    if (it) Object.assign(it, rec); else { if (e === 'item') rec.uses = 0; D[e].push(rec); }
+    if (it) Object.assign(it, rec); else D[e].push(rec);
     save(); closeSh(); render();
   }
 
   /* ---------- keranjang & resi ---------- */
   const lineOf = k => D.cart.find(l => l.k === k);
-  function inc(k, d) {
-    let l = lineOf(k);
-    if (!l) { const i = by(D.item, k); if (!i || d < 0) return; l = { k, name: i.name, catId: i.catId, price: +i.price, qty: 0 }; D.cart.push(l); }
-    l.qty += d; if (l.qty <= 0) D.cart = D.cart.filter(x => x !== l); save();
+  function inc(k, d) { const l = lineOf(k); if (!l) return; l.qty += d; if (l.qty <= 0) D.cart = D.cart.filter(x => x !== l); save(); }
+  const nameHist = cid => { const o = {}; D.tx.forEach(t => { if (t.type === 'Expense' && t.catId === cid && t.desc) { const n = t.desc.replace(/ ×\d+$/, ''); o[n] = (o[n] || 0) + 1; } }); return Object.keys(o).sort((a, b) => o[b] - o[a]).slice(0, 12); };
+  function pickSheet(cid) {
+    const c = by(D.cat, cid); if (!c) return;
+    const tags = D.tag.length ? `<div class="full fn-tgs" role="radiogroup" aria-label="Label prioritas"><span>Label prioritas</span><div><label class="fn-tgo"><input type="radio" name="tagId" value="" checked><b>Tanpa label</b></label>${D.tag.map(t => `<label class="fn-tgo" style="--h:${hue(t.name)}"><input type="radio" name="tagId" value="${t.id}"><b>${tgi(t)} ${esc(t.name)}</b></label>`).join('')}</div></div>` : '';
+    sheet(shHead(`<span class="fn-ph"><i class="fn-ico">${cic(c)}</i>${esc(c.name)}</span>`) + `<form data-f="pick" data-id="${c.id}"><div class="fn-flds"><label class="full"><span>Nama item *</span><input name="name" required maxlength="80" autocomplete="off" list="fn-nh" placeholder="Isi sendiri, mis. ${c.name === 'Makanan' ? 'Nasi goreng' : c.name === 'Minuman' ? 'Es teh' : 'Nama item'}"><datalist id="fn-nh">${nameHist(c.id).map(n => `<option value="${esc(n)}">`).join('')}</datalist></label><label><span>Harga satuan (Rp) *</span><input type="number" name="price" min="1" step="any" inputmode="decimal" required placeholder="0"></label><label><span>Jumlah</span><input type="number" name="qty" min="1" step="1" inputmode="numeric" value="1"></label>${tags}<label class="full"><span>Keterangan (opsional)</span><input name="note" maxlength="120" placeholder="Mis. buat rapat, patungan, diskon"></label></div><div class="fn-tot"><span>Subtotal</span><b data-sub>${rp(0)}</b></div><footer><button type="submit" class="fn-btn ghost" data-go="more">+ Tambah lagi</button><button type="submit" class="fn-btn" data-go="cart">Lanjut ke keranjang</button></footer></form>`);
   }
   function cartSheet() {
-    if (!D.cart.length) return sheet(shHead('Keranjang') + empty('Keranjang kosong. Pilih pengeluaran di Katalog dulu.', '<button class="fn-btn" data-a="gomenu">Buka Katalog</button>'));
+    if (!D.cart.length) return sheet(shHead('Keranjang') + empty('Keranjang kosong. Pilih kategori di Katalog dulu.', '<button class="fn-btn" data-a="gomenu">Buka Katalog</button>'));
     const act = D.acc.filter(a => a.active);
-    sheet(shHead('Keranjang pengeluaran') + `<form data-f="cart"><div class="fn-lines">${D.cart.map(l => `<div class="fn-ln"><i class="fn-ico">${ci(by(D.item, l.k), cic(by(D.cat, l.catId)))}</i><div><b>${esc(l.name)}</b><small>${rp(l.price)}</small></div><div class="fn-st"><button type="button" data-a="cdec" data-k="${l.k}" aria-label="Kurangi">−</button><i>${l.qty}</i><button type="button" data-a="cinc" data-k="${l.k}" aria-label="Tambah">+</button></div><strong>${rp(l.price * l.qty)}</strong></div>`).join('')}</div>
+    sheet(shHead('Keranjang pengeluaran') + `<form data-f="cart"><div class="fn-lines">${D.cart.map(l => `<div class="fn-ln"><i class="fn-ico">${cic(by(D.cat, l.catId))}</i><div><b>${esc(l.name)}</b><small>${esc(cn(l.catId))} · ${rp(l.price)}${l.tagId && tg(l.tagId) ? ' · ' + esc(tg(l.tagId).name) : ''}${l.note ? ' · ' + esc(l.note) : ''}</small></div><div class="fn-st"><button type="button" data-a="cdec" data-k="${l.k}" aria-label="Kurangi">−</button><i>${l.qty}</i><button type="button" data-a="cinc" data-k="${l.k}" aria-label="Tambah">+</button></div><strong>${rp(l.price * l.qty)}</strong></div>`).join('')}</div>
+    <button type="button" class="fn-btn ghost sm" data-a="gomenu" style="margin-bottom:14px">+ Tambah item lain</button>
     <div class="fn-flds"><label class="full"><span>Dibayar dari *</span><select name="accId" required>${act.length ? act.map(a => `<option value="${a.id}">${esc(a.name)} · ${rp(bal(a))}</option>`).join('') : '<option value="">Belum ada akun aktif</option>'}</select></label><label><span>Tanggal</span><input type="date" name="date" value="${today()}" required></label><label><span>Metode</span><select name="method">${PM.map(p => `<option>${p}</option>`).join('')}</select></label><label><span>Cakupan</span><select name="scope"><option>Pribadi</option><option>Pekerjaan</option></select></label><label><span>Catatan</span><input type="text" name="note" placeholder="Opsional"></label></div>
     <div class="fn-tot"><span>Total</span><b>${rp(cartT())}</b></div><footer><button type="button" class="fn-btn ghost" data-a="clear">Kosongkan</button><button class="fn-btn"${act.length ? '' : ' disabled'}>Catat &amp; buat resi</button></footer></form>`);
-  }
-  function customSheet() {
-    sheet(shHead('Pengeluaran lain') + `<form data-f="custom"><div class="fn-flds"><label class="full"><span>Nama pengeluaran *</span><input name="name" required placeholder="Mis. Parkir"></label><label class="full"><span>Kategori *</span><select name="catId" required>${catO('Pengeluaran', '').map(p => `<option value="${p[0]}">${esc(p[1])}</option>`).join('')}</select></label><label><span>Harga (Rp) *</span><input type="number" name="price" min="1" step="any" required></label><label><span>Jumlah</span><input type="number" name="qty" min="1" value="1"></label></div><footer><button class="fn-btn">Masukkan ke keranjang</button></footer></form>`);
   }
   function checkout(f) {
     const a = D.acc.find(x => x.id === f.elements.accId.value); if (!a) return MO.msg('Pilih akun', 'Tambahkan akun aktif di Dompet.');
     const date = f.elements.date.value || today(), n = D.rcp.filter(r => r.date === date).length + 1, rid = uid(), now = new Date();
-    const r = { id: rid, no: 'RS-' + date.replace(/-/g, '') + '-' + String(n).padStart(3, '0'), date, time: pad(now.getHours()) + ':' + pad(now.getMinutes()), accId: a.id, method: f.elements.method.value, scope: f.elements.scope.value, note: f.elements.note.value.trim(), items: D.cart.map(l => ({ name: l.name, qty: l.qty, price: l.price, catId: l.catId })), total: cartT() };
-    D.cart.forEach(l => { D.tx.push({ id: uid(), type: 'Expense', date, amount: l.qty * l.price, accId: a.id, catId: l.catId, desc: l.name + (l.qty > 1 ? ' ×' + l.qty : ''), method: r.method, scope: r.scope, rcpId: rid }); const i = by(D.item, l.k); if (i) i.uses = (i.uses || 0) + l.qty; });
+    const r = { id: rid, no: 'RS-' + date.replace(/-/g, '') + '-' + String(n).padStart(3, '0'), date, time: pad(now.getHours()) + ':' + pad(now.getMinutes()), accId: a.id, method: f.elements.method.value, scope: f.elements.scope.value, note: f.elements.note.value.trim(), items: D.cart.map(l => ({ name: l.name, qty: l.qty, price: l.price, catId: l.catId, tagId: l.tagId || '', note: l.note || '' })), total: cartT() };
+    D.cart.forEach(l => { D.tx.push({ id: uid(), type: 'Expense', date, amount: l.qty * l.price, accId: a.id, catId: l.catId, tagId: l.tagId || '', desc: l.name + (l.qty > 1 ? ' ×' + l.qty : ''), notes: l.note || '', method: r.method, scope: r.scope, rcpId: rid }); });
     D.rcp.push(r); D.cart = []; save(); render(); showRcp(r, true);
   }
   const recRows = r => {
     const o = [['No. resi', r.no], ['Tanggal', fd(r.date) + ' ' + r.time], ['Akun', an(r.accId)], ['Metode', r.method || '—'], ['-']];
-    r.items.forEach(i => { o.push([i.name, '', 'b']); o.push(['  ' + i.qty + ' x ' + Math.round(i.price).toLocaleString('id-ID'), rp(i.price * i.qty)]); });
+    r.items.forEach(i => { const t = i.tagId && tg(i.tagId); o.push([i.name + (t ? ' [' + t.name + ']' : ''), '', 'b']); o.push(['  ' + i.qty + ' x ' + Math.round(i.price).toLocaleString('id-ID'), rp(i.price * i.qty)]); if (i.note) o.push(['  ' + i.note, '', 'i']); });
     o.push(['-']); o.push(['TOTAL', rp(r.total), 't']); if (r.note) { o.push(['-']); o.push(['Catatan: ' + r.note, '', 'i']); } return o;
   };
   function showRcp(r, fresh) {
@@ -296,7 +294,7 @@
     c.toBlob(b => dl(b, r.no + '.png'));
   }
   function csv() {
-    const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"', rows = [['Tanggal', 'Jenis', 'Kategori', 'Akun', 'Deskripsi', 'Jumlah', 'Metode', 'Cakupan', 'Resi']].concat(D.tx.slice().sort((a, b) => a.date.localeCompare(b.date)).map(t => [t.date, t.type, cn(t.catId), an(t.accId), t.desc || '', t.amount, t.method || '', t.scope || '', (by(D.rcp, t.rcpId) || {}).no || '']));
+    const q = v => '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"', rows = [['Tanggal', 'Jenis', 'Kategori', 'Akun', 'Deskripsi', 'Jumlah', 'Metode', 'Cakupan', 'Label', 'Keterangan', 'Resi']].concat(D.tx.slice().sort((a, b) => a.date.localeCompare(b.date)).map(t => [t.date, t.type, cn(t.catId), an(t.accId), t.desc || '', t.amount, t.method || '', t.scope || '', (tg(t.tagId) || {}).name || '', t.notes || '', (by(D.rcp, t.rcpId) || {}).no || '']));
     dl(new Blob(['\ufeff' + rows.map(r => r.map(q).join(',')).join('\n')], { type: 'text/csv' }), 'transaksi-myoffice.csv');
   }
 
@@ -307,10 +305,9 @@
     sub(d) { st.sub[d.k] = d.v; render(); }, goriw() { st.tab = 'riw'; st.sub.riw = 'rcp'; render(); }, gomenu() { closeSh(); st.tab = 'menu'; render(); },
     godom(d) { st.tab = 'dom'; st.sub.dom = d.v; render(); V.scrollTop = 0; },
     mon(d) { st.m = addM(st.m, +d.d); render(); }, tt(d) { st.tt = d.v; render(); },
-    gocat(d) { st.cat = d.id; st.tab = 'menu'; render(); V.scrollTop = 0; }, cat(d) { st.cat = d.id; render(); },
-    inc(d) { inc(d.k, 1); render(); }, dec(d) { inc(d.k, -1); render(); },
+    pick(d) { pickSheet(d.id); },
     cinc(d) { inc(d.k, 1); render(); cartSheet(); }, cdec(d) { inc(d.k, -1); render(); cartSheet(); },
-    cart() { cartSheet(); }, clear() { D.cart = []; save(); render(); closeSh(); }, custom() { customSheet(); },
+    cart() { cartSheet(); }, clear() { D.cart = []; save(); render(); closeSh(); },
     add(d) {
       if (d.e === 'tx' && !D.acc.some(a => a.active)) return MO.msg('Belum ada akun aktif', 'Tambahkan akun dulu di Dompet.');
       if (d.e === 'con' && !D.goal.length) return MO.msg('Belum ada target', 'Buat target tabungan dulu.');
@@ -335,14 +332,20 @@
     if (f.dataset.f === 'ent') onEnt(f);
     else if (f.dataset.f === 'brand') { D.brand = { name: f.elements.name.value.trim(), tag: f.elements.tag.value.trim(), img: f.elements.img.value }; save(); paintBrand(); closeSh(); }
     else if (f.dataset.f === 'cart') checkout(f);
-    else if (f.dataset.f === 'custom') { const k = 'c' + uid(); D.cart.push({ k, name: f.elements.name.value.trim(), catId: f.elements.catId.value, price: +f.elements.price.value, qty: Math.max(1, +f.elements.qty.value || 1) }); save(); render(); cartSheet(); }
+    else if (f.dataset.f === 'pick') {
+      const go = (e.submitter && e.submitter.dataset.go) || 'cart', nm = f.elements.name.value.trim(), pr = +f.elements.price.value, q = Math.max(1, Math.round(+f.elements.qty.value || 1)), c = by(D.cat, f.dataset.id);
+      if (!nm) return MO.msg('Periksa data', 'Isi nama item.'); if (!(pr > 0)) return MO.msg('Periksa data', 'Harga harus lebih dari 0.');
+      const tid = (f.querySelector('input[name=tagId]:checked') || {}).value || '';
+      D.cart.push({ k: 'c' + uid(), name: nm, catId: c.id, price: pr, qty: q, tagId: tid, note: f.elements.note.value.trim() }); save(); render();
+      if (go === 'more') pickSheet(c.id); else cartSheet();
+    }
   });
   R.addEventListener('change', e => {
     const t = e.target; if (!t.matches || !t.matches('[data-img-in]') || !t.files || !t.files[0]) return;
     const w = t.closest('[data-img]'), fit = w.querySelector('[data-fit]').checked;
     (w.hasAttribute('data-card') ? (f, _, cb) => toCard(f, cb) : toSquare)(t.files[0], fit, url => { w.querySelector('input[type=hidden]').value = url; w.querySelector('.fn-imp').innerHTML = '<img src="' + url + '" alt="">'; t.value = ''; });
   });
-  let fqt; R.addEventListener('input', e => { if (e.target.dataset.in === 'q') { st.q = e.target.value; clearTimeout(fqt); fqt = setTimeout(() => { const g = R.querySelector('#fng'); if (g) g.innerHTML = gridHTML(); }, 120); } });
+  R.addEventListener('input', e => { const f = e.target.form; if (f && f.dataset.f === 'pick' && (e.target.name === 'price' || e.target.name === 'qty')) { const b = f.querySelector('[data-sub]'); if (b) b.textContent = rp((+f.elements.price.value || 0) * Math.max(1, Math.round(+f.elements.qty.value || 1))); } });
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !R.hidden) { if (!SH.hidden) closeSh(); else A.close(); } });
   const X = MO.fin = { D, st, views: {}, addM, mlab, pc, mon, empty, meter, txRow, ci, cic, ic, bal, sum, expBy, budFor, got, expCats, cn, an, total: () => D.acc.filter(a => a.active).reduce((a, x) => a + bal(x), 0) };
   function open() { R.hidden = false; document.body.style.overflow = 'hidden'; render(); R.querySelector('.fn-hb button:last-child').focus(); }

@@ -372,3 +372,34 @@
   .an-kp{grid-template-columns:repeat(2,minmax(0,1fr))}.an-k.main{grid-column:1/-1}
 }
 @media print{.fn-card-sh{box-shadow:none}}
+
+/* ===== Katalog = kategori (isi item, harga, jumlah & label sendiri) ===== */
+.fn-hint{margin:2px 2px 14px;font-size:12.5px;line-height:1.55;color:var(--mute);font-weight:600}
+.fn-hint b{color:var(--ink)}
+.fn-kc{padding:0}
+.fn-kc .fn-kb{display:flex;flex-direction:column;align-items:stretch;width:100%;padding:10px 12px 12px;text-align:left;border-radius:24px}
+.fn-kc .fn-kb:active{transform:scale(.98)}
+.fn-kc .fn-kb>b{font-size:14px;font-weight:800;line-height:1.25;margin-top:8px;word-break:break-word}
+.fn-kc .fn-kb>small{font-size:11.5px;color:var(--mute);font-weight:600;margin-top:1px}
+.fn-kc .fn-go{align-self:flex-start;margin-top:10px;padding:6px 14px;border-radius:999px;background:var(--red);color:#fff;font:800 12px var(--disp);box-shadow:0 8px 14px -8px var(--red2)}
+.fn-kc:hover .fn-go{background:var(--red2)}
+.fn-kc .fn-ed{z-index:2}
+.fn-new{display:flex;flex-direction:column;align-items:stretch;padding:10px 12px 12px;text-align:left;background:transparent;box-shadow:inset 0 0 0 2px var(--line);border:0}
+.fn-new .fn-art{background:var(--cr3);color:var(--red);font-size:38px;font-weight:300}
+.fn-new>b{font-size:14px;font-weight:800;margin-top:8px}
+.fn-new>small{font-size:11.5px;color:var(--mute);font-weight:600}
+.fn-new:hover{background:var(--cr2)}
+
+/* label prioritas */
+.fn-lb{display:inline-flex;align-items:center;gap:4px;padding:2px 9px;border-radius:99px;font-size:10.5px;font-weight:800;background:hsl(var(--h) 80% 92%);color:hsl(var(--h) 55% 26%)}
+.fn-flds .fn-tgs{display:grid;gap:7px;min-width:0}
+.fn-tgs>div{display:flex;flex-wrap:wrap;gap:8px}
+.fn-flds .fn-tgo{position:relative;display:inline-flex;gap:0;cursor:pointer}
+.fn-flds .fn-tgo input{position:absolute;opacity:0;width:1px;height:1px;min-height:0;padding:0;pointer-events:none}
+.fn-tgo b{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;border-radius:999px;background:var(--cr2);box-shadow:inset 0 0 0 1.5px var(--line);font-size:12.5px;font-weight:800;color:var(--ink);transition:background .15s,box-shadow .15s}
+.fn-tgo[style] b{background:hsl(var(--h) 80% 96%)}
+.fn-tgo:hover b{box-shadow:inset 0 0 0 1.5px var(--red)}
+.fn-flds .fn-tgo input:checked+b{background:var(--blue);color:#fff;box-shadow:none}
+.fn-flds .fn-tgo input:focus-visible+b{outline:3px solid var(--blue2);outline-offset:2px}
+.fn-ph{display:inline-flex;align-items:center;gap:10px}
+.fn-ph .fn-ico{width:40px;height:40px;font-size:20px}
