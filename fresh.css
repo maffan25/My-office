@@ -236,3 +236,70 @@ html:root:root:root .fn-app .fn-search :is(input){background:#fff;box-shadow:ins
     background:var(--fx-grad)!important;box-shadow:0 8px 14px -10px #0a7a8a!important;
   }
 }
+
+
+/* =====================================================================
+   TEMA 3D — ikon menu 3D (icons/*.png) + kartu ATM Dompet
+   ===================================================================== */
+html:root:root body{background:
+  radial-gradient(900px 520px at 8% -6%,rgba(120,150,255,.26),transparent 62%),
+  radial-gradient(760px 480px at 96% 4%,rgba(255,196,92,.24),transparent 60%),
+  radial-gradient(820px 560px at 70% 108%,rgba(170,140,255,.22),transparent 62%),
+  radial-gradient(640px 420px at 0% 100%,rgba(112,210,160,.18),transparent 62%),#f6f8ff!important}
+html:root:root .nav a{background:linear-gradient(165deg,#fff 0,var(--t,#eef3ff) 100%)!important;border:1px solid rgba(255,255,255,.9);box-shadow:0 10px 22px -14px rgba(70,90,170,.45),inset 0 1px 0 #fff!important}
+html:root:root .nav a:nth-child(1){--t:#e4ecff}html:root:root .nav a:nth-child(2){--t:#ffeede}html:root:root .nav a:nth-child(3){--t:#e6f0ff}
+html:root:root .nav a:nth-child(4){--t:#e9efff}html:root:root .nav a:nth-child(5){--t:#efe9ff}html:root:root .nav a:nth-child(6){--t:#ffe9ec}
+html:root:root .nav a:nth-child(7){--t:#e3f7ea}html:root:root .nav a:nth-child(8){--t:#ffe8e6}html:root:root .nav a:nth-child(9){--t:#fff3d6}
+html:root:root .nav a:nth-child(10){--t:#e8f1ff}html:root:root .nav a:nth-child(11){--t:#eee9ff}
+html:root:root .nav a .ic{width:62px!important;height:62px!important;padding:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;overflow:visible;
+  filter:drop-shadow(0 9px 8px rgba(60,70,150,.22));transition:transform .35s cubic-bezier(.3,1.6,.5,1),filter .3s}
+html:root:root .nav a:hover .ic,html:root:root .nav a:focus-visible .ic{transform:translateY(-5px) scale(1.12) rotate(-3deg)!important;filter:drop-shadow(0 15px 11px rgba(60,70,150,.3))!important;box-shadow:none!important}
+html:root:root .nav a:active .ic{transform:scale(.94)!important}
+@media (max-width:700px){html:root:root .nav a .ic{width:50px!important;height:50px!important}}
+.fn-3d{width:26px;height:26px;object-fit:contain;display:block;filter:drop-shadow(0 3px 3px rgba(60,70,150,.25))}
+.fn-nav button .fn-3d{width:30px;height:30px;margin:0 auto}
+
+/* ---- Kartu ATM (rasio ID-1 85,6 × 54 mm) ---- */
+.atm-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:18px;margin-top:6px}
+html:root .atm{--g1:#2f5bd8;--g2:#6a8cff;position:relative;display:block;width:100%;max-width:400px;aspect-ratio:856/540;margin:0 auto;padding:0;border:0;border-radius:5.2% / 8.2%;overflow:hidden;
+  color:#fff;text-align:left;cursor:pointer;isolation:isolate;container-type:inline-size;
+  background:linear-gradient(135deg,var(--g1),var(--g2));
+  box-shadow:0 22px 30px -18px rgba(25,40,110,.7),0 2px 0 rgba(255,255,255,.35) inset,0 0 0 1px rgba(0,0,0,.14);
+  transition:transform .3s cubic-bezier(.2,.9,.3,1.2),box-shadow .3s}
+html:root .atm:hover{transform:translateY(-5px) rotate(-.6deg);box-shadow:0 30px 34px -18px rgba(25,40,110,.75),0 2px 0 rgba(255,255,255,.35) inset}
+html:root .atm:active{transform:scale(.97)}
+html:root .atm.c0{--g1:#1f3fae;--g2:#5b8cff}html:root .atm.c1{--g1:#6a3fd0;--g2:#a98bff}html:root .atm.c2{--g1:#0f8a6a;--g2:#4fd1a0}html:root .atm.c3{--g1:#d9552b;--g2:#ffb04a}html:root .atm.c4{--g1:#1c2233;--g2:#4a5878}html:root .atm.c5{--g1:#c2306a;--g2:#ff8aa8}
+html:root .atm.t-ew.c0,html:root .atm.t-ew.c4{--g1:#7a3fe0;--g2:#4aa8ff}
+.atm.off{filter:grayscale(.85);opacity:.7}
+.atm-pat{position:absolute;inset:0;z-index:-2;background:
+  radial-gradient(circle at 88% -10%,rgba(255,255,255,.34) 0 26%,transparent 27%),
+  radial-gradient(circle at 105% 70%,rgba(255,255,255,.16) 0 32%,transparent 33%),
+  repeating-linear-gradient(115deg,rgba(255,255,255,.05) 0 2px,transparent 2px 9px)}
+.atm-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:-2}
+.atm-sh{position:absolute;inset:0;z-index:-1;pointer-events:none;background:linear-gradient(112deg,rgba(255,255,255,.34) 0,rgba(255,255,255,.06) 34%,transparent 46%,transparent 70%,rgba(255,255,255,.12) 100%)}
+.atm.has-img:not(.plain)::before{content:"";position:absolute;inset:0;z-index:-1;background:linear-gradient(180deg,rgba(0,0,0,.34),transparent 38%,transparent 52%,rgba(0,0,0,.52))}
+.atm-top{position:absolute;left:6.5%;right:6.5%;top:8%;display:flex;justify-content:space-between;align-items:baseline;gap:8px;text-shadow:0 1px 3px rgba(0,0,0,.35)}
+.atm-top em{font:800 clamp(14px,5.2cqw,20px)/1.1 var(--disp,inherit);font-style:normal;letter-spacing:.02em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.atm-top small{font:700 clamp(9px,2.8cqw,11px) var(--disp,inherit);letter-spacing:.14em;text-transform:uppercase;opacity:.85;white-space:nowrap}
+.atm-mid{position:absolute;left:6.5%;top:30%;display:flex;align-items:center;gap:5%}
+.atm-chip{display:block;width:clamp(38px,13cqw,54px);aspect-ratio:1.28;border-radius:18% / 22%;position:relative;
+  background:linear-gradient(135deg,#f6dc8a,#c9a043 55%,#f1d27c);box-shadow:inset 0 0 0 1px rgba(90,60,0,.35),0 2px 3px rgba(0,0,0,.25)}
+.atm-chip::before{content:"";position:absolute;inset:18% 12%;border-radius:8%;background:
+  linear-gradient(90deg,transparent 31%,rgba(90,60,0,.38) 31% 33%,transparent 33% 66%,rgba(90,60,0,.38) 66% 68%,transparent 68%),
+  linear-gradient(0deg,transparent 46%,rgba(90,60,0,.38) 46% 54%,transparent 54%)}
+.atm-nfc{width:clamp(18px,6cqw,26px);height:auto;opacity:.9;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))}
+.atm-no{position:absolute;left:6.5%;right:6.5%;top:52%;font:600 clamp(15px,5.6cqw,22px)/1 "Courier New",ui-monospace,monospace;letter-spacing:.14em;text-shadow:0 1px 0 rgba(0,0,0,.35),0 -1px 0 rgba(255,255,255,.25);white-space:nowrap}
+.atm-bot{position:absolute;left:6.5%;right:6.5%;bottom:8%;display:flex;justify-content:space-between;align-items:flex-end;gap:10px}
+.atm-bot small{display:block;font:600 clamp(7px,2.1cqw,9px) var(--disp,inherit);letter-spacing:.14em;opacity:.8}
+.atm-bot strong{display:block;font:700 clamp(11px,3.6cqw,14px)/1.15 var(--disp,inherit);letter-spacing:.06em;max-width:48cqw;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;text-shadow:0 1px 2px rgba(0,0,0,.35)}
+.atm-bal{position:absolute;right:6.5%;top:32%;text-align:right;font:800 clamp(15px,5.6cqw,22px)/1.1 var(--disp,inherit);text-shadow:0 1px 3px rgba(0,0,0,.4)}
+.atm-bal small{display:block;font:600 clamp(8px,2.3cqw,10px) var(--disp,inherit);letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.atm-bal.neg{color:#ffd0d0}
+.atm.plain .atm-bal{top:auto;bottom:6%;right:5%;padding:6px 12px;border-radius:999px;background:rgba(15,20,40,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.atm-visa{font:italic 900 clamp(18px,6.4cqw,26px) Arial,sans-serif;letter-spacing:-.02em;text-shadow:0 1px 3px rgba(0,0,0,.3)}
+.atm-gpn{font:900 clamp(14px,4.8cqw,19px) Arial,sans-serif;padding:2px 8px;border-radius:6px;border:2px solid rgba(255,255,255,.9);letter-spacing:.08em}
+.atm-mc{display:flex}.atm-mc u{width:clamp(22px,7.4cqw,32px);aspect-ratio:1;border-radius:50%;background:#eb001b;mix-blend-mode:normal;opacity:.95}
+.atm-mc u+u{background:#f79e1b;margin-left:-38%;opacity:.92}
+html:root:root:root:root .atm,html:root:root:root:root .atm *{color:#fff!important}
+html:root:root:root:root .atm .atm-bal.neg{color:#ffd0d0!important}
+html:root:root:root:root .atm .atm-bal,html:root:root:root:root .atm .atm-no,html:root:root:root:root .atm .atm-top em{opacity:1!important}
