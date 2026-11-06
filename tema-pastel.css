@@ -350,3 +350,60 @@ html:root:root:root:root .dock a.on{--edge:#1d6fd6;background:var(--blue)!import
 html:root:root:root:root .tk-hero,html:root:root:root:root .kc-side,html:root:root:root:root .gq-main,html:root:root:root:root .fn-ban{
   box-shadow:0 6px 0 0 color-mix(in srgb,var(--mc) 55%,#000),0 14px 24px -14px var(--mc)!important}
 html:root:root:root:root .pcard{box-shadow:0 6px 0 0 #1f5fc4,0 18px 30px -16px rgba(47,124,240,.6)!important}
+
+/* ===== v3: buang dekorasi ambient wx-* (blob oval di belakang konten) ===== */
+html:root:root:root:root .ac-ov [class*="wx-"],html:root:root:root:root .ad-ov [class*="wx-"],
+html:root:root:root:root .wo-ov [class*="wx-"],html:root:root:root:root .es-ov [class*="wx-"],
+html:root:root:root:root .fn-ov [class*="wx-"],html:root:root:root:root .wx-amb,html:root:root:root:root .wx-spot{display:none!important}
+
+/* ===== v3: bentuk konsisten — sudut tegas dan tumpul, bukan pil/oval =====
+   Semua elemen di dalam overlay memakai sudut 14px, kecuali avatar bulat. */
+html:root:root:root:root .ac-ov *,html:root:root:root:root .ad-ov *,html:root:root:root:root .wo-ov *,
+html:root:root:root:root .es-ov *,html:root:root:root:root .fn-ov *{border-radius:14px!important}
+html:root:root:root:root .ac-ov .ac-win,html:root:root:root:root .ad-ov .ad-win,html:root:root:root:root .wo-ov .wo-frame,
+html:root:root:root:root .es-ov .es-frame,html:root:root:root:root .fn-ov .fn-app{border-radius:24px!important}
+html:root:root:root:root .ac-ov .ac-card,html:root:root:root:root .ac-ov .ac-item,html:root:root:root:root .ac-ov .ac-stat,
+html:root:root:root:root .ac-ov .ac-row,html:root:root:root:root .ac-ov .ac-empty,html:root:root:root:root .ac-ov .ins,
+html:root:root:root:root .ac-ov .tk-card,html:root:root:root:root .ac-ov .tk-hero,html:root:root:root:root .ac-ov .kc-side,
+html:root:root:root:root .ac-ov .gq-main,html:root:root:root:root .ad-win .ac-card,html:root:root:root:root .ad-win .ac-item,
+html:root:root:root:root .ad-win .ac-stat,html:root:root:root:root .ad-win .ad-cc,html:root:root:root:root .ad-win .ad-as,
+html:root:root:root:root .ad-win .ad-ht,html:root:root:root:root .fn-app .fn-it,html:root:root:root:root .fn-app .fn-sec,
+html:root:root:root:root .fn-ban,html:root:root:root:root .wo-ov .wo-card,html:root:root:root:root .wo-ov .wo-box,
+html:root:root:root:root .es-ov .es-card,html:root:root:root:root .es-ov .es-box{border-radius:18px!important}
+html:root:root:root:root .ac-ov .ac-btn,html:root:root:root:root .ac-ov button,html:root:root:root:root .ad-win button,
+html:root:root:root:root .wo-ov button,html:root:root:root:root .es-ov button,html:root:root:root:root .fn-ov button{border-radius:12px!important}
+/* Kalender: sel berupa kotak dengan sudut tumpul, tidak oval */
+html:root:root:root:root .ad-win .ad-d,html:root:root:root:root .ac-ov .kc-d,html:root:root:root:root .ac-ov .tk-d,
+html:root:root:root:root .ac-ov .mc,html:root:root:root:root .ac-ov .tg .ad{border-radius:12px!important}
+/* Pengecualian: avatar & titik kecil tetap bulat */
+html:root:root:root:root .ad-av,html:root:root:root:root .ac-ov .ac-av,html:root:root:root:root .ac-ov .avatar,
+html:root:root:root:root .ac-ov .ph,html:root:root:root:root .es-ov .es-av,html:root:root:root:root .ac-ov .dot,
+html:root:root:root:root .ac-ov .ac-bd,html:root:root:root:root .ac-ov input[type=checkbox],html:root:root:root:root .ac-ov .ac-track i{border-radius:50%!important}
+html:root:root:root:root .ac-ov .ac-track,html:root:root:root:root .ac-ov .ac-track i,html:root:root:root:root .ac-ov .ac-bar{border-radius:6px!important}
+
+/* Efek timbul lebih halus: tepi tipis, bayangan lembut */
+html:root:root:root:root .tools button,html:root:root:root:root .ac-ov button,html:root:root:root:root .ad-win button,
+html:root:root:root:root .wo-ov button,html:root:root:root:root .es-ov button,html:root:root:root:root .fn-ov button,
+html:root:root:root:root .pc-btn,html:root:root:root:root .pc-more,html:root:root:root:root .dock a,
+html:root:root:root:root .nav a,html:root:root:root:root .tchip{
+  --edge:#d3daea;
+  box-shadow:0 2px 0 0 var(--edge),0 4px 8px -6px rgba(40,60,110,.28)!important}
+html:root:root:root:root .ac-ov button:not(:disabled):hover,html:root:root:root:root .ad-win button:not(:disabled):hover,
+html:root:root:root:root .wo-ov button:not(:disabled):hover,html:root:root:root:root .es-ov button:not(:disabled):hover,
+html:root:root:root:root .fn-ov button:not(:disabled):hover,html:root:root:root:root .tools button:hover,
+html:root:root:root:root .pc-btn:hover,html:root:root:root:root .nav a:hover,html:root:root:root:root .tchip:hover,
+html:root:root:root:root .dock a:hover{transform:translateY(-1px)!important;
+  box-shadow:0 3px 0 0 var(--edge),0 6px 10px -6px rgba(40,60,110,.3)!important}
+html:root:root:root:root .ac-ov button:not(:disabled):active,html:root:root:root:root .ad-win button:not(:disabled):active,
+html:root:root:root:root .wo-ov button:not(:disabled):active,html:root:root:root:root .es-ov button:not(:disabled):active,
+html:root:root:root:root .fn-ov button:not(:disabled):active,html:root:root:root:root .tools button:active,
+html:root:root:root:root .pc-btn:active,html:root:root:root:root .pc-more:active,html:root:root:root:root .dock a:active,
+html:root:root:root:root .nav a:active,html:root:root:root:root .tchip:active{transform:translateY(2px)!important;
+  box-shadow:0 0 0 0 var(--edge),0 1px 2px -1px rgba(40,60,110,.35)!important}
+html:root:root:root:root .ac-ov .ac-btn.pri,html:root:root:root:root .ad-win .ac-btn.pri,html:root:root:root:root .wo-ov .wo-btn.go,
+html:root:root:root:root .fn-app .fn-btn.pri,html:root:root:root:root .es-frame .es-buy{--edge:color-mix(in srgb,var(--mc) 60%,#000)}
+
+/* Teks di atas latar gelap otomatis putih (ditandai oleh tema-pastel.js) */
+html:root:root:root:root [data-tdark]{color:#fff!important}
+html:root:root:root:root [data-tdark] .ac-tab,html:root:root:root:root [data-tdark] button{color:var(--ink)!important}
+html:root:root:root:root [data-tdark].ac-ov .ac-btn.pri,html:root:root:root:root button[data-tdark]{color:inherit!important}
