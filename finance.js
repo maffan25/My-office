@@ -32,7 +32,7 @@
   /* gambar/logo kustom: o.img (data URL) menang atas emoji */
   const ci = (o, fb) => (o && o.img) ? '<img class="fn-im" src="' + o.img + '" alt="" draggable="false">' : (o && o.icon ? esc(o.icon) : fb);
   const cic = c => ci(c, c ? (ICO[c.name] || '🧾') : '🧾');
-  const bnm = () => (D.brand && D.brand.name) || 'MyOffice Finance';
+  const bnm = () => (D.brand && D.brand.name) || 'Beresin Finance';
 
   /* ---------- ikon ---------- */
   const SV = p => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
@@ -136,7 +136,7 @@
   function paintBrand() {
     const b = D.brand || {};
     R.querySelectorAll('.fn-logo').forEach(e => { e.innerHTML = b.img ? '<img class="fn-im" src="' + b.img + '" alt="">' : 'Rp'; });
-    R.querySelectorAll('[data-bn]').forEach(e => { e.textContent = b.name || 'MyOffice Finance'; });
+    R.querySelectorAll('[data-bn]').forEach(e => { e.textContent = b.name || 'Beresin Finance'; });
     R.querySelectorAll('[data-bt]').forEach(e => { e.textContent = b.tag || 'Catat hemat, hidup tenang'; });
   }
   function render() {
@@ -215,7 +215,7 @@
   }
   function brandSheet() {
     const b = D.brand || {};
-    sheet(shHead('Logo & nama aplikasi') + `<form data-f="brand"><div class="fn-flds"><label class="full"><span>Nama</span><input name="name" value="${esc(b.name || '')}" placeholder="MyOffice Finance" maxlength="40"></label><label class="full"><span>Slogan</span><input name="tag" value="${esc(b.tag || '')}" placeholder="Catat hemat, hidup tenang" maxlength="60"></label>${imgFld('img', 'Logo', b.img || '', true)}</div><footer><button type="button" class="fn-btn ghost dng" data-a="rstbrand">Reset</button><button class="fn-btn">Simpan</button></footer></form>`);
+    sheet(shHead('Logo & nama aplikasi') + `<form data-f="brand"><div class="fn-flds"><label class="full"><span>Nama</span><input name="name" value="${esc(b.name || '')}" placeholder="Beresin Finance" maxlength="40"></label><label class="full"><span>Slogan</span><input name="tag" value="${esc(b.tag || '')}" placeholder="Catat hemat, hidup tenang" maxlength="60"></label>${imgFld('img', 'Logo', b.img || '', true)}</div><footer><button type="button" class="fn-btn ghost dng" data-a="rstbrand">Reset</button><button class="fn-btn">Simpan</button></footer></form>`);
   }
   function form(e, id, pre) {
     const sp = SP[e], it = id ? by(D[e], id) : Object.assign({}, sp.def, pre || {});

@@ -92,7 +92,7 @@
     var m = raw.match(/^Assalamu’alaikum,?\s*(.*)$/), name = m ? m[1].trim() : '';
     var pix = false;
     return [raw, 'Semangat hari ini!', dayWord() + (name ? ', ' + name : ''),
-      pix ? 'Ayo lari, jangan lompat sendiri' : 'Siap meluncur?', 'Selamat datang di MyOffice', 'Plan · Execute · Achieve'];
+      pix ? 'Ayo lari, jangan lompat sendiri' : 'Siap meluncur?', 'Selamat datang di Beresin', 'Plan · Execute · Achieve'];
   }
   function setText(t) { gl.textContent = t; gl.setAttribute('data-text', t); }
 
@@ -2857,7 +2857,7 @@
         row('Sistem kalender', sel('mode', [['both', 'Masehi + Hijriah'], ['masehi', 'Masehi saja'], ['hijri', 'Hijriah (grid mengikuti bulan Hijriah)']], CF.mode)) +
         row('Koreksi tanggal Hijriah', sel('hij', [[-2, '−2 hari'], [-1, '−1 hari'], [0, 'Tanpa koreksi'], [1, '+1 hari'], [2, '+2 hari']], CF.hij)) +
         '<p class="ac-hint" style="margin:-4px 0 12px">Hijriah dihitung dengan kalender Umm al-Qura. Penetapan awal bulan di Indonesia bisa berbeda satu hari; gunakan koreksi untuk menyesuaikan.</p>' +
-        row('Pengingat di browser', '<div><button class="ac-btn sm" data-act="notif">Aktifkan notifikasi browser</button> <small style="opacity:.7">Pengingat hanya berbunyi saat MyOffice terbuka di browser.</small></div>') + '</div>' +
+        row('Pengingat di browser', '<div><button class="ac-btn sm" data-act="notif">Aktifkan notifikasi browser</button> <small style="opacity:.7">Pengingat hanya berbunyi saat Beresin terbuka di browser.</small></div>') + '</div>' +
         '<div class="ac-bar"><div class="ac-h" style="margin:0">Kategori acara</div>' + add('cat', 'Kategori') + '</div>' +
         D.cat.map(function (c) { return '<div class="ac-item"><span style="width:14px;height:14px;border-radius:50%;background:' + c.color + ';margin-top:3px;flex:none"></span><div><b>' + esc(c.name) + '</b></div>' + btns('cat', c.id) + '</div>'; }).join('');
     }
@@ -2952,7 +2952,7 @@
   /* gambar/logo kustom: o.img (data URL) menang atas emoji */
   const ci = (o, fb) => (o && o.img) ? '<img class="fn-im" src="' + o.img + '" alt="" draggable="false">' : (o && o.icon ? esc(o.icon) : fb);
   const cic = c => ci(c, c ? (ICO[c.name] || '🧾') : '🧾');
-  const bnm = () => (D.brand && D.brand.name) || 'MyOffice Finance';
+  const bnm = () => (D.brand && D.brand.name) || 'Beresin Finance';
 
   /* ---------- ikon ---------- */
   const SV = p => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + p + '</svg>';
@@ -3056,7 +3056,7 @@
   function paintBrand() {
     const b = D.brand || {};
     R.querySelectorAll('.fn-logo').forEach(e => { e.innerHTML = b.img ? '<img class="fn-im" src="' + b.img + '" alt="">' : 'Rp'; });
-    R.querySelectorAll('[data-bn]').forEach(e => { e.textContent = b.name || 'MyOffice Finance'; });
+    R.querySelectorAll('[data-bn]').forEach(e => { e.textContent = b.name || 'Beresin Finance'; });
     R.querySelectorAll('[data-bt]').forEach(e => { e.textContent = b.tag || 'Catat hemat, hidup tenang'; });
   }
   function render() {
@@ -3135,7 +3135,7 @@
   }
   function brandSheet() {
     const b = D.brand || {};
-    sheet(shHead('Logo & nama aplikasi') + `<form data-f="brand"><div class="fn-flds"><label class="full"><span>Nama</span><input name="name" value="${esc(b.name || '')}" placeholder="MyOffice Finance" maxlength="40"></label><label class="full"><span>Slogan</span><input name="tag" value="${esc(b.tag || '')}" placeholder="Catat hemat, hidup tenang" maxlength="60"></label>${imgFld('img', 'Logo', b.img || '', true)}</div><footer><button type="button" class="fn-btn ghost dng" data-a="rstbrand">Reset</button><button class="fn-btn">Simpan</button></footer></form>`);
+    sheet(shHead('Logo & nama aplikasi') + `<form data-f="brand"><div class="fn-flds"><label class="full"><span>Nama</span><input name="name" value="${esc(b.name || '')}" placeholder="Beresin Finance" maxlength="40"></label><label class="full"><span>Slogan</span><input name="tag" value="${esc(b.tag || '')}" placeholder="Catat hemat, hidup tenang" maxlength="60"></label>${imgFld('img', 'Logo', b.img || '', true)}</div><footer><button type="button" class="fn-btn ghost dng" data-a="rstbrand">Reset</button><button class="fn-btn">Simpan</button></footer></form>`);
   }
   function form(e, id, pre) {
     const sp = SP[e], it = id ? by(D[e], id) : Object.assign({}, sp.def, pre || {});
@@ -4326,7 +4326,7 @@
     function vData() {
       var keys = Object.keys(localStorage).filter(function (k) { return k.indexOf('mo-') === 0 && k !== 'mo-fired'; });
       return '<div class="ac-card"><b>Cadangan data</b><p class="ac-hint" style="margin:4px 0 10px">Semua data tersimpan hanya di browser ini (' + keys.length + ' kelompok data). Buat cadangan agar tidak hilang jika data browser dibersihkan. File di Document Center tidak ikut dicadangkan.</p><div class="ac-acts"><button class="ac-btn pri" data-act="export">Unduh cadangan (.json)</button><label class="ac-btn" style="cursor:pointer;display:inline-block">Pulihkan dari cadangan<input type="file" accept="application/json,.json" hidden data-chg="import"></label></div></div>' +
-        '<div class="ac-card"><b>Hapus semua data</b><p class="ac-hint" style="margin:4px 0 10px">Menghapus seluruh data MyOffice di browser ini, termasuk dokumen. Tidak bisa dibatalkan.</p><button class="ac-btn danger" data-act="wipe">Hapus semua data</button></div>';
+        '<div class="ac-card"><b>Hapus semua data</b><p class="ac-hint" style="margin:4px 0 10px">Menghapus seluruh data Beresin di browser ini, termasuk dokumen. Tidak bisa dibatalkan.</p><button class="ac-btn danger" data-act="wipe">Hapus semua data</button></div>';
     }
     return {
       specs: {}, tabs: [['prof', 'Profil', vProf], ['stat', 'Status Kegiatan', vStat], ['data', 'Data & Cadangan', vData]],
@@ -4351,7 +4351,7 @@
           r.readAsDataURL(f);
         }
         if (a === 'export') {
-          var o = { app: 'MyOffice', exported: new Date().toISOString(), data: {} };
+          var o = { app: 'Beresin', exported: new Date().toISOString(), data: {} };
           Object.keys(localStorage).forEach(function (k) { if (k.indexOf('mo-') === 0 && k !== 'mo-fired') o.data[k] = localStorage.getItem(k); });
           var u = URL.createObjectURL(new Blob([JSON.stringify(o)], { type: 'application/json' })), l = document.createElement('a');
           l.href = u; l.download = 'myoffice-cadangan-' + K.todayS() + '.json'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 10000);
@@ -4359,13 +4359,13 @@
         if (a === 'import') {
           var fl = t.files && t.files[0]; t.value = ''; if (!fl) return;
           fl.text().then(function (x) {
-            var o = JSON.parse(x); if (!o || o.app !== 'MyOffice' || !o.data) throw 0;
+            var o = JSON.parse(x); if (!o || (o.app !== 'Beresin' && o.app !== 'MyOffice') || !o.data) throw 0;
             if (!confirm('Pulihkan ' + Object.keys(o.data).length + ' kelompok data? Data saat ini akan ditimpa.')) return;
             Object.keys(o.data).forEach(function (k) { if (k.indexOf('mo-') === 0) localStorage.setItem(k, o.data[k]); });
             location.reload();
           }).catch(function () { MO.msg('Gagal', 'Berkas cadangan tidak valid.'); });
         }
-        if (a === 'wipe' && confirm('Hapus SEMUA data MyOffice di browser ini?') && confirm('Yakin? Tindakan ini tidak bisa dibatalkan.')) {
+        if (a === 'wipe' && confirm('Hapus SEMUA data Beresin di browser ini?') && confirm('Yakin? Tindakan ini tidak bisa dibatalkan.')) {
           Object.keys(localStorage).forEach(function (k) { if (k.indexOf('mo-') === 0) localStorage.removeItem(k); });
           try { indexedDB.deleteDatabase('mo-docs'); } catch (e) { }
           location.reload();
@@ -4490,7 +4490,7 @@
       Array.prototype.forEach.call(nav.querySelectorAll('.ac-tab'), function (b) {
         b.insertAdjacentHTML('afterbegin', svg(tabIcon(b.textContent), 1.7).replace('<svg ', '<svg class="ac-ti" '));
       });
-      nav.insertAdjacentHTML('afterbegin', '<div class="ac-brand"><span class="ac-bd"></span><div><b>MyOffice</b><small>Plan · Execute · Achieve</small></div></div><i class="ac-ind"></i>');
+      nav.insertAdjacentHTML('afterbegin', '<div class="ac-brand"><span class="ac-bd"></span><div><b>Beresin</b><small>Plan · Execute · Achieve</small></div></div><i class="ac-ind"></i>');
       nav.insertAdjacentHTML('beforeend', '<div class="ac-side-foot"><kbd>Esc</kbd><span>untuk menutup</span></div>');
       new MutationObserver(function () { place(ov); }).observe(nav, { attributes: true, attributeFilter: ['aria-selected'], subtree: true });
     }

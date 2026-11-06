@@ -92,7 +92,7 @@
     var m = raw.match(/^Assalamu’alaikum,?\s*(.*)$/), name = m ? m[1].trim() : '';
     var pix = false;
     return [raw, 'Semangat hari ini!', dayWord() + (name ? ', ' + name : ''),
-      pix ? 'Ayo lari, jangan lompat sendiri' : 'Siap meluncur?', 'Selamat datang di MyOffice', 'Plan · Execute · Achieve'];
+      pix ? 'Ayo lari, jangan lompat sendiri' : 'Siap meluncur?', 'Selamat datang di Beresin', 'Plan · Execute · Achieve'];
   }
   function setText(t) { gl.textContent = t; gl.setAttribute('data-text', t); }
 

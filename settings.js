@@ -58,7 +58,7 @@
     function vData() {
       var keys = Object.keys(localStorage).filter(function (k) { return k.indexOf('mo-') === 0 && k !== 'mo-fired'; });
       return '<div class="ac-card"><b>Cadangan data</b><p class="ac-hint" style="margin:4px 0 10px">Semua data tersimpan hanya di browser ini (' + keys.length + ' kelompok data). Buat cadangan agar tidak hilang jika data browser dibersihkan. File di Document Center tidak ikut dicadangkan.</p><div class="ac-acts"><button class="ac-btn pri" data-act="export">Unduh cadangan (.json)</button><label class="ac-btn" style="cursor:pointer;display:inline-block">Pulihkan dari cadangan<input type="file" accept="application/json,.json" hidden data-chg="import"></label></div></div>' +
-        '<div class="ac-card"><b>Hapus semua data</b><p class="ac-hint" style="margin:4px 0 10px">Menghapus seluruh data MyOffice di browser ini, termasuk dokumen. Tidak bisa dibatalkan.</p><button class="ac-btn danger" data-act="wipe">Hapus semua data</button></div>';
+        '<div class="ac-card"><b>Hapus semua data</b><p class="ac-hint" style="margin:4px 0 10px">Menghapus seluruh data Beresin di browser ini, termasuk dokumen. Tidak bisa dibatalkan.</p><button class="ac-btn danger" data-act="wipe">Hapus semua data</button></div>';
     }
     return {
       specs: {}, tabs: [['prof', 'Profil', vProf], ['stat', 'Status Kegiatan', vStat], ['data', 'Data & Cadangan', vData]],
@@ -83,7 +83,7 @@
           r.readAsDataURL(f);
         }
         if (a === 'export') {
-          var o = { app: 'MyOffice', exported: new Date().toISOString(), data: {} };
+          var o = { app: 'Beresin', exported: new Date().toISOString(), data: {} };
           Object.keys(localStorage).forEach(function (k) { if (k.indexOf('mo-') === 0 && k !== 'mo-fired') o.data[k] = localStorage.getItem(k); });
           var u = URL.createObjectURL(new Blob([JSON.stringify(o)], { type: 'application/json' })), l = document.createElement('a');
           l.href = u; l.download = 'myoffice-cadangan-' + K.todayS() + '.json'; document.body.appendChild(l); l.click(); l.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 10000);
@@ -91,13 +91,13 @@
         if (a === 'import') {
           var fl = t.files && t.files[0]; t.value = ''; if (!fl) return;
           fl.text().then(function (x) {
-            var o = JSON.parse(x); if (!o || o.app !== 'MyOffice' || !o.data) throw 0;
+            var o = JSON.parse(x); if (!o || (o.app !== 'Beresin' && o.app !== 'MyOffice') || !o.data) throw 0;
             if (!confirm('Pulihkan ' + Object.keys(o.data).length + ' kelompok data? Data saat ini akan ditimpa.')) return;
             Object.keys(o.data).forEach(function (k) { if (k.indexOf('mo-') === 0) localStorage.setItem(k, o.data[k]); });
             location.reload();
           }).catch(function () { MO.msg('Gagal', 'Berkas cadangan tidak valid.'); });
         }
-        if (a === 'wipe' && confirm('Hapus SEMUA data MyOffice di browser ini?') && confirm('Yakin? Tindakan ini tidak bisa dibatalkan.')) {
+        if (a === 'wipe' && confirm('Hapus SEMUA data Beresin di browser ini?') && confirm('Yakin? Tindakan ini tidak bisa dibatalkan.')) {
           Object.keys(localStorage).forEach(function (k) { if (k.indexOf('mo-') === 0) localStorage.removeItem(k); });
           try { indexedDB.deleteDatabase('mo-docs'); } catch (e) { }
           location.reload();
