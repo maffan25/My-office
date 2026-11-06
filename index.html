@@ -126,7 +126,7 @@ body{overflow-x:hidden;overflow-y:auto}
   @keyframes rise{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 }
 </style>
-<link rel="stylesheet" href="app.css">
+<link rel="stylesheet" href="app.css?v=candy2">
 </head>
 <body>
 
@@ -252,7 +252,7 @@ body{overflow-x:hidden;overflow-y:auto}
   tick();setInterval(tick,1000);
 
   /* ---------- Tampilan: satu suasana, langit bintang ---------- */
-  root.dataset.theme='pagi';root.dataset.wall='bintang';
+  root.dataset.theme='pagi';root.dataset.wall='candy';
   ['mo-wall','mo-theme','mo-custom','mo-gn'].forEach(function(k){S.del(k)});
 
   /* ---------- Panel ---------- */
@@ -266,6 +266,6 @@ body{overflow-x:hidden;overflow-y:auto}
   document.addEventListener('keydown',function(e){if(e.key==='Escape')toggle(false)});
 })();
 </script>
-<script src="app.js" defer></script>
+<script src="app.js?v=candy2" defer></script>
 </body>
 </html>

@@ -35,5 +35,6 @@ new = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="
        f'<link rel="stylesheet" href="{rest}" media="print" onload="this.media=\'all\'">\n'
        f'<noscript><link rel="stylesheet" href="{rest}"></noscript>')
 out = out.replace(fonts.group(0), new)
+out = out.replace('href="app.css"','href="app.css?v=candy2"').replace('src="app.js"','src="app.js?v=candy2"')
 open(os.path.join(H, 'index.html'), 'w', encoding='utf-8').write(out)
 print('css', len(css), 'js', len(core), 'banks', len(banks))

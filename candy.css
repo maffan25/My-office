@@ -101,3 +101,54 @@ html:root:root .ac-ov .ac-win.ac-form>header h2{color:var(--cy-ink)!important}
 .ac-win ::-webkit-scrollbar{width:8px}.ac-win ::-webkit-scrollbar-thumb{background:rgba(31,33,36,.18);border-radius:8px}
 @media(max-width:600px){html:root:root .ac-ov .ac-win:not(.vw){border-radius:30px 30px 0 0!important}.nav{padding:12px;gap:8px}.hero{padding:22px 18px 18px;border-radius:32px}}
 @media(prefers-reduced-motion:reduce){.nav a,.ac-win .ac-item{transition:none}}
+/* ---- penguatan: menimpa aturan lama (bintang/neon/ikon gelap) ---- */
+html:root:root:root,html:root:root:root body{background:linear-gradient(165deg,#fde4ee 0,#fdeee6 45%,#fcead4 100%) fixed!important;color:var(--cy-ink)}
+html:root:root:root .hero .greet{justify-content:flex-start;align-items:flex-start;text-align:left;font-family:var(--cy-f);max-width:100%;min-height:0;width:100%}
+html:root:root:root .glitch{display:block;text-align:left;color:#fff}
+html:root:root:root .greet-dots{justify-content:flex-start}
+html:root:root:root .nav a .ic{box-sizing:border-box;width:46px;height:46px;padding:12px;border-radius:50%;
+  background:var(--tt)!important;color:var(--t)!important;box-shadow:none!important;filter:none;stroke-width:2}
+html:root:root:root .nav a:hover .ic{background:var(--t)!important;color:#fff!important}
+html:root:root:root .nav a{background:#fff;color:var(--cy-ink);box-shadow:0 10px 22px -16px rgba(120,60,40,.45)}
+html:root:root:root .nav{background:var(--cy-cream)}
+html:root:root:root .info{background:var(--cy-cream);color:var(--cy-ink)}
+html:root:root:root .tools button,html:root:root:root .brand{background:#fff;color:var(--cy-ink)}
+html:root:root:root .hero{background:radial-gradient(circle at 92% 8%,rgba(255,255,255,.22) 0 70px,transparent 71px),var(--cy-pink)}
+html:root:root:root .hero .quote{color:rgba(255,255,255,.95)}
+html:root:root:root .foot-l{color:#fff;background:var(--cy-ink)}
+html:root:root:root .info b,html:root:root:root .info small{white-space:normal;overflow:visible;text-overflow:clip}
+html:root:root:root .quote{text-shadow:none}
+/* skin per-modul (tk/pj/gq/wo/...) memakai token gelap sendiri: timpa dengan spesifisitas lebih tinggi */
+html:root:root:root:root:root .ac-ov[class]{
+  --ink:var(--cy-ink);--panel:#fffdf6;--mute:var(--cy-mute);--line:var(--cy-line);--ac:var(--cd,var(--cy-pink));--ac-ink:var(--cy-ink);
+  --fb-bg:#fffdf6;--fb-card:#fff;--fb-ink:var(--cy-ink);--fb-mute:var(--cy-mute);--fb-line:var(--cy-line);--fb-line2:#f8eee3;--fb-or:var(--cd,var(--cy-pink));--fb-or2:var(--cy-org);
+  --fb-tint:var(--cy-pinkt);--fb-lime:var(--cy-tealt);--fb-limei:var(--cy-teal);--fb-pri:var(--cy-ink);--fb-prii:#fff;--fb-side:var(--cy-ink);--fb-sidei:#cfc8c2;
+  --gq-bg:#fffdf6;--gq-card:#fff;--an-bg1:#fffdf6;--an-bg2:#fff;--an-ink:var(--cy-ink);--c:var(--cd,var(--cy-pink))}
+/* ---- Work Office: arcade gelap → pastel teal & krem ---- */
+.wo-ov{background:rgba(70,40,40,.38)!important}
+html:root:root .wo-frame{background:var(--cy-cream)!important;color:var(--cy-ink)!important;border-radius:36px;box-shadow:0 40px 90px -30px rgba(80,30,30,.65)!important;font-family:var(--cy-f)}
+html:root:root .wo-frame .wo-top,html:root:root .wo-frame .wo-nav{background:var(--cy-teal);color:#fff}
+html:root:root .wo-frame .wo-top{padding-bottom:12px}html:root:root .wo-frame .wo-nav{padding:0 20px 14px;border-radius:0 0 34px 34px}
+html:root:root .wo-frame .wo-nav button{color:rgba(255,255,255,.78)}html:root:root .wo-frame .wo-nav button:hover{color:#fff}
+html:root:root .wo-frame .wo-nav button[aria-selected=true],html:root:root .wo-frame .wo-nav button.on{background:var(--cy-cream);color:var(--cy-teal)}
+html:root:root .wo-frame :is(.wo-search,.wo-back,.wo-coin,.wo-mini,.wo-sel,.wo-st){background:#fff;color:var(--cy-ink);box-shadow:0 8px 18px -14px rgba(0,0,0,.5)}
+html:root:root .wo-frame :is(.wo-box,.wo-item,.wo-stat,.wo-btn){background:#fff!important;color:var(--cy-ink);border:0;border-radius:24px;box-shadow:0 12px 26px -18px rgba(120,60,40,.45)}
+html:root:root .wo-frame .wo-track{background:rgba(31,33,36,.08)}
+html:root:root .wo-frame :is(.wo-search input,.wo-search input::placeholder){color:var(--cy-mute)}
+html:root:root .wo-frame .wo-x{background:#fff;color:var(--cy-ink)}
+html:root:root .wo-frame .wo-logo{background:#fff;color:var(--cy-teal);box-shadow:none}
+html:root:root .wo-frame h1,html:root:root .wo-frame h2,html:root:root .wo-frame h3{color:var(--cy-ink);letter-spacing:-.6px}
+html:root:root .wo-frame :is(small,p){color:var(--cy-mute)}
+html:root:root .wo-modal{background:#fffdf6!important;color:var(--cy-ink)!important;border-radius:30px!important}
+/* ---- Task: kartu hero ---- */
+html:root:root:root:root .ac-ov.tk-skin .tk-hero{background:radial-gradient(circle at 90% 10%,rgba(255,255,255,.22) 0 60px,transparent 61px),var(--cy-yel)!important;box-shadow:none}
+html:root:root:root:root .ac-ov.tk-skin .tk-hero :is(h3,p,small,u){color:var(--cy-ink)!important}
+/* ---- Finance & Academic: token warna sendiri ---- */
+html:root .fn-ov,html:root [data-wx=finance]{--cr:var(--cy-cream);--cr2:#fffdf6;--cr3:var(--cy-pinkt);--red:var(--cy-pink);--red2:#d9556a;--blue:var(--cy-teal);--blue2:#3f9a88;--ink:var(--cy-ink);--mute:var(--cy-mute)}
+html:root:root:root:root:root .ac-ov.ad-skin{--ad-bg:#fffdf6;--ad-card:#fff;--ad-main:var(--cy-cream);--ad-ink:var(--cy-ink);--ad-mute:var(--cy-mute);--ad-line:var(--cy-line);--ad-bar:var(--cy-ink);--ad-navy:var(--cy-ink);--ad-yel:var(--cy-yel);--ad-yel2:var(--cy-yelt);--ad-grn:var(--cy-teal);--ad-grnbg:var(--cy-tealt);--ad-mint:var(--cy-tealt);--ad-sc1:var(--cy-pinkt);--ad-sc2:var(--cy-tealt);--ink:var(--cy-ink)}
+html:root:root .ad-skin .ac-win{border-radius:36px;background:#fffdf6;color:var(--cy-ink)}
+html:root:root .ad-skin .ac-btn{border-radius:999px;font-weight:700}
+html:root:root .ad-skin .ac-btn.pri{background:var(--cy-pink);color:#fff}
+html:root:root .ad-skin .ac-win header h2{font-weight:800;letter-spacing:-.6px;color:var(--cy-ink)}
+html:root:root .wo-frame .wo-addbox{border:2px dashed var(--cy-teal)!important;color:var(--cy-teal);background:rgba(255,255,255,.6)!important}
+html:root:root .wo-frame .wo-addbox span{color:var(--cy-teal)}
