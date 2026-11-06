@@ -179,7 +179,7 @@
 
   function build() {
     ov = el('ad-ov', '<section class="ad-win" role="dialog" aria-modal="true" aria-label="Academic Management">' +
-      '<aside class="ad-nav"><div class="ad-logo">' + MARK + '<span><small>MYOFFICE</small><b>ACADEMY</b></span></div>' +
+      '<aside class="ad-nav"><div class="ad-logo">' + MARK + '<span><small>BERESIN</small><b>ACADEMY</b></span></div>' +
       '<nav class="ad-menu" aria-label="Menu Academic">' + TABS.map(function (t) {
         return '<button class="ad-nl" data-act="tab" data-t="' + t[0] + '">' + ic(t[2]) + '<span>' + t[1] + '</span>' + (t[0] === 'task' ? '<span class="ad-bdg" id="acBdg" hidden></span>' : '') + '</button>';
       }).join('') + '</nav>' +
