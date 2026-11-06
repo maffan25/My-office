@@ -59,9 +59,9 @@ html:root:root:root .ac-ov[data-wx=finance],html:root:root:root [data-wx=finance
 [data-wx=goal]{--wx-glow:rgba(39,169,212,.4)}
 [data-wx=goal]>:first-child{background-image:linear-gradient(180deg,#d4f0f7 0,#e6f6f2 50%,#fdf5df 100%)!important}
 html:root:root:root .ac-ov[data-wx=goal],html:root:root:root [data-wx=goal]{--gq-bg:#e2f4f7;--gq-card:#fff;--gq-line:#cfe7ee;--gq-ink:#1f3d4a;--gq-mute:#6f95a3;--gq-b1:#5cc8e6;--gq-b2:#27a9d4;--gq-b3:#1a7fa6;--gq-tint:#e8f5f9;--gq-orbg:#fff1cf;--gq-or:#b97a05;--gq-trk:#d6ebf1}
-[data-wx=documents]{--wx-glow:rgba(150,100,55,.4)}
-[data-wx=documents]>:first-child{background-image:linear-gradient(160deg,#fcf2e4 0,#f3e1c9 60%,#e9d0b0 100%)!important}
-html:root:root:root .ac-ov[data-wx=documents],html:root:root:root [data-wx=documents]{--rd-bg:#fffbf5;--rd-cream:#fbf0e1;--rd-cream2:#f6e5d0}
+[data-wx=documents]{--wx-glow:rgba(18,179,148,.4)}
+[data-wx=documents]>:first-child{background-image:linear-gradient(160deg,#e3faf3 0,#d4f1ee 55%,#cde7fa 100%)!important}
+html:root:root:root .ac-ov[data-wx=documents],html:root:root:root [data-wx=documents]{--rd-bg:#fcfffe;--rd-cream:#eefaf6;--rd-cream2:#e1f4ee}
 [data-wx=analytics]{--wx-glow:rgba(108,98,214,.4)}
 [data-wx=analytics]>:first-child{background-image:linear-gradient(150deg,#e8e5f8 0,#f4e8f0 55%,#e4f1f3 100%)!important}
 html:root:root:root .ac-ov[data-wx=analytics],html:root:root:root [data-wx=analytics]{--an-a1:#6b5fd6;--an-a2:#f08f78;--an-bg1:#e8e5f8;--an-bg2:#d9d6f0}

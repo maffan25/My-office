@@ -3723,8 +3723,8 @@
 
   /* ---------- Jenis berkas → warna sampul ---------- */
   var PAL = {
-    pdf: ['#d2634a', '#9b3125'], doc: ['#4a7cc0', '#2a4f8c'], xls: ['#58a275', '#2f6e4a'], ppt: ['#e79442', '#b85a1d'],
-    img: ['#45a2b0', '#26667a'], av: ['#8264b8', '#523a88'], txt: ['#fdf8ee', '#eadcc0'], zip: ['#7a8190', '#474e5c'], oth: ['#a08672', '#664f3f']
+    pdf: ['#ff8a75', '#e5484d'], doc: ['#4aa8ff', '#2f6fe0'], xls: ['#3fd6a0', '#12a07a'], ppt: ['#ffbe55', '#f08a1c'],
+    img: ['#2fd0e0', '#0e8fb0'], av: ['#a58bff', '#6a47e6'], txt: ['#fbfffd', '#d3efe6'], zip: ['#7f93a8', '#475b70'], oth: ['#86c5b8', '#3f8379']
   };
   function kind(f) {
     var t = f.type || '', n = f.name.toLowerCase(), s = t + ' ' + n;
@@ -3862,7 +3862,7 @@
 
     /* ----- Grid (Semua / Terbaru / hasil cari) ----- */
     function folderCover(f) {
-      return '<button class="rd-cover k-fold p' + (hash(f.name) % 4) + '" style="--c1:#b07a45;--c2:#7a4a24" data-act="cd" data-id="' + f.id + '" title="' + esc(pstr(f.id)) + '" aria-label="Buka rak ' + esc(f.name) + '"><i class="rd-art"></i><i class="rd-ext">RAK</i><b class="rd-name">' + esc(f.name) + '</b><span class="rd-fico">' + ic('folder', 1.5) + '</span></button>';
+      return '<button class="rd-cover k-fold p' + (hash(f.name) % 4) + '" style="--c1:#2fd0b4;--c2:#0b8f9c" data-act="cd" data-id="' + f.id + '" title="' + esc(pstr(f.id)) + '" aria-label="Buka rak ' + esc(f.name) + '"><i class="rd-art"></i><i class="rd-ext">RAK</i><b class="rd-name">' + esc(f.name) + '</b><span class="rd-fico">' + ic('folder', 1.5) + '</span></button>';
     }
     function card(f, i) {
       var tg = tagList(f);
@@ -4584,7 +4584,7 @@ var D=document,calm=matchMedia('(prefers-reduced-motion:reduce)').matches;
 /* blob: [warna, opasitas, x, y, ukuran, durasi, dx, dy] */
 var Wd={
 academic:{b:[['#f6c25b',.5,'8%','8%',520,17,150,90],['#9fb8e8',.42,'78%','70%',560,20,-140,-90],['#f1b9a8',.38,'35%','95%',440,18,120,-110]],r:['rgba(246,194,91,.35)',.5],p:[10,'#fff6dc',.7,4,14]},
-work:{b:[['#2fb7a6',.3,'18%','12%',620,18,200,80],['#5b6fd6',.24,'50%','100%',640,20,-160,-90]],au:[[ '#2fe0c0','12%',.34,-10],['#5b8cf0','38%',.3,12],['#b58cf0','62%',.26,-14],['#e8c07a','82%',.18,10]],st:[24,'#bfeee8'],sh:2,spot:'rgba(79,195,184,.14)'},
+work:{b:[['#d6b36a',.16,'18%','12%',620,18,200,80],['#6b6f80',.14,'50%','100%',640,20,-160,-90]],au:[[ '#d6b36a','12%',.2,-10],['#8a8578','38%',.16,12],['#f2dda6','62%',.14,-14],['#d6b36a','82%',.14,10]],st:[24,'#f2e6c4'],sh:2,spot:'rgba(214,179,106,.08)'},
 org:{b:[['#8fcfb0',.5,'12%','10%',520,18,140,90],['#f0d58c',.42,'85%','25%',460,20,-130,80],['#b8e0d0',.45,'55%','92%',560,19,100,-100]],r:['rgba(255,255,255,.55)',.45],l:[10,['#6fb58f','#8fcfb0','#e6c36a','#4f9a7a']]},
 project:{b:[['#e58a63',.36,'88%','8%',560,18,-140,90],['#f2cf9a',.44,'10%','55%',520,20,130,-60]],au:[['#e9825a','20%',.3,22],['#f2b07a','55%',.28,-20],['#c9667a','80%',.2,24]]},
 task:{b:[['#5865f2',.32,'85%','8%',620,19,-160,110],['#a06cf0',.24,'10%','60%',560,21,150,-80]],st:[34,'#dfe4ff'],sh:2,spot:'rgba(140,158,255,.16)',au:[['#6a78ff','30%',.2,8],['#a06cf0','70%',.18,-10]]},
