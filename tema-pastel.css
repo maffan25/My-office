@@ -262,3 +262,91 @@ html:root:root:root:root .ad-ov,html:root:root:root:root .wo-ov,html:root:root:r
   --panel:#ffffff!important;--fb-card:#ffffff!important;--fb-bg:#eef2f8!important;--fb-line:#e4e9f4!important;
   --card:#ffffff!important;--fb-side:#ffffff!important;--fb-sidei:#6b7896!important;--line:#e4e9f4!important;
   --soft:#f3f6fb!important;--soft2:#eaeff7!important;--ac-ink:var(--mc)!important}
+
+/* =====================================================================
+   PERBAIKAN v2 — scroll, bentuk presisi (tanpa oval), tombol timbul & efek tekan
+   ===================================================================== */
+
+/* 1. Scroll: layout Academic di layar kecil harus bisa digulir */
+@media (max-width:1180px){
+  html:root:root:root:root .ad-win{overflow-y:auto!important;overflow-x:hidden!important;height:100dvh!important}
+  html:root:root:root:root .ad-main{overflow:visible!important}
+  html:root:root:root:root .ad-body{overflow:visible!important}
+  html:root:root:root:root .ad-side{overflow:visible!important}
+}
+html:root:root:root:root .ac-ov,html:root:root:root:root .ad-ov,html:root:root:root:root .wo-ov,
+html:root:root:root:root .es-ov,html:root:root:root:root .fn-ov{overscroll-behavior:contain!important}
+html:root:root:root:root .ac-body,html:root:root:root:root .ad-body,html:root:root:root:root .wo-main,
+html:root:root:root:root .es-body,html:root:root:root:root .fn-v{-webkit-overflow-scrolling:touch;touch-action:pan-y!important;overscroll-behavior:contain}
+
+/* 2. Bentuk presisi: buang dekorasi oval/lingkaran, pakai sudut tegas */
+html:root:root:root:root .pc-art,html:root:root:root:root .pcard::after,html:root:root:root:root .tk-hero::after{display:none!important}
+html:root:root:root:root .pcard{border-radius:24px!important}
+html:root:root:root:root .today,html:root:root:root:root .info{border-radius:22px!important}
+html:root:root:root:root .tchip{border-radius:16px!important}
+html:root:root:root:root .tchip::before{border-radius:10px!important;width:36px!important;height:36px!important}
+html:root:root:root:root .info .ic,html:root:root:root:root .ac-ov .ac-ico,html:root:root:root:root .ac-ov .ac-x{border-radius:12px!important}
+html:root:root:root:root .ac-ov .ac-x{border-radius:10px!important;width:40px!important;height:40px!important}
+html:root:root:root:root .tools button{border-radius:14px!important;width:44px!important;height:44px!important}
+html:root:root:root:root .tools .avatar{border-radius:50%!important}
+html:root:root:root:root .dock{border-radius:18px!important;padding:8px 10px!important}
+html:root:root:root:root .dock a{border-radius:12px!important}
+html:root:root:root:root .hi-date,html:root:root:root:root .menu-c,html:root:root:root:root .ac-ov .ac-badge,
+html:root:root:root:root .ac-ov .ac-chip,html:root:root:root:root .ac-ov .ac-tab,html:root:root:root:root .ac-ov .ac-brand .ac-bd,
+html:root:root:root:root .ac-ov .ac-btn,html:root:root:root:root .ad-win .ac-btn,html:root:root:root:root .ac-ov .ac-tabs,
+html:root:root:root:root .ac-ov .pj-tabs,html:root:root:root:root .ac-ov .pj-nav,html:root:root:root:root .ac-ov .ac-ind,
+html:root:root:root:root .fn-app .fn-btn,html:root:root:root:root .wo-ov .wo-btn,html:root:root:root:root .es-frame .es-ghost,
+html:root:root:root:root .es-frame .es-buy,html:root:root:root:root .ad-win .ad-nl,html:root:root:root:root .wo-frame .wo-nav,
+html:root:root:root:root .es-frame .es-nav,html:root:root:root:root .wo-chips button,html:root:root:root:root .es-chips button,
+html:root:root:root:root .ac-ov .tk-cta,html:root:root:root:root .pc-btn,html:root:root:root:root .pc-lvl,html:root:root:root:root .pc-more{
+  border-radius:12px!important}
+html:root:root:root:root .ac-ov .ac-ico{width:44px!important;height:44px!important}
+html:root:root:root:root .ac-ov .ac-tabs,html:root:root:root:root .ac-ov .pj-tabs,html:root:root:root:root .ac-ov .pj-nav,
+html:root:root:root:root .wo-frame .wo-nav,html:root:root:root:root .es-frame .es-nav{border-radius:14px!important}
+html:root:root:root:root .nav a{border-radius:18px!important}
+html:root:root:root:root .nav a .ic{border-radius:12px!important}
+html:root:root:root:root .ac-ov .ac-card,html:root:root:root:root .ac-ov .ac-item,html:root:root:root:root .ac-ov .ac-stat,
+html:root:root:root:root .ad-win .ac-card,html:root:root:root:root .ad-win .ac-item,html:root:root:root:root .ad-win .ac-stat,
+html:root:root:root:root .ac-ov .ac-row,html:root:root:root:root .ac-ov .ac-empty,html:root:root:root:root .ac-ov .ins,
+html:root:root:root:root .ac-ov .kc-d,html:root:root:root:root .ad-cg,html:root:root:root:root .ad-add,
+html:root:root:root:root .fn-app .fn-it,html:root:root:root:root .fn-app .fn-row,html:root:root:root:root .fn-app .fn-sec,
+html:root:root:root:root .wo-ov .wo-card,html:root:root:root:root .wo-ov .wo-box,html:root:root:root:root .es-frame .es-card{border-radius:16px!important}
+html:root:root:root:root .ad-win .ad-cc,html:root:root:root:root .ad-win .ad-ht,html:root:root:root:root .ad-win .ad-as{border-radius:16px!important}
+html:root:root:root:root .ac-ov .tk-hero,html:root:root:root:root .ac-ov .kc-side,html:root:root:root:root .ac-ov .gq-main,
+html:root:root:root:root .fn-ban,html:root:root:root:root .ad-help{border-radius:18px!important}
+html:root:root:root:root .ac-ov .ac-win.ac-form,html:root:root:root:root .ac-ov .ac-win:not(.ac-form):not(.vw),
+html:root:root:root:root .ad-win,html:root:root:root:root .wo-frame,html:root:root:root:root .es-frame,html:root:root:root:root .fn-app{border-radius:22px!important}
+html:root:root:root:root .ad-av{border-radius:50%!important}
+html:root:root:root:root input:not([type=checkbox]):not([type=radio]):not([type=range]),
+html:root:root:root:root select,html:root:root:root:root textarea{border-radius:10px!important}
+html:root:root:root:root .ac-ov .ac-track,html:root:root:root:root .ac-ov .ac-track i{border-radius:4px!important}
+
+/* 3. Tombol timbul (raised) + efek tekan. Urutan: dasar < hover < active (spesifisitas naik) */
+html:root:root:root:root .tools button,html:root:root:root:root .ac-ov button,html:root:root:root:root .ad-win button,
+html:root:root:root:root .wo-ov button,html:root:root:root:root .es-ov button,html:root:root:root:root .fn-ov button,
+html:root:root:root:root .pc-btn,html:root:root:root:root .pc-more,html:root:root:root:root .dock a,
+html:root:root:root:root .nav a,html:root:root:root:root .tchip{
+  --edge:#c9d2e6;cursor:pointer;
+  transition:transform .09s ease,box-shadow .09s ease,filter .15s ease!important;
+  box-shadow:0 4px 0 0 var(--edge),0 8px 14px -8px rgba(40,60,110,.38)!important;
+  transform:none!important}
+html:root:root:root:root .ac-ov button:not(:disabled):hover,html:root:root:root:root .ad-win button:not(:disabled):hover,
+html:root:root:root:root .wo-ov button:not(:disabled):hover,html:root:root:root:root .es-ov button:not(:disabled):hover,
+html:root:root:root:root .fn-ov button:not(:disabled):hover,html:root:root:root:root .tools button:hover,
+html:root:root:root:root .pc-btn:hover,html:root:root:root:root .nav a:hover,html:root:root:root:root .tchip:hover,
+html:root:root:root:root .dock a:hover{transform:translateY(-2px)!important;filter:brightness(1.03)}
+html:root:root:root:root .ac-ov button:not(:disabled):active,html:root:root:root:root .ad-win button:not(:disabled):active,
+html:root:root:root:root .wo-ov button:not(:disabled):active,html:root:root:root:root .es-ov button:not(:disabled):active,
+html:root:root:root:root .fn-ov button:not(:disabled):active,html:root:root:root:root .tools button:active,
+html:root:root:root:root .pc-btn:active,html:root:root:root:root .pc-more:active,html:root:root:root:root .dock a:active,
+html:root:root:root:root .nav a:active,html:root:root:root:root .tchip:active{
+  transform:translateY(4px)!important;
+  box-shadow:0 0 0 0 var(--edge),0 1px 2px -1px rgba(40,60,110,.45)!important;filter:brightness(.96)}
+/* Varian primer: tepi lebih gelap dari warna menu */
+html:root:root:root:root .ac-ov .ac-btn.pri,html:root:root:root:root .ad-win .ac-btn.pri,html:root:root:root:root .wo-ov .wo-btn.go,
+html:root:root:root:root .fn-app .fn-btn.pri,html:root:root:root:root .es-frame .es-buy,html:root:root:root:root .ac-ov .ac-tab[aria-selected=true],
+html:root:root:root:root .ac-ov .ac-chip[aria-pressed=true],html:root:root:root:root .ad-win .ad-nl[aria-current=page]{--edge:color-mix(in srgb,var(--mc) 55%,#000)}
+html:root:root:root:root .dock a.on{--edge:#1d6fd6;background:var(--blue)!important}
+html:root:root:root:root .tk-hero,html:root:root:root:root .kc-side,html:root:root:root:root .gq-main,html:root:root:root:root .fn-ban{
+  box-shadow:0 6px 0 0 color-mix(in srgb,var(--mc) 55%,#000),0 14px 24px -14px var(--mc)!important}
+html:root:root:root:root .pcard{box-shadow:0 6px 0 0 #1f5fc4,0 18px 30px -16px rgba(47,124,240,.6)!important}
