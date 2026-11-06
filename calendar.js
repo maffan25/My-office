@@ -68,7 +68,7 @@
     var tag = function (e) { var n = fl(e); return n < 0 ? '' : fireEl(n); };
     var kindLbl = function (e) {
       var k = kindOf(e); if (!k) return ''; var n = lo(e);
-      return '<span class="kc-tag" style="--b:' + KD[k].c + '">' + KD[k].n + (n >= 0 ? ' · ' + hLbl(n) : '') + '</span>';
+      return '<span class="kc-tag" data-k="' + k + '" style="--b:' + KD[k].c + '">' + KD[k].n + (n >= 0 ? ' · ' + hLbl(n) : '') + '</span>';
     };
     var legend = function () {
       return '<div class="kc-leg"><span>' + fireEl(2).replace('class="fire l2"', 'class="fire l2" style="--fd:1.2s"') + 'Api = H-3 s/d hari-H</span>' +
@@ -146,7 +146,7 @@
           dayNum(d) + (fn >= 0 ? fireEl(fn) : '') +
           (bars.length ? '<span class="kc-bars">' + bars.slice(0, 4).map(function (c) { return '<i style="background:' + c + '"></i>'; }).join('') + '</span>' : (tks.length ? '<u class="kc-dot"></u>' : '')) + '</button>';
       }
-      h += '</div><div class="kc-foot">' + legend() + '<button class="kc-today" data-act="cnav" data-d="0">Kembali ke hari ini</button></div></div>';
+      h += '</div><div class="kc-foot">' + legend() + '<button class="kc-today" data-act="cnav" data-d="0"><i class="kt-ic" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle class="kt-o" cx="12" cy="12" r="7.5"/><circle class="kt-d" cx="12" cy="12" r="2.4" fill="currentColor" stroke="none"/><path class="kt-t" d="M12 1.800v3.200M12 19v3.200M1.800 12H5M19 12h3.200"/></svg></i><span>Kembali ke hari ini</span></button></div></div>';
       var ev = onDay(sel).sort(function (x, y) { return rng(x)[0] - rng(y)[0]; }), tk = tasksOn(sel);
       h += '<aside class="kc-side" aria-live="polite"><small>' + DL[dow(sel)] + ', ' + (+sel.slice(8)) + ' ' + MN[+sel.slice(5, 7) - 1] + ' ' + sel.slice(0, 4) + '</small>';
       if (!ev.length && !tk.length) h += '<p>Belum ada kegiatan pada tanggal ini.</p>';
