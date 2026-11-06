@@ -78,20 +78,64 @@
   }
 
 
-  /* ================= Sapaan (Hai, Nama 👋🏻) ================= */
-  var gl = $('glitch'), src = $('hiName');
-  function paintGreet() {
-    if (!gl) return;
-    var t = (src && src.textContent || 'Hai, Sobat').trim().replace(/,\s*$/, '');
-    var name = t.replace(/^Hai,?\s*/i, '') || 'Sobat';
-    gl.textContent = '';
-    var sm = document.createElement('small'); sm.textContent = 'Hai, 👋🏻';
-    var b = document.createElement('b'); b.textContent = name;
-    gl.appendChild(sm); gl.appendChild(b);
-    gl.setAttribute('data-text', t);
+  /* ================= Sapaan glitch ================= */
+  var gl = $('glitch'), greet = $('greet'), src = $('hiName'), dotsBox = $('greetDots');
+  var GLYPH = '!<>-_\\/[]{}=+*^?#%&01';
+  var idx = -1, current = '', busy = false, holdTimer = 0, dots = [];
+
+  function dayWord() {
+    var h = new Date().getHours();
+    return h < 4 ? 'Selamat dini hari' : h < 11 ? 'Selamat pagi' : h < 15 ? 'Selamat siang' : h < 18 ? 'Selamat sore' : 'Selamat malam';
   }
-  paintGreet();
-  if (src && window.MutationObserver) new MutationObserver(paintGreet).observe(src, { childList: true, characterData: true, subtree: true });
+  function phrases() {
+    var raw = (src && src.textContent || 'Assalamu’alaikum,').trim().replace(/,\s*$/, '');
+    var m = raw.match(/^Assalamu’alaikum,?\s*(.*)$/), name = m ? m[1].trim() : '';
+    var pix = false;
+    return [raw, 'Semangat hari ini!', dayWord() + (name ? ', ' + name : ''),
+      pix ? 'Ayo lari, jangan lompat sendiri' : 'Siap meluncur?', 'Selamat datang di MyOffice', 'Plan · Execute · Achieve'];
+  }
+  function setText(t) { gl.textContent = t; gl.setAttribute('data-text', t); }
+
+  function scramble(to, done) {
+    if (reduce) { setText(to); current = to; return done && done(); }
+    busy = true;
+    var from = current, len = Math.max(from.length, to.length), t0 = performance.now(), dur = 600 + len * 8, lastDraw = 0;
+    gl.classList.add('on'); greet.classList.remove('scan'); void greet.offsetWidth; greet.classList.add('scan');
+    (function step(now) {
+      if (now - lastDraw < 42 && now - t0 < dur) return requestAnimationFrame(step);   // ±24 gambar/detik cukup
+      lastDraw = now;
+      var p = Math.min(1, (now - t0) / dur), out = '';
+      for (var i = 0; i < len; i++) {
+        var b = to.charAt(i), lock = (i / len) * .8 + .1;
+        if (p >= lock + .12) out += b;
+        else if (b === ' ' && from.charAt(i) === ' ') out += ' ';
+        else out += GLYPH.charAt((Math.random() * GLYPH.length) | 0);
+      }
+      if (p > .9) out = out.slice(0, to.length);
+      setText(out);
+      if (p < 1) requestAnimationFrame(step);
+      else { setText(to); current = to; busy = false; setTimeout(function () { gl.classList.remove('on'); }, 140); done && done(); }
+    })(t0);
+  }
+  function mark(i) { dots.forEach(function (d, k) { d.classList.toggle('on', k === i); }); }
+  function next() {
+    clearTimeout(holdTimer);
+    var list = phrases();
+    if (dots.length !== list.length && dotsBox) {
+      dotsBox.innerHTML = ''; dots = list.map(function () { var d = document.createElement('i'); dotsBox.appendChild(d); return d; });
+    }
+    idx = (idx + 1) % list.length; mark(idx);
+    scramble(list[idx], function () { holdTimer = setTimeout(next, 3800); });
+  }
+  function micro() {                               // glitch kilat sesekali saat teks ditahan
+    setTimeout(micro, rand(4000, 8000));
+    if (reduce || lite === '1' || busy || document.hidden || paused()) return;
+    gl.classList.add('on'); setTimeout(function () { if (!busy) gl.classList.remove('on'); }, 180);
+  }
+  if (gl && greet) {
+    greet.addEventListener('click', function () { if (!busy) next(); });
+    setTimeout(function () { current = ''; next(); setTimeout(micro, 3000); }, 380);
+  }
 
   /* Efek klik (tekan + riak + pantul) ditangani fx.js — duplikat di sini dihapus. */
 
