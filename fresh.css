@@ -252,9 +252,9 @@ html:root:root .nav a:nth-child(4){--t:#e9efff}html:root:root .nav a:nth-child(5
 html:root:root .nav a:nth-child(7){--t:#e3f7ea}html:root:root .nav a:nth-child(8){--t:#ffe8e6}html:root:root .nav a:nth-child(9){--t:#fff3d6}
 html:root:root .nav a:nth-child(10){--t:#e8f1ff}html:root:root .nav a:nth-child(11){--t:#eee9ff}
 html:root:root .nav a .ic{width:62px!important;height:62px!important;padding:0!important;border-radius:0!important;background:none!important;box-shadow:none!important;overflow:visible;
-  filter:drop-shadow(0 9px 8px rgba(60,70,150,.22));transition:transform .35s cubic-bezier(.3,1.6,.5,1),filter .3s}
-html:root:root .nav a:hover .ic,html:root:root .nav a:focus-visible .ic{transform:translateY(-5px) scale(1.12) rotate(-3deg)!important;filter:drop-shadow(0 15px 11px rgba(60,70,150,.3))!important;box-shadow:none!important}
-html:root:root .nav a:active .ic{transform:scale(.94)!important}
+  filter:drop-shadow(0 9px 8px rgba(60,70,150,.22));transition:translate .35s cubic-bezier(.3,1.6,.5,1),scale .35s cubic-bezier(.3,1.6,.5,1),filter .3s}
+html:root:root .nav a:hover .ic,html:root:root .nav a:focus-visible .ic{translate:0 -5px;scale:1.12;filter:drop-shadow(0 15px 11px rgba(60,70,150,.3))!important;box-shadow:none!important}
+html:root:root .nav a:active .ic{scale:.94}
 @media (max-width:700px){html:root:root .nav a .ic{width:50px!important;height:50px!important}}
 .fn-3d{width:26px;height:26px;object-fit:contain;display:block;filter:drop-shadow(0 3px 3px rgba(60,70,150,.25))}
 .fn-nav button .fn-3d{width:30px;height:30px;margin:0 auto}
@@ -303,3 +303,42 @@ html:root .atm.t-ew.c0,html:root .atm.t-ew.c4{--g1:#7a3fe0;--g2:#4aa8ff}
 html:root:root:root:root .atm,html:root:root:root:root .atm *{color:#fff!important}
 html:root:root:root:root .atm .atm-bal.neg{color:#ffd0d0!important}
 html:root:root:root:root .atm .atm-bal,html:root:root:root:root .atm .atm-no,html:root:root:root:root .atm .atm-top em{opacity:1!important}
+
+/* ---- Gerak ikon: tiap ikon punya gaya sendiri. Muncul = ".ic" saat halaman tampil; klik = kelas .ic-go ---- */
+@keyframes mTossK{0%{transform:translateY(0) rotate(0)}30%{transform:translateY(-16px) rotate(-14deg)}55%{transform:translateY(-20px) rotate(10deg)}80%{transform:translateY(2px) rotate(-3deg)}100%{transform:none}}
+@keyframes mJigK{0%,100%{transform:none}15%{transform:translateY(-8px) rotate(-8deg)}30%{transform:rotate(7deg)}45%{transform:rotate(-5deg)}60%{transform:rotate(3deg)}80%{transform:none}}
+@keyframes mWaveK{0%{transform:scale(1)}25%{transform:scale(1.2,.86)}50%{transform:scale(.92,1.18) translateY(-7px)}75%{transform:scale(1.06,.96)}100%{transform:none}}
+@keyframes mSwingK{0%,100%{transform:none}25%{transform:rotate(-12deg) translateY(-3px)}50%{transform:rotate(9deg)}75%{transform:rotate(-4deg)}}
+@keyframes mWriteK{0%,100%{transform:none}15%{transform:translate(-4px,2px) rotate(-5deg)}30%{transform:translate(4px,-1px) rotate(4deg)}45%{transform:translate(-4px,2px) rotate(-5deg)}60%{transform:translate(4px,-1px) rotate(4deg)}80%{transform:translate(-1px,1px)}}
+@keyframes mFlipK{0%{transform:perspective(300px) rotateX(-90deg);opacity:0}60%{transform:perspective(300px) rotateX(18deg);opacity:1}80%{transform:perspective(300px) rotateX(-6deg)}100%{transform:none}}
+@keyframes mHopK{0%{transform:none}18%{transform:scale(1.14,.82)}42%{transform:translateY(-22px) scale(.92,1.14)}66%{transform:scale(1.12,.86)}82%{transform:scale(.97,1.04)}100%{transform:none}}
+@keyframes mHitK{0%{transform:scale(1.7) rotate(-25deg);opacity:0}55%{transform:scale(.86) rotate(4deg);opacity:1}72%{transform:scale(1.1) rotate(-2deg)}100%{transform:none}}
+@keyframes mOpenK{0%{transform:translateY(12px) scale(.8,.7);opacity:0}55%{transform:translateY(-6px) scale(1.06,1.1);opacity:1}100%{transform:none}}
+@keyframes mGrowK{0%{transform:scaleY(.15) scaleX(.9);opacity:0}60%{transform:scaleY(1.14) scaleX(1)}80%{transform:scaleY(.96)}100%{transform:none}}
+@keyframes mSpinK{0%{transform:rotate(-360deg) scale(.5);opacity:0}70%{transform:rotate(14deg) scale(1.08);opacity:1}100%{transform:none}}
+@keyframes mRingK{0%,100%{transform:none}8%,24%,40%,56%{transform:rotate(-13deg)}16%,32%,48%,64%{transform:rotate(13deg)}80%{transform:rotate(-3deg)}}
+html:root:root .nav a .ic{transform-origin:50% 78%}
+@media (prefers-reduced-motion:no-preference){
+html:root:root .nav a[href="#academic"] .ic{transform-origin:50% 78%;animation:mTossK .9s cubic-bezier(.3,1.3,.5,1) 0.25s both}
+html:root:root .nav a[href="#academic"] .ic.ic-go{animation:mTossK .9s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#work"] .ic{transform-origin:50% 78%;animation:mJigK .9s cubic-bezier(.3,1.3,.5,1) 0.34s both}
+html:root:root .nav a[href="#work"] .ic.ic-go{animation:mJigK .9s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#organization"] .ic{transform-origin:50% 78%;animation:mWaveK .9s cubic-bezier(.3,1.3,.5,1) 0.43s both}
+html:root:root .nav a[href="#organization"] .ic.ic-go{animation:mWaveK .9s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#project"] .ic{transform-origin:50% 78%;animation:mSwingK .9s cubic-bezier(.3,1.3,.5,1) 0.52s both}
+html:root:root .nav a[href="#project"] .ic.ic-go{animation:mSwingK .9s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#task"] .ic{transform-origin:50% 78%;animation:mWriteK .9s cubic-bezier(.3,1.3,.5,1) 0.61s both}
+html:root:root .nav a[href="#task"] .ic.ic-go{animation:mWriteK .9s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#calendar"] .ic{transform-origin:50% 0;animation:mFlipK .8s cubic-bezier(.3,1.3,.5,1) 0.70s both}
+html:root:root .nav a[href="#calendar"] .ic.ic-go{animation:mFlipK .8s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#finance"] .ic{transform-origin:50% 78%;animation:mHopK .9s cubic-bezier(.3,1.3,.5,1) 0.79s both}
+html:root:root .nav a[href="#finance"] .ic.ic-go{animation:mHopK .9s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#goal"] .ic{transform-origin:50% 50%;animation:mHitK .8s cubic-bezier(.3,1.3,.5,1) 0.88s both}
+html:root:root .nav a[href="#goal"] .ic.ic-go{animation:mHitK .8s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#documents"] .ic{transform-origin:50% 100%;animation:mOpenK .8s cubic-bezier(.3,1.3,.5,1) 0.97s both}
+html:root:root .nav a[href="#documents"] .ic.ic-go{animation:mOpenK .8s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#analytics"] .ic{transform-origin:50% 100%;animation:mGrowK .9s cubic-bezier(.3,1.3,.5,1) 1.06s both}
+html:root:root .nav a[href="#analytics"] .ic.ic-go{animation:mGrowK .9s cubic-bezier(.3,1.3,.5,1) 0s both}
+html:root:root .nav a[href="#settings"] .ic{transform-origin:50% 50%;animation:mSpinK .9s cubic-bezier(.3,1.3,.5,1) 1.15s both}
+html:root:root .nav a[href="#settings"] .ic.ic-go{animation:mSpinK .9s cubic-bezier(.3,1.3,.5,1) 0s both}
+}
