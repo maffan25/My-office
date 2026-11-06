@@ -26,15 +26,14 @@ out = re.sub(r'(<script src="[^"]+\.js"></script>\s*)+', '<script src="app.js" d
 # Font: hanya yang dibutuhkan di layar pertama dimuat dulu; sisanya setelah halaman tampil
 fonts = re.search(r'<link rel="preconnect" href="https://fonts.googleapis.com">.*?<noscript>.*?</noscript>', out, flags=re.S)
 G = 'https://fonts.googleapis.com/css2?'
-crit = G + 'family=Chakra+Petch:wght@500;600&family=Inter:wght@300;400;500;600;700&display=swap'
+crit = G + 'family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap'
 rest = G + ('family=Anton&family=Baloo+2:wght@600;700;800&family=EB+Garamond:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700'
-            '&family=Nunito:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800'
+            '&family=Nunito:wght@500;600;700;800'
             '&family=Sora:wght@400;500;600;700&display=swap')
 new = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>\n'
        f'<link rel="stylesheet" href="{crit}">\n'
        f'<link rel="stylesheet" href="{rest}" media="print" onload="this.media=\'all\'">\n'
        f'<noscript><link rel="stylesheet" href="{rest}"></noscript>')
 out = out.replace(fonts.group(0), new)
-out = out.replace('href="app.css"','href="app.css?v=candy2"').replace('src="app.js"','src="app.js?v=candy2"')
 open(os.path.join(H, 'index.html'), 'w', encoding='utf-8').write(out)
 print('css', len(css), 'js', len(core), 'banks', len(banks))

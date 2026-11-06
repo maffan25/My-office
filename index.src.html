@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@600;700;800&family=Chakra+Petch:wght@400;500;600&family=EB+Garamond:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap" onload="this.onload=null;this.rel='stylesheet'">
 <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Baloo+2:wght@600;700;800&family=Chakra+Petch:wght@400;500;600&family=EB+Garamond:wght@400;500&family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@300;400;500;600;700&family=Nunito:wght@500;600;700;800&family=Outfit:wght@300;400;500;600;700&family=Pixelify+Sans:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Sora:wght@400;500;600;700&display=swap"></noscript>
-<meta name="theme-color" content="#fde4ee">
+<meta name="theme-color" content="#f7d8ef">
 <style>
 :root{
   --ink:#1f2f4d;
@@ -22,7 +22,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
-body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#5b82b5;-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);color:var(--ink);overflow:hidden;background:#f7d8ef;-webkit-font-smoothing:antialiased}
 
 /* ---------- Background ---------- */
 :root{--panel:rgba(246,248,253,.94)}
@@ -150,7 +150,7 @@ body{overflow-x:hidden;overflow-y:auto}
 <link rel="stylesheet" href="academic-light.css">
 <link rel="stylesheet" href="fixes-buttons.css">
 <link rel="stylesheet" href="exam.css">
-<link rel="stylesheet" href="candy.css">
+<link rel="stylesheet" href="playful.css">
 </head>
 <body>
 
@@ -184,25 +184,50 @@ body{overflow-x:hidden;overflow-y:auto}
 <div class="app">
   <header class="top">
     <a class="brand" href="#" aria-label="MyOffice">
-      <svg viewBox="0 0 32 32" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round">
-        <g transform="translate(16 16)">
-          <path id="petal" d="M0 -3 C-4 -6 -4 -11 0 -14 C4 -11 4 -6 0 -3Z"/>
-          <use href="#petal" transform="rotate(60)"/><use href="#petal" transform="rotate(120)"/>
-          <use href="#petal" transform="rotate(180)"/><use href="#petal" transform="rotate(240)"/><use href="#petal" transform="rotate(300)"/>
-          <circle r="1.4" fill="#fff" stroke="none"/>
-        </g>
-      </svg>
-      MyOffice
+      <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+      <span class="brand-t">MyOffice</span>
     </a>
     <div class="tools">
-      <button type="button" aria-label="Cari"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-search"/></svg></button>
-      <button type="button" id="themeBtn" aria-label="Tema dan wallpaper" aria-expanded="false" aria-controls="panel"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-palette"/></svg></button>
-      <button type="button" aria-label="Notifikasi"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bell"/></svg><span class="dot"></span></button>
-      <button type="button" class="avatar" aria-label="Akun"><i></i><svg viewBox="0 0 12 12" fill="none" stroke="#fff" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="m2.5 4.5 3.5 3.5 3.5-3.5"/></svg></button>
+      <button type="button" aria-label="Cari"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-search"/></svg></button>
+      <button type="button" id="themeBtn" aria-label="Tema dan wallpaper" aria-expanded="false" aria-controls="panel"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-palette"/></svg></button>
+      <button type="button" aria-label="Notifikasi"><svg class="ic" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><use href="#i-bell"/></svg><span class="dot"></span></button>
+      <button type="button" class="avatar" aria-label="Akun"><i></i></button>
     </div>
   </header>
 
-  <div class="nav-wrap">
+  <main class="hero">
+    <div class="hi">
+      <h1 class="greet" id="greet"><span id="hiName" class="sr-only">Hai, Sobat</span><span class="glitch" id="glitch" aria-hidden="true" data-text=""></span></h1>
+      <p class="hi-date" id="hiDate">—</p>
+    </div>
+    <div class="greet-dots" id="greetDots" aria-hidden="true"></div>
+
+    <section class="pcard" aria-label="Semangat hari ini">
+      <div class="pc-top">
+        <span class="pc-lvl">Rencanakan · Kerjakan · Capai</span>
+        <a class="pc-more" href="#task" aria-label="Buka Task"><svg class="ic" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M7 17 17 7M8 7h9v9"/></svg></a>
+      </div>
+      <h2 class="pc-h">Progres belajar &amp; kerja kamu</h2>
+      <p class="quote">“Setiap langkah kecil yang kamu lakukan hari ini, <br>adalah bagian dari impian besar yang sedang kamu bangun.”</p>
+      <div class="pc-art" aria-hidden="true"><i class="a1"></i><i class="a2"></i><i class="a3"></i></div>
+      <a class="pc-btn" href="#task"><span>Mulai hari ini</span><svg class="ic" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="m9 6 6 6-6 6"/></svg></a>
+    </section>
+
+    <div class="info">
+      <div class="cell">
+        <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cal"/></svg>
+        <span><b id="masehi">Rabu, 29 Oktober 2025</b><small id="hijriah">4 Jumadil Akhir 1447 H</small></span>
+      </div>
+      <i class="sep"></i>
+      <div class="cell">
+        <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clock"/></svg>
+        <span><b id="clock">00:00:00</b><small id="zone">WIB</small></span>
+      </div>
+    </div>
+  </main>
+
+  <section class="menu-sec" aria-label="Menu utama">
+    <div class="menu-h"><h2>Menu saya</h2><span class="menu-c">11 menu</span></div>
     <nav class="nav" aria-label="Menu utama">
       <a href="#academic"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-academic"/></svg><span>Academic<br>Management</span></a>
       <a href="#work"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-work"/></svg><span>Work<br>Office</span></a>
@@ -216,27 +241,18 @@ body{overflow-x:hidden;overflow-y:auto}
       <a href="#analytics"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-chart"/></svg><span>Analytics</span></a>
       <a href="#settings" id="navSettings"><svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-set"/></svg><span>Settings</span></a>
     </nav>
-  </div>
-
-  <main class="hero">
-    <h1 class="greet" id="greet"><span id="hiName" class="sr-only">Hi, 👋</span><span class="glitch" id="glitch" aria-hidden="true" data-text=""></span></h1>
-    <div class="greet-dots" id="greetDots" aria-hidden="true"></div>
-    <p class="quote">“Setiap langkah kecil yang kamu lakukan hari ini, <br>adalah bagian dari impian besar yang sedang kamu bangun.”</p>
-    <div class="info">
-      <div class="cell">
-        <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cal"/></svg>
-        <span><b id="masehi">Rabu, 29 Oktober 2025</b><small id="hijriah">4 Jumadil Akhir 1447 H</small></span>
-      </div>
-      <i class="sep"></i>
-      <div class="cell">
-        <svg class="ic" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><use href="#i-clock"/></svg>
-        <span><b id="clock">00:00:00</b><small id="zone">WIB</small></span>
-      </div>
-    </div>
-  </main>
+  </section>
+  <div class="foot-l">Plan <span>·</span> Execute <span>·</span> Achieve</div>
 </div>
 
-<div class="foot-l">Plan <span>·</span> Execute <span>·</span> Achieve</div>
+<!-- Dock gelap (seperti navigasi bawah di desain) -->
+<nav class="dock" aria-label="Pintasan">
+  <a href="#home" class="on" data-home="1" aria-label="Beranda"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 10.5 9-7.5 9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg></a>
+  <a href="#academic" aria-label="Academic"><svg class="ic" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-academic"/></svg></a>
+  <a href="#task" aria-label="Task"><svg class="ic" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-task"/></svg></a>
+  <a href="#calendar" aria-label="Calendar"><svg class="ic" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-cal"/></svg></a>
+  <a href="#finance" aria-label="Finance"><svg class="ic" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><use href="#i-fin"/></svg></a>
+</nav>
 <aside class="panel" id="panel" aria-label="Tampilan">
   <div class="p-head"><b>Tampilan</b><small>Atur kenyamanan tampilan</small></div>
   <div class="p-row"><span><b>Mode hemat</b><small>Kurangi animasi latar agar ringan di perangkat lawas</small></span><button type="button" class="sw" id="liteBtn" role="switch" aria-checked="false" aria-label="Mode hemat"></button></div>
@@ -265,6 +281,7 @@ body{overflow-x:hidden;overflow-y:auto}
     if(d.getDate()!==lastDay){
       lastDay=d.getDate();
       $('zone').textContent=zone(d);
+      try{var hd=$('hiDate');if(hd)hd.textContent=d.toLocaleDateString('id-ID',{weekday:'short',day:'numeric',month:'long'})}catch(e){}
       $('masehi').textContent=d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
       try{
         var p={};
@@ -276,8 +293,17 @@ body{overflow-x:hidden;overflow-y:auto}
   tick();setInterval(tick,1000);
 
   /* ---------- Tampilan: satu suasana, langit bintang ---------- */
-  root.dataset.theme='pagi';root.dataset.wall='candy';
+  root.dataset.theme='pagi';root.dataset.wall='playful';
   ['mo-wall','mo-theme','mo-custom','mo-gn'].forEach(function(k){S.del(k)});
+
+  /* ---------- Dock & tombol kartu ---------- */
+  document.addEventListener('click',function(e){
+    var a=e.target.closest&&e.target.closest('.dock a, .pcard a');if(!a)return;
+    e.preventDefault();
+    var hr=a.getAttribute('href'),M=window.MyOffice;
+    if(a.dataset.home){window.scrollTo({top:0,behavior:'smooth'});return}
+    if(M&&M.routes&&M.routes[hr])M.routes[hr]();
+  });
 
   /* ---------- Panel ---------- */
   var panel=$('panel'),btn=$('themeBtn');
