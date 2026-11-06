@@ -24,6 +24,7 @@ for name, (x0, y0, w, h) in meta.items():
     if name in CLOSE:
         mp = np.pad(m, 40); mp = ndi.binary_closing(mp, structure=E_(CLOSE[name])); m = ndi.binary_fill_holes(mp)[40:-40, 40:-40]
     m = ndi.binary_opening(m, iterations=4 if name == 'set' else 2)
+    if name == 'set': m = ndi.binary_erosion(m, iterations=2)   # buang tepi putih agar gir bersih saat berputar
     if name == 'cal':     # badan putih kalender: cangkang cembung
         l1, k1 = ndi.label(m); big = l1 == 1 + int(np.argmax(ndi.sum(m, l1, range(1, k1 + 1))))
         cs, _ = cv2.findContours(big.astype(np.uint8), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)

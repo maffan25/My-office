@@ -19,6 +19,7 @@ orange = (hh >= 5) & (hh <= 22) & (ss > 110) & (vv > 170)   # hue OpenCV 0-179: 
 blue = (B > R + 60) & (B > 150)
 purple = (B > 190) & (R < 200) & (G < 150) & (B > G + 50)
 # parts: ikon -> [(nama, mask, titik-putar sheet, clear_alpha)]
+_arrow = ndi.binary_dilation(box(80, 655, 268, 790) & purple, iterations=6)   # panah ungu tidak boleh ikut batang
 P = {
  'academic': [('cap', 'hull:214', box(95, 45, 410, 228) & (navy | gold), (255, 205), 0)],
  'work': [('tag', '', box(612, 95, 705, 280) & ((B > R + 10) | (np.min(sheet, 2) > 225)), (655, 105), 0)],
@@ -26,8 +27,8 @@ P = {
  'set': [('gear', '', box(0, 0, SW_, SH_) & ~box(559, 0, SW_, 742), (502, 810), 1)],
  'goal': [('arrow', '', box(1070, 360, 1215, 500) & blue, (1075, 490), 0)],
  'bell': [('badge', '', dist(1138, 745, 40), (1138, 745), 0)],
- 'chart': [('arrow', '', box(80, 655, 268, 790) & purple, (90, 775), 0)] +
-          [('b%d' % i, '', box(a, 700, b, 905), ((a + b) // 2, 898), 1) for i, (a, b) in enumerate([(57, 117), (117, 178), (178, 237), (237, 297)])],
+ 'chart': [('arrow', 'close', box(80, 655, 268, 790) & purple, (90, 775), 1)] +
+          [('b%d' % i, '', box(a, 700, b, 905) & ~_arrow, ((a + b) // 2, 898), 1) for i, (a, b) in enumerate([(57, 117), (117, 178), (178, 237), (237, 297)])],
 }
 CLOCK = (788, 820)
 out = {}
@@ -53,6 +54,11 @@ for name, (x0, y0, w, h) in meta.items():
             m = ndi.binary_closing(ndi.binary_dilation(m, iterations=1), structure=cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11)).astype(bool))
             l2, k = ndi.label(m)
             if k > 1: sz = ndi.sum(m, l2, range(1, k + 1)); m = l2 == 1 + int(np.argmax(sz))
+        if name == 'set' and cls == 'gear':   # buang tepi pucat (sisa latar putih) di pinggiran gir
+            sa = rgb.max(2).astype(int) - rgb.min(2); ring = m & ~ndi.binary_erosion(m, iterations=7)
+            m = m & ~(ring & (sa < 55)); m = ndi.binary_opening(m, iterations=2)
+        if cls == 'gear':
+            gy, gx = np.where(m); org = (gx.mean() + x0, gy.mean() + y0)
         parts.append((cls, m, (org[0] - x0, org[1] - y0), clr))
     if name == 'clock':
         d = dist(*CLOCK, 66)[sl] & (np.max(sheet, 2)[sl] < 120) & ~dist(*CLOCK, 9)[sl]
