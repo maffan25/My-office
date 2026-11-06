@@ -241,6 +241,8 @@
     '<path class="bk-rib" d="M52 86h12v14l-6-4.500-6 4.500z" fill="' + U('red') + '"/>' +
     '<g class="bk-sp"><path d="M88 18l7-6M92 30l8-1" stroke="#ffc42e" stroke-width="3.200" stroke-linecap="round"/></g>';
 
+  if (window.IC3D) Object.keys(window.IC3D).forEach(function (k) { I[k] = window.IC3D[k]; });   /* ikon 3D baru (icons-3d.js) menggantikan SVG lama */
+
   /* ---------- pemasangan ---------- */
   var KEY = {
     'i-academic': 'academic', 'i-work': 'work', 'i-org': 'org', 'i-project': 'project', 'i-task': 'task', 'i-cal': 'cal', 'i-fin': 'fin',
