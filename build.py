@@ -37,4 +37,15 @@ new = ('<link rel="preconnect" href="https://fonts.googleapis.com">\n<link rel="
        f'<noscript><link rel="stylesheet" href="{rest}"></noscript>')
 out = out.replace(fonts.group(0), new)
 open(os.path.join(H, 'index.html'), 'w', encoding='utf-8').write(out)
+# EMBED_ICONS: ikon 3D ditanam sebagai data (WebP) agar tidak bergantung pada folder icons/ atau path relatif
+import base64, io
+from PIL import Image
+def _uri(n):
+    im = Image.open(os.path.join(H, 'icons', n + '.png')).convert('RGBA').resize((144, 144), Image.LANCZOS)
+    b = io.BytesIO(); im.save(b, 'WEBP', quality=88, method=6)
+    return 'data:image/webp;base64,' + base64.b64encode(b.getvalue()).decode()
+for fn in ('index.html', 'app.js'):
+    t = rd(fn)
+    t = re.sub(r'icons/([a-z]+)\.png', lambda m: _uri(m.group(1)), t)
+    open(os.path.join(H, fn), 'w', encoding='utf-8').write(t)
 print('css', len(css), 'js', len(core), 'banks', len(banks))
