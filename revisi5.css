@@ -1,0 +1,107 @@
+/* REVISI 5 — dimuat paling akhir (lihat build.py)
+   1. Document Center › kolom pencarian: teks & ikon presisi, tinggi seragam dengan tab
+   2. Document Center › kotak dokumen (Terbaru / Semua dokumen / hasil cari): gradasi off-white lembut multiwarna
+   3. Dashboard › ikon kalender & jam: besar, tanpa latar, gaya sama dengan ikon menu */
+
+/* ---------- 1. Baris atas: tab + pencarian ---------- */
+html:root:root .rd-skin .rd-top {
+  display: flex; align-items: center; gap: 10px;
+  padding: 6px; border-radius: 18px;
+}
+html:root:root .rd-skin .rd-tabs {
+  display: flex; align-items: center; gap: 4px; flex: none; height: 44px;
+}
+html:root:root .rd-skin .rd-tab {
+  height: 44px; box-sizing: border-box;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 18px; border-radius: 13px;
+  font: 600 13.5px/1 var(--rd-font, inherit); white-space: nowrap;
+}
+
+/* kotak pencarian = satu permukaan; input di dalamnya transparan (tidak ada kotak-dalam) */
+html:root:root .rd-skin .rd-search {
+  position: relative; flex: 1 1 auto; min-width: 0;
+  display: flex; align-items: center; gap: 11px;
+  height: 44px; box-sizing: border-box; padding: 0 18px 0 16px;
+  border-radius: 13px;
+}
+html:root:root .rd-skin .rd-search svg {
+  display: block; flex: none; width: 18px; height: 18px; margin: 0;
+}
+html:root:root:root:root:root:root .rd-skin .rd-search input[data-in="dq"],
+html:root:root:root:root:root:root .rd-skin .rd-search input[data-in="dq"] {
+  flex: 1 1 auto; min-width: 0; width: 100%; height: 100%;
+  margin: 0; padding: 0; border: 0 !important; border-radius: 0 !important;
+  background: transparent !important; box-shadow: none !important; outline: 0 !important;
+  -webkit-appearance: none; appearance: none;
+  font: 500 14px/normal var(--rd-font, inherit); letter-spacing: 0;
+  color: var(--rd-ink, #15403f);
+  text-overflow: ellipsis; text-indent: 0;
+}
+html:root:root:root:root:root:root .rd-skin .rd-search input[data-in="dq"]::placeholder {
+  color: var(--rd-ink2, #5b8782); opacity: .8; font-weight: 400;
+}
+html:root:root:root:root:root:root .rd-skin .rd-search input[data-in="dq"]:focus,
+html:root:root:root:root:root:root .rd-skin .rd-search input[data-in="dq"]:hover {
+  background: transparent !important; box-shadow: none !important; outline: 0 !important;
+}
+
+@media (max-width: 760px) {
+  html:root:root .rd-skin .rd-top { flex-direction: column; align-items: stretch; gap: 6px; }
+  html:root:root .rd-skin .rd-tabs { width: 100%; }
+  html:root:root .rd-skin .rd-tab { flex: 1 1 0; padding: 0 10px; }
+  html:root:root .rd-skin .rd-search { flex: none; width: 100%; }
+}
+
+/* ---------- 2. Kotak dokumen: gradasi lembut off-white ---------- */
+html:root:root:root:root:root .rd-skin .rd-grid .rd-card {
+  --g1: #e3f5ee; --g2: #fdf3e4;     /* mint → krem  */
+  position: relative; overflow: hidden; isolation: isolate;
+  background:
+    radial-gradient(120% 80% at 100% 0%, var(--g2) 0%, transparent 62%),
+    linear-gradient(158deg, #fffefb 0%, #fbfaf6 34%, var(--g1) 100%) !important;
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .85),
+    0 0 0 1px rgba(40, 70, 90, .05),
+    0 18px 34px -24px rgba(40, 70, 90, .38) !important;
+  transition: transform .35s cubic-bezier(.2, .7, .2, 1), box-shadow .35s;
+}
+html:root:root:root:root:root .rd-skin .rd-grid .rd-card:nth-child(6n+2) { --g1: #fbe6d8; --g2: #fdf0f3; }  /* persik → rose   */
+html:root:root:root:root:root .rd-skin .rd-grid .rd-card:nth-child(6n+3) { --g1: #e9e4fb; --g2: #e6f1fc; }  /* lavender → langit */
+html:root:root:root:root:root .rd-skin .rd-grid .rd-card:nth-child(6n+4) { --g1: #dcedfb; --g2: #e4f7ef; }  /* langit → mint   */
+html:root:root:root:root:root .rd-skin .rd-grid .rd-card:nth-child(6n+5) { --g1: #fadfe6; --g2: #fbf1dc; }  /* rose → butter   */
+html:root:root:root:root:root .rd-skin .rd-grid .rd-card:nth-child(6n+6) { --g1: #faf0cc; --g2: #fbe8e0; }  /* butter → persik */
+
+html:root:root:root:root:root .rd-skin .rd-grid .rd-card:hover {
+  transform: translateY(-4px);
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, .9),
+    0 0 0 1px rgba(40, 70, 90, .07),
+    0 26px 40px -24px rgba(40, 70, 90, .46) !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:root:root:root:root:root .rd-skin .rd-grid .rd-card { transition: none; }
+  html:root:root:root:root:root .rd-skin .rd-grid .rd-card:hover { transform: none; }
+}
+
+/* ---------- 3. Dashboard: ikon kalender & jam besar tanpa latar (seperti ikon menu) ---------- */
+html:root:root .info .ic,
+html:root:root .info .cell:nth-of-type(1) .ic,
+html:root:root .info .cell:nth-of-type(2) .ic {
+  flex: none;
+  width: 66px !important; height: 66px !important;
+  padding: 0 !important; border-radius: 0 !important;
+  background: none !important; box-shadow: none !important; border: 0 !important;
+  filter: drop-shadow(0 9px 8px rgba(60, 70, 150, .22));
+  overflow: visible;
+}
+html:root:root .info { min-height: 100px; grid-template-columns: minmax(0, 1.3fr) 1px minmax(0, 1fr) !important; }
+html:root:root .info .cell { gap: 10px; padding: 10px 20px 10px 16px; }
+html:root:root .info b { font-size: 16.5px !important; letter-spacing: -.005em; }
+
+@media (max-width: 640px) {
+  html:root:root .info { grid-template-columns: 1fr !important; }
+  html:root:root .info .ic,
+  html:root:root .info .cell:nth-of-type(1) .ic,
+  html:root:root .info .cell:nth-of-type(2) .ic { display: block !important; width: 60px !important; height: 60px !important; }
+}

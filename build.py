@@ -7,7 +7,7 @@ rd = lambda f: open(os.path.join(S, f), encoding='utf-8').read()
 src = rd('index.src.html')
 css = re.findall(r'<link rel="stylesheet" href="([^"]+\.css)">', src)
 css.append('perf.css')
-css = [f for f in css if f not in ('soft.css','final.css','fresh.css','icons-live.css','icons-3d.css','cal-polish.css','cekricek.css','work-noir.css','beresin.css','redesign.css','revisi.css','tasks.css','revisi2.css','revisi3.css','revisi4.css')] + ['soft.css','final.css','fresh.css','icons-live.css','icons-3d.css','cal-polish.css','cekricek.css','work-noir.css','beresin.css','redesign.css','revisi.css','tasks.css','revisi2.css','revisi3.css','revisi4.css']   # soft lalu final (perbaikan layout & kontras) selalu paling akhir
+css = [f for f in css if f not in ('soft.css','final.css','fresh.css','icons-live.css','icons-3d.css','cal-polish.css','cekricek.css','work-noir.css','beresin.css','redesign.css','revisi.css','tasks.css','revisi2.css','revisi3.css','revisi4.css','revisi5.css')] + ['soft.css','final.css','fresh.css','icons-live.css','icons-3d.css','cal-polish.css','cekricek.css','work-noir.css','beresin.css','redesign.css','revisi.css','tasks.css','revisi2.css','revisi3.css','revisi4.css','revisi5.css']   # soft lalu final (perbaikan layout & kontras) selalu paling akhir
 core = re.findall(r'<script src="([^"]+\.js)"></script>', src)
 banks = [f for f in core if f.startswith('exam-bank')]
 core = [f for f in core if f not in banks and f != 'soft.js'] + ['perf.js', 'soft.js']

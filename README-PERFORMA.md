@@ -32,3 +32,7 @@ bintang pakai sprite 30fps, partikel latar jendela dikurangi di HP, bank soal di
 - Aksi dokumen (Unduh, Ubah sampul, Edit, Hapus) tetap ada di halaman keterangan (ketuk sampul). Tombol Hapus ditambahkan di sana.
 - Hitung-naik lama (premium.js, tasks.js) dinonaktifkan otomatis oleh revisi4.js agar tidak bentrok.
 - app.js/app.css sudah diperbarui langsung (icons/ tidak ada di zip); revisi4 juga terdaftar di index.src.html & build.py.
+
+## Revisi v2.3
+- revisi5.css (paling akhir): kolom pencarian Document Center presisi (tinggi seragam dengan tab, ikon & teks sejajar, tanpa kotak-dalam); kotak dokumen di Terbaru/Semua dokumen/hasil cari bergradasi off-white lembut (mint, persik, lavender, langit, rose, butter); ikon kalender & jam di dashboard besar tanpa latar, bergaya ikon menu.
+- app.css sudah diperbarui langsung (revisi5 ditambahkan di akhir), sama seperti revisi sebelumnya.
