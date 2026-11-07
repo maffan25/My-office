@@ -43,3 +43,9 @@ bintang pakai sprite 30fps, partikel latar jendela dikurangi di HP, bank soal di
 - Angka lonceng = jumlah item di panel (1 pengingat → 1). Dihitung ulang saat data 'mo-*' disimpan, saat tab difokuskan, dan tiap 20 detik.
 - Logo: lambang melayang/miring dengan kilau & percikan; tulisan "Beresin" muncul huruf demi huruf dari kiri (dengan kursor), tahan, lalu menghilang dari kiri, berulang. Tempo diatur lewat `--bs-cycle` (siklus) dan `--bs-step` (jeda antar huruf) di revisi5.css.
 - app.js/app.css diperbarui langsung (icons/ tidak ada di zip).
+
+## Revisi v2.5
+- revisi6.css (paling akhir): tampilan PC (>= 1100px) kini satu skala untuk SEMUA menu. Academic, Work Office, Organization, dan Finance memakai zoom yang sama seperti Analytics/Task/Calendar/Goal (1,3x; 1,5x di layar >= 1700px), jadi tampil besar saat diklik.
+- Bug scroll PC: aturan ukuran jendela di fresh.css/polish.css (`100dvh - 56px !important`) mengalahkan aturan zoom sehingga tinggi jendela = 1,3x tinggi layar dan bagian bawah terpotong (isi tak bisa digulir sampai dasar). Kini lebar/tinggi dihitung dari viewport dibagi faktor zoom (`--pcz`), jadi jendela selalu pas di layar. Atur faktor di bagian atas revisi6.css (`--pcz`, `--pcgap`, `--pcmax`).
+- Academic: kolom menu kiri (menu + kartu "Pusat bantuan") bisa digulir bila layar pendek (>= 1181px). Di bawah itu Academic memakai rel ikon dan seluruh jendela bisa digulir.
+- app.css sudah diperbarui langsung (revisi6 ditambahkan di akhir); revisi6 juga terdaftar di index.src.html & build.py.
