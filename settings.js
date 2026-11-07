@@ -106,4 +106,6 @@
     };
   });
   MO.routes['#settings'] = set.open;
+  /* dipakai modul lain (mis. Task) untuk mengganti foto profil tanpa membuka Pengaturan */
+  MO.setPhoto = function (d) { set.app.D.photo = d; set.app.save(); apply(); };
 })();
