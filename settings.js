@@ -61,7 +61,7 @@
         '<div class="ac-card"><b>Hapus semua data</b><p class="ac-hint" style="margin:4px 0 10px">Menghapus seluruh data Beresin di browser ini, termasuk dokumen. Tidak bisa dibatalkan.</p><button class="ac-btn danger" data-act="wipe">Hapus semua data</button></div>';
     }
     return {
-      specs: {}, tabs: [['prof', 'Profil', vProf], ['stat', 'Status Kegiatan', vStat], ['data', 'Data & Cadangan', vData]],
+      specs: {}, tabs: [['prof', 'Profil', vProf], ['stat', 'Status Kegiatan', vStat], ['sync', 'Sambung Perangkat', function () { return window.BeresinSync ? window.BeresinSync.html() : ''; }], ['data', 'Data & Cadangan', vData]],
       sub: function () { return D.nick ? 'Halo, ' + D.nick : 'Atur profil Anda'; },
       act: function (a, d, t) {
         if (a === 'savenick') { D.nick = t.parentNode.querySelector('input').value.trim().slice(0, 30); app.save(); apply(); }

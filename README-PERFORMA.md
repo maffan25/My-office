@@ -49,3 +49,10 @@ bintang pakai sprite 30fps, partikel latar jendela dikurangi di HP, bank soal di
 - Bug scroll PC: aturan ukuran jendela di fresh.css/polish.css (`100dvh - 56px !important`) mengalahkan aturan zoom sehingga tinggi jendela = 1,3x tinggi layar dan bagian bawah terpotong (isi tak bisa digulir sampai dasar). Kini lebar/tinggi dihitung dari viewport dibagi faktor zoom (`--pcz`), jadi jendela selalu pas di layar. Atur faktor di bagian atas revisi6.css (`--pcz`, `--pcgap`, `--pcmax`).
 - Academic: kolom menu kiri (menu + kartu "Pusat bantuan") bisa digulir bila layar pendek (>= 1181px). Di bawah itu Academic memakai rel ikon dan seluruh jendela bisa digulir.
 - app.css sudah diperbarui langsung (revisi6 ditambahkan di akhir); revisi6 juga terdaftar di index.src.html & build.py.
+
+
+## Revisi v2.6 — Sambung Perangkat
+- Pengaturan → tab **Sambung Perangkat** (sync.js, sync.css, qrlib.js). Perangkat asal: 'Buat kode sambung' → kode teks (BRS1…) + QR animasi. Perangkat tujuan: tempel kode atau 'Pindai QR' → Terapkan.
+- PIN opsional: kode dienkripsi AES-GCM (PBKDF2 150k). Mode 'Gabung' menambah item ber-id baru tanpa menimpa data lokal; 'Timpa semua' mengganti total.
+- Tanpa server. Pemindai QR memakai BarcodeDetector (Chrome/Edge/Android); di iPhone/Safari pakai kode teks. File Document Center (IndexedDB) tidak ikut.
+- app.js/app.css diperbarui langsung; sync juga terdaftar di index.src.html & build.py.
