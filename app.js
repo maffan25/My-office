@@ -2539,7 +2539,7 @@
     Medium: { l: 'Sedang', ico: '🌱', c: 'medium' },
     Low: { l: 'Santai', ico: '☕', c: 'low' }
   };
-  var PCAL = { Urgent: '#ff7a6b', High: '#f0b000', Medium: '#7c6cf0', Low: '#a0673f' };
+  var PCAL = { Urgent: '#ff7a6b', High: '#f0b000', Medium: '#3d9be9', Low: '#a0673f' };
   var KIND = { todo: { l: 'To Do list', ico: '📝' }, event: { l: 'Acara', ico: '📅' }, project: { l: 'Proyek', ico: '🗂️' } };
   var STS = [['To Do', 'Belum'], ['In Progress', 'Sedang'], ['Done', 'Selesai']];
   var STL = { 'To Do': 'Belum dikerjakan', 'In Progress': 'Sedang dikerjakan', Done: 'Selesai' };
@@ -2625,12 +2625,13 @@
         (di ? '<span class="tk3-due" style="--c:' + di.c + '">' + esc(di.text) + '</span>' : '') +
         (subs.length ? '<span class="tk3-kd">' + sd + '/' + subs.length + ' subtugas</span>' : '') +
         (kids.length ? '<span class="tk3-kd">' + kids.filter(function (x) { return nst(x) === 'Done'; }).length + '/' + kids.length + ' tugas</span>' : '') + '</div>';
+      if (done) h += '<button class="tk3-ib tk3-trash" data-act="rmtask" data-id="' + t.id + '" aria-label="Hapus">🗑️</button>';
       if (k === 'project') h += '<div class="tk3-bar"><i style="width:' + Math.round(prog(t)) + '%"></i></div>';
       else if (subs.length) h += '<div class="tk3-bar"><i style="width:' + Math.round(sd / subs.length * 100) + '%"></i></div>';
       return h + '</article>';
     }
     function list(L, msg) { return L.length ? L.map(note).join('') : empty(msg || 'Belum ada di sini.'); }
-    function tile(label, n, cls) { return '<div class="tk3-tile ' + cls + '"><small>' + label + '</small><b>' + n + '</b></div>'; }
+    function tile(label, n, cls) { return '<div class="tk3-tile ' + cls + '"><small>' + label + '</small><b data-cnt="' + n + '" data-lab="' + label + '">' + n + '</b></div>'; }
 
     /* ---------- Hari ini ---------- */
     function home() {
@@ -2705,7 +2706,7 @@
           return '<section class="tk3-grp g-hist"><h4>' + (k === 'Tanpa tanggal' ? k : fd(k)) + ' <span>' + groups[k].length + '</span></h4>' +
             groups[k].map(function (t) {
               var par = t.parentId ? by(D.task, t.parentId) : null;
-              return '<div class="tk3-hist"><input type="checkbox" class="tk3-chk" checked data-act="tgd" data-id="' + t.id + '" aria-label="Kembalikan ke daftar"><div><span class="tk3-htt">' + esc(t.title) + '</span><small>' + KIND[kindOf(t)].l + (par ? ' · dari ' + esc(par.title) : '') + ' · ketuk kotak untuk mengembalikan</small></div></div>';
+              return '<div class="tk3-hist"><input type="checkbox" class="tk3-chk" checked data-act="tgd" data-id="' + t.id + '" aria-label="Kembalikan ke daftar"><div><span class="tk3-htt">' + esc(t.title) + '</span><small>' + KIND[kindOf(t)].l + (par ? ' · dari ' + esc(par.title) : '') + ' · ketuk kotak untuk mengembalikan</small></div><button class="tk3-ib tk3-trash" data-act="rmtask" data-id="' + t.id + '" aria-label="Hapus">🗑️</button></div>';
             }).join('') + '</section>';
         }).join('') : empty('Belum ada yang selesai. Tugas yang selesai akan muncul di sini.'));
     }
@@ -2755,7 +2756,7 @@
         '<div class="tk3-row2"><label>Tenggat<input type="date" value="' + esc(p.due) + '" data-chg="tdue" data-id="' + p.id + '"></label></div>' +
         '<p class="tk3-lbl">Tugas di dalam proyek</p>' +
         (kids.length ? kids.map(function (c) {
-          return '<div class="tk3-kid' + (nst(c) === 'Done' ? ' is-done' : '') + '"><div class="tk3-kidt"><span>' + esc(c.title) + '</span><button class="tk3-ib" data-act="rmtask" data-id="' + c.id + '" aria-label="Hapus">×</button></div>' + statSeg(c) + '</div>';
+          return '<div class="tk3-kid' + (nst(c) === 'Done' ? ' is-done' : '') + '"><div class="tk3-kidt"><span>' + esc(c.title) + '</span><button class="tk3-ib tk3-trash" data-act="rmtask" data-id="' + c.id + '" aria-label="Hapus">' + (nst(c) === 'Done' ? '🗑️' : '×') + '</button></div>' + statSeg(c) + '</div>';
         }).join('') : '<p class="tk3-none">Belum ada tugas. Tambahkan di bawah.</p>') +
         addForm('padd', 'padd', p.id, 'Tambah tugas ke proyek, lalu Enter') +
         '<button class="tk3-danger" data-act="rmtask" data-id="' + p.id + '">Hapus proyek</button></div>';
@@ -2872,6 +2873,24 @@
       act: function (a, d, t) { actImpl(a, d, t); pendingFocus(); }
     };
   });
+
+  /* angka menghitung dari 0 saat pertama kali terlihat */
+  var seenCnt = {};
+  function countUp(el) {
+    var to = +el.getAttribute('data-cnt'), key = el.getAttribute('data-lab') || ('' + to);
+    if (!isFinite(to) || seenCnt[key] !== undefined) return;
+    seenCnt[key] = to;
+    var suf = el.getAttribute('data-suf') || '', t0 = null;
+    el.textContent = '0' + suf;
+    var step = function (ts) {
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / 900), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = Math.round(to * e) + suf;
+      if (k < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  }
+  if (window.MutationObserver) new MutationObserver(function () { document.querySelectorAll('b[data-cnt]').forEach(countUp); }).observe(document.body, { childList: true, subtree: true });
 
   MO.routes['#task'] = tasks.open;
 })();
