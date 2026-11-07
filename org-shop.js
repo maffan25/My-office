@@ -17,9 +17,10 @@
   var ov, frame, isOpen = false, drag = null, dragged = false;
 
   function oc(o, i) { return o.color || PALETTE[(i == null ? D.org.indexOf(o) : i) % PALETTE.length]; }
-  /* warna kartu = warna dominan logo organisasi (dihitung sekali dari gambar, lalu di-cache) */
-  var BR = {};
+  /* warna kartu = warna dominan logo; warna tepi = warna latar logo (agar kotak gambar menyatu dengan hero) */
+  var BR = {}, ED = {};
   function brandKey(src) { return src.length + '|' + src.slice(-80); }
+  function hex(r, g, b) { return '#' + [r, g, b].map(function (v) { return Math.round(v).toString(16).padStart(2, '0'); }).join(''); }
   function domColor(src, done) {
     var im = new Image();
     im.onload = function () {
@@ -27,27 +28,30 @@
         var W = 48, H = Math.max(1, Math.round(W * im.naturalHeight / im.naturalWidth)), cv = document.createElement('canvas');
         cv.width = W; cv.height = H; var cx = cv.getContext('2d', { willReadFrequently: true });
         cx.drawImage(im, 0, 0, W, H);
-        var px = cx.getImageData(0, 0, W, H).data, bins = {};
+        var px = cx.getImageData(0, 0, W, H).data, bins = {}, er = 0, eg = 0, eb = 0, en = 0;
         for (var p = 0; p < px.length; p += 4) {
+          var idx = p / 4, x = idx % W, y = Math.floor(idx / W);
           if (px[p + 3] < 200) continue;
           var r = px[p], g = px[p + 1], b = px[p + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+          if (x === 0 || y === 0 || x === W - 1 || y === H - 1) { er += r; eg += g; eb += b; en++; }
           if (mx < 50 || (mx - mn) / mx < 0.28) continue; /* abaikan putih, abu-abu, dan hitam */
-          var key = (r >> 5) + ',' + (g >> 5) + ',' + (b >> 5), e = bins[key] || (bins[key] = { n: 0, r: 0, g: 0, b: 0 });
-          e.n++; e.r += r; e.g += g; e.b += b;
+          var key = (r >> 5) + ',' + (g >> 5) + ',' + (b >> 5), q = bins[key] || (bins[key] = { n: 0, r: 0, g: 0, b: 0 });
+          q.n++; q.r += r; q.g += g; q.b += b;
         }
         var best = null; for (var k in bins) if (!best || bins[k].n > best.n) best = bins[k];
-        done(best ? '#' + [best.r, best.g, best.b].map(function (v) { return Math.round(v / best.n).toString(16).padStart(2, '0'); }).join('') : '');
-      } catch (err) { done(''); }
+        done(best ? hex(best.r / best.n, best.g / best.n, best.b / best.n) : '', en ? hex(er / en, eg / en, eb / en) : '');
+      } catch (err) { done('', ''); }
     };
-    im.onerror = function () { done(''); };
+    im.onerror = function () { done('', ''); };
     im.src = src;
   }
   function brandOf(o, i, cb) {
     if (!o.img) return oc(o, i);
     var k = brandKey(o.img);
-    if (BR[k] === undefined) { BR[k] = ''; domColor(o.img, function (c) { BR[k] = c; if (cb) cb(c); else if (isOpen) render(); }); }
+    if (BR[k] === undefined) { BR[k] = ''; domColor(o.img, function (c, edge) { BR[k] = c; ED[k] = edge; if (cb) cb(c); else if (isOpen) render(); }); }
     return BR[k] || oc(o, i);
   }
+  function edgeOf(o, i) { var c = brandOf(o, i); return (o.img && ED[brandKey(o.img)]) || c; }
   function lum(h) { h = (h || '#888').replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); return (0.299 * parseInt(h.substr(0, 2), 16) + 0.587 * parseInt(h.substr(2, 2), 16) + 0.114 * parseInt(h.substr(4, 2), 16)) / 255; }
   function ink(h) { return lum(h) > 0.7 ? '#1a1405' : '#fff'; }
   function on(id) { var o = by(D.org, id); return o ? o.name : '—'; }
@@ -125,8 +129,8 @@
       return '<button class="es-card' + (k === i ? ' sel' : '') + '" data-a="pick" data-i="' + k + '" style="--c:' + c + ';--ci:' + ink(c) + '" aria-pressed="' + (k === i) + '"><span class="es-thumb">' + art(x, D.org.indexOf(x)) + '</span><span class="es-cap">' + esc(x.name) + '</span>' + (isNew ? '<em>BARU</em>' : '') + '</button>';
     }).join('') + '<button class="es-card add" data-a="oadd"><span class="es-thumb"><i>+</i></span><span class="es-cap">Tambah organisasi</span></button></div>';
     if (!o) return '<div class="es-hero empty"><div class="es-txt"><h1>' + (D.org.length ? 'Tidak ada hasil' : 'Belum ada organisasi') + '</h1><p class="es-desc">' + (D.org.length ? 'Coba kata kunci lain.' : 'Tambahkan organisasi pertama kamu untuk mulai mencatat rapat, anggaran, dan dokumen.') + '</p></div></div>' + grid;
-    var c = brandOf(o, D.org.indexOf(o)), b = bsum(o.id);
-    return '<div class="es-hero" style="--c:' + c + ';--ci:' + ink(c) + '"><div class="es-art">' + art(o, D.org.indexOf(o)) + '</div>' +
+    var c = brandOf(o, D.org.indexOf(o)), b = bsum(o.id), ed = edgeOf(o, D.org.indexOf(o));
+    return '<div class="es-hero" style="--c:' + c + ';--ci:' + ink(c) + ';--edge:' + ed + '"><div class="es-art">' + art(o, D.org.indexOf(o)) + '</div>' +
       '<div class="es-txt"><h1>' + esc(o.name) + '</h1>' +
       '<div class="es-meta">' + I.cal + '<span>' + esc(o.period ? 'Periode ' + o.period : 'Periode belum diisi') + '</span></div>' +
       '<div class="es-meta">' + I.role + '<span>' + esc(o.role ? 'Jabatan: ' + o.role : 'Jabatan belum diisi') + '</span></div>' +
