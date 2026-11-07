@@ -74,7 +74,7 @@
       return out;
     }
     var evAll = function () { return D.ev.concat(AXE); };
-    var eact = function (e) { return e.ax ? 'data-act="goacad" data-t="' + e.ax + '"' : '' + eact(e) + ''; };
+    var eact = function (e) { return e.ax ? 'data-act="goacad" data-t="' + e.ax + '"' : 'data-act="edit" data-e="ev" data-id="' + esc(e.id) + '"'; };
     var kindOf = function (e) {
       if (e.kind === 'biasa') return '';
       if (KD[e.kind]) return e.kind;

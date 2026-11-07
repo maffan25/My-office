@@ -2230,6 +2230,37 @@
   var ov, frame, isOpen = false, drag = null, dragged = false;
 
   function oc(o, i) { return o.color || PALETTE[(i == null ? D.org.indexOf(o) : i) % PALETTE.length]; }
+  /* warna kartu = warna dominan logo organisasi (dihitung sekali dari gambar, lalu di-cache) */
+  var BR = {};
+  function brandKey(src) { return src.length + '|' + src.slice(-80); }
+  function domColor(src, done) {
+    var im = new Image();
+    im.onload = function () {
+      try {
+        var W = 48, H = Math.max(1, Math.round(W * im.naturalHeight / im.naturalWidth)), cv = document.createElement('canvas');
+        cv.width = W; cv.height = H; var cx = cv.getContext('2d', { willReadFrequently: true });
+        cx.drawImage(im, 0, 0, W, H);
+        var px = cx.getImageData(0, 0, W, H).data, bins = {};
+        for (var p = 0; p < px.length; p += 4) {
+          if (px[p + 3] < 200) continue;
+          var r = px[p], g = px[p + 1], b = px[p + 2], mx = Math.max(r, g, b), mn = Math.min(r, g, b);
+          if (mx < 50 || (mx - mn) / mx < 0.28) continue; /* abaikan putih, abu-abu, dan hitam */
+          var key = (r >> 5) + ',' + (g >> 5) + ',' + (b >> 5), e = bins[key] || (bins[key] = { n: 0, r: 0, g: 0, b: 0 });
+          e.n++; e.r += r; e.g += g; e.b += b;
+        }
+        var best = null; for (var k in bins) if (!best || bins[k].n > best.n) best = bins[k];
+        done(best ? '#' + [best.r, best.g, best.b].map(function (v) { return Math.round(v / best.n).toString(16).padStart(2, '0'); }).join('') : '');
+      } catch (err) { done(''); }
+    };
+    im.onerror = function () { done(''); };
+    im.src = src;
+  }
+  function brandOf(o, i, cb) {
+    if (!o.img) return oc(o, i);
+    var k = brandKey(o.img);
+    if (BR[k] === undefined) { BR[k] = ''; domColor(o.img, function (c) { BR[k] = c; if (cb) cb(c); else if (isOpen) render(); }); }
+    return BR[k] || oc(o, i);
+  }
   function lum(h) { h = (h || '#888').replace('#', ''); if (h.length === 3) h = h.replace(/./g, '$&$&'); return (0.299 * parseInt(h.substr(0, 2), 16) + 0.587 * parseInt(h.substr(2, 2), 16) + 0.114 * parseInt(h.substr(4, 2), 16)) / 255; }
   function ink(h) { return lum(h) > 0.7 ? '#1a1405' : '#fff'; }
   function on(id) { var o = by(D.org, id); return o ? o.name : '—'; }
@@ -2303,12 +2334,12 @@
   function orgsHTML() {
     var L = filtered(), i = Math.min(S.idx, Math.max(0, L.length - 1)), o = L[i];
     var grid = '<div class="es-grid">' + L.map(function (x, k) {
-      var c = oc(x), isNew = x === D.org[D.org.length - 1] && D.org.length > 1;
-      return '<button class="es-card' + (k === i ? ' sel' : '') + '" data-a="pick" data-i="' + k + '" style="--c:' + c + '" aria-pressed="' + (k === i) + '"><span class="es-thumb">' + art(x, D.org.indexOf(x)) + '</span><span class="es-cap">' + esc(x.name) + '</span>' + (isNew ? '<em>BARU</em>' : '') + '</button>';
+      var c = brandOf(x, D.org.indexOf(x)), isNew = x === D.org[D.org.length - 1] && D.org.length > 1;
+      return '<button class="es-card' + (k === i ? ' sel' : '') + '" data-a="pick" data-i="' + k + '" style="--c:' + c + ';--ci:' + ink(c) + '" aria-pressed="' + (k === i) + '"><span class="es-thumb">' + art(x, D.org.indexOf(x)) + '</span><span class="es-cap">' + esc(x.name) + '</span>' + (isNew ? '<em>BARU</em>' : '') + '</button>';
     }).join('') + '<button class="es-card add" data-a="oadd"><span class="es-thumb"><i>+</i></span><span class="es-cap">Tambah organisasi</span></button></div>';
     if (!o) return '<div class="es-hero empty"><div class="es-txt"><h1>' + (D.org.length ? 'Tidak ada hasil' : 'Belum ada organisasi') + '</h1><p class="es-desc">' + (D.org.length ? 'Coba kata kunci lain.' : 'Tambahkan organisasi pertama kamu untuk mulai mencatat rapat, anggaran, dan dokumen.') + '</p></div></div>' + grid;
-    var c = oc(o), b = bsum(o.id);
-    return '<div class="es-hero" style="--c:' + c + '"><div class="es-art">' + art(o, D.org.indexOf(o)) + '</div>' +
+    var c = brandOf(o, D.org.indexOf(o)), b = bsum(o.id);
+    return '<div class="es-hero" style="--c:' + c + ';--ci:' + ink(c) + '"><div class="es-art">' + art(o, D.org.indexOf(o)) + '</div>' +
       '<div class="es-txt"><h1>' + esc(o.name) + '</h1>' +
       '<div class="es-meta">' + I.cal + '<span>' + esc(o.period ? 'Periode ' + o.period : 'Periode belum diisi') + '</span></div>' +
       '<div class="es-meta">' + I.role + '<span>' + esc(o.role ? 'Jabatan: ' + o.role : 'Jabatan belum diisi') + '</span></div>' +
@@ -2390,24 +2421,37 @@
       '<label class="full"><span>Nama organisasi *</span><input name="name" type="text" value="' + esc(ed ? ed.name : '') + '" required maxlength="80"></label>' +
       '<label><span>Periode kepengurusan</span><input name="period" type="text" placeholder="2025–2026" value="' + esc(ed ? ed.period || '' : '') + '"></label>' +
       '<label><span>Jabatan saya</span><input name="role" type="text" value="' + esc(ed ? ed.role || '' : '') + '"></label>' +
-      '<div class="full"><span class="lb">Warna latar kartu</span><div class="es-sw">' + PALETTE.map(function (c) { return '<button type="button" data-c="' + c + '" style="background:' + c + '" aria-label="Warna ' + c + '"></button>'; }).join('') + '<label class="es-cp" title="Warna sendiri"><input type="color" name="color" value="' + m.color + '"></label></div></div>' +
-      '<div class="full"><span class="lb">Gambar kartu</span><div class="es-upl"><label class="es-ghost">Pilih gambar…<input type="file" accept="image/*" hidden name="file"></label><button type="button" class="es-ghost" data-noimg>Hapus gambar</button></div><small class="es-hint">Gambar lebar (landscape) paling pas. Otomatis dikecilkan agar hemat penyimpanan.</small></div>' +
+      '<div class="full"><span class="lb">Warna cadangan (dipakai jika tanpa gambar)</span><div class="es-sw">' + PALETTE.map(function (c) { return '<button type="button" data-c="' + c + '" style="background:' + c + '" aria-label="Warna ' + c + '"></button>'; }).join('') + '<label class="es-cp" title="Warna sendiri"><input type="color" name="color" value="' + m.color + '"></label></div></div>' +
+      '<div class="full"><span class="lb">Gambar kartu</span><div class="es-upl"><label class="es-ghost">Pilih gambar…<input type="file" accept="image/*" hidden name="file"></label><button type="button" class="es-ghost" data-noimg>Hapus gambar</button></div><small class="es-hint">Ukuran ideal 1280 × 720 px (rasio 16:9, landscape). Warna kartu otomatis diambil dari logo.</small><small class=\"es-hint\" data-fit></small></div>' +
       '</div></div><footer><button type="button" class="es-ghost" data-x>Batal</button>' + (ed ? '' : '<button type="button" class="es-ghost" data-more>Simpan & isi detail</button>') + '<button class="es-buy sm">Simpan</button></footer></form>';
     document.body.appendChild(w);
     var f = w.querySelector('form'), more = false;
     function sync() {
-      var pv = w.querySelector('[data-pv]'); pv.style.setProperty('--c', m.color);
+      var pv = w.querySelector('[data-pv]');
+      var paintPv = function (c) { pv.style.setProperty('--c', c); pv.style.setProperty('--ci', ink(c)); };
+      paintPv(m.img ? brandOf({ img: m.img }, idx, function (c) { paintPv(c || m.color); }) : m.color);
       pv.innerHTML = '<span class="es-thumb">' + (m.img ? fit(m.img) : scene(idx)) + '</span><span class="es-cap">' + esc(f.elements.name.value || 'Nama organisasi') + '</span>';
       [].forEach.call(w.querySelectorAll('.es-sw button'), function (b) { b.classList.toggle('on', b.dataset.c === m.color); });
     }
     sync();
     f.addEventListener('input', function (e) { if (e.target.name === 'color') m.color = e.target.value; sync(); });
-    f.addEventListener('change', function (e) { if (e.target.name === 'file' && e.target.files[0]) shrink(e.target.files[0], function (d) { m.img = d; sync(); }); });
+    function fitHint(src) {
+      var h = w.querySelector('[data-fit]'); if (!h) return;
+      if (!src) { h.textContent = ''; h.className = 'es-hint'; return; }
+      var im = new Image();
+      im.onload = function () {
+        var r = im.width / im.height, ok = Math.abs(r - 16 / 9) < 0.04;
+        h.textContent = ok ? 'Rasio pas (16:9). Kartu tampil utuh tanpa terpotong.' : 'Rasio gambar ' + (Math.round(r * 100) / 100) + ':1, sebagian sisi akan terpotong. Pakai 1280 × 720 px agar pas.';
+        h.className = 'es-hint ' + (ok ? 'ok' : 'warn');
+      };
+      im.src = src;
+    }
+    f.addEventListener('change', function (e) { if (e.target.name === 'file' && e.target.files[0]) shrink(e.target.files[0], function (d) { m.img = d; sync(); fitHint(d); }); });
     w.addEventListener('click', function (e) {
       var t = e.target;
       if (t.hasAttribute('data-x')) w.remove();
       if (t.dataset.c) { m.color = t.dataset.c; f.elements.color.value = m.color; sync(); }
-      if (t.hasAttribute('data-noimg')) { m.img = ''; f.elements.file.value = ''; sync(); }
+      if (t.hasAttribute('data-noimg')) { m.img = ''; f.elements.file.value = ''; sync(); fitHint(''); }
       if (t.hasAttribute('data-more')) { more = true; f.requestSubmit ? f.requestSubmit() : f.dispatchEvent(new Event('submit', { cancelable: true })); }
     });
     w.addEventListener('mousedown', function (e) { if (e.target === w) w.remove(); });
@@ -2426,7 +2470,7 @@
     r.onload = function () {
       var im = new Image();
       im.onload = function () {
-        var M = 900, k = Math.min(1, M / Math.max(im.width, im.height)), cv = document.createElement('canvas'); cv.width = Math.round(im.width * k); cv.height = Math.round(im.height * k);
+        var M = 1280, k = Math.min(1, M / Math.max(im.width, im.height)), cv = document.createElement('canvas'); cv.width = Math.round(im.width * k); cv.height = Math.round(im.height * k);
         cv.getContext('2d').drawImage(im, 0, 0, cv.width, cv.height);
         var d = cv.toDataURL('image/webp', 0.82); if (d.indexOf('data:image/webp') !== 0) d = cv.toDataURL('image/jpeg', 0.82);
         cb(d);
@@ -2723,7 +2767,7 @@
       return out;
     }
     var evAll = function () { return D.ev.concat(AXE); };
-    var eact = function (e) { return e.ax ? 'data-act="goacad" data-t="' + e.ax + '"' : '' + eact(e) + ''; };
+    var eact = function (e) { return e.ax ? 'data-act="goacad" data-t="' + e.ax + '"' : 'data-act="edit" data-e="ev" data-id="' + esc(e.id) + '"'; };
     var kindOf = function (e) {
       if (e.kind === 'biasa') return '';
       if (KD[e.kind]) return e.kind;
