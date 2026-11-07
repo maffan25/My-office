@@ -356,7 +356,7 @@
   var seenCnt = {};
   function countUp(el) {
     var to = +el.getAttribute('data-cnt'), key = el.getAttribute('data-lab') || ('' + to);
-    if (!isFinite(to) || seenCnt[key] !== undefined) return;
+    if (!isFinite(to) || seenCnt[key] !== undefined || window.MOCountUp) return;
     seenCnt[key] = to;
     var suf = el.getAttribute('data-suf') || '', t0 = null;
     el.textContent = '0' + suf;

@@ -134,7 +134,7 @@
 
   /* ---------- Hitung-naik angka statistik ---------- */
   function countUp(root) {
-    if (reduce) return;
+    if (reduce || window.MOCountUp) return;
     Array.prototype.forEach.call(root.querySelectorAll('.ac-stat b'), function (b) {
       if (b.children.length) return;
       var t = b.textContent.trim(), rp = /^(Rp\s?)(-?[\d.]+)$/.exec(t), pl = /^(-?\d+(?:\.(\d+))?)(%?)$/.exec(t), to, fmt;

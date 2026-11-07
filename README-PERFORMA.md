@@ -26,3 +26,9 @@ bintang pakai sprite 30fps, partikel latar jendela dikurangi di HP, bank soal di
 - revisi3.css (paling akhir): kotak tambah organisasi presisi, tab Task rata tengah, centang tunggal, pensil Finance, teks Goal, kartu Document Center, tampilan PC lebih besar.
 - documents.js: sampul kustom (dokumen & rak), rating, halaman keterangan, pembaca dalam aplikasi (pdf.js di folder pdfjs/, perlu dibuka lewat http/Vercel; dari file:// memakai penampil bawaan).
 - Catatan: folder icons/ tidak ada di zip, jadi app.js/app.css diperbarui langsung (bukan lewat build.py). Jika icons/ dikembalikan, build.py tetap bisa dipakai.
+
+## Revisi v2.2
+- revisi4.js + revisi4.css (paling akhir): efek angka menghitung naik di semua modul (beranda, Academic, Task, Finance, Work, Organization, Goal, Analytics); pensil Katalog Finance tidak menembus bar menu; label prioritas terpilih berwarna pastel + centang (tidak gelap); alat di rak Document Center disembunyikan; judul dokumen kini di bawah sampul.
+- Aksi dokumen (Unduh, Ubah sampul, Edit, Hapus) tetap ada di halaman keterangan (ketuk sampul). Tombol Hapus ditambahkan di sana.
+- Hitung-naik lama (premium.js, tasks.js) dinonaktifkan otomatis oleh revisi4.js agar tidak bentrok.
+- app.js/app.css sudah diperbarui langsung (icons/ tidak ada di zip); revisi4 juga terdaftar di index.src.html & build.py.

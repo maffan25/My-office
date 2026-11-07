@@ -2878,7 +2878,7 @@
   var seenCnt = {};
   function countUp(el) {
     var to = +el.getAttribute('data-cnt'), key = el.getAttribute('data-lab') || ('' + to);
-    if (!isFinite(to) || seenCnt[key] !== undefined) return;
+    if (!isFinite(to) || seenCnt[key] !== undefined || window.MOCountUp) return;
     seenCnt[key] = to;
     var suf = el.getAttribute('data-suf') || '', t0 = null;
     el.textContent = '0' + suf;
@@ -3285,7 +3285,7 @@
     let bL = 0, bS = 0; expCats().forEach(c => { const b = budFor(c.id, m); if (b) { bL += +b.limit || 0; bS += eb[c.id] || 0; } });
     const gs = D.goal.filter(g => g.status === 'Aktif'), g0 = gs[0];
     const recent = D.tx.slice().sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
-    return mon() + `<div class="fn-hm"><div class="fn-hm-a"><section class="fn-ban"><div><h1>Catat.<br>Hemat.<br>Tenang.</h1><p>Saldo <b>${rp(total)}</b><br>Keluar bulan ini ${rp(exp)} · masuk ${rp(inc)}</p><button class="fn-btn w" data-a="tab" data-t="menu">Catat pengeluaran</button></div>${ART}</section>
+    return mon() + `<div class="fn-hm"><div class="fn-hm-a"><section class="fn-ban"><div><h1>Catat.<br>Hemat.<br>Tenang.</h1><p>Saldo <b>${rp(total)}</b><br>Keluar bulan ini <span class="cu">${rp(exp)}</span> · masuk <span class="cu">${rp(inc)}</span></p><button class="fn-btn w" data-a="tab" data-t="menu">Catat pengeluaran</button></div>${ART}</section>
     <div class="fn-cats" role="list">${expCats().map(c => `<button role="listitem" data-a="pick" data-id="${c.id}"><i>${cic(c)}</i><span>${esc(c.name)}</span><small>${eb[c.id] ? rp(eb[c.id]).replace('Rp ', '') : '–'}</small></button>`).join('')}</div>
     <div class="fn-sec"><h3>Pengeluaran per label</h3><button class="fn-lnk" data-a="tab" data-t="menu">Katalog →</button></div>
     ${tk.length ? '<div class="fn-lst">' + tk.map(k => { const t = tg(k); return `<div class="fn-bud"><i class="fn-ico">${t ? tgi(t) : '🏷️'}</i><div><b>${t ? esc(t.name) : 'Tanpa label'}</b><small>${rp(tb[k])} dari ${rp(tsum)}</small>${meter(pc(tb[k], tsum))}</div><em>${Math.round(pc(tb[k], tsum))}%</em></div>`; }).join('') + '</div>' : empty('Pilih kategori di atas, lalu isi nama item, harga, jumlah & label sesukamu. Ringkasan per label muncul di sini.')}
@@ -4117,7 +4117,7 @@
       var b = function (a, ico, lb, cls, e) { return '<button class="' + (cls || '') + '" data-act="' + a + '"' + (e ? ' data-e="' + e + '"' : '') + ' data-id="' + f.id + '" aria-label="' + lb + ' ' + esc(f.name) + '" title="' + lb + '">' + ic(ico, 2) + '</button>'; };
       return '<div class="rd-tools">' + b('dl', 'dl', 'Unduh') + b('cvr', 'img', 'Ubah sampul') + b('edit', 'edit', 'Edit', '', 'file') + b('delfile', 'del', 'Hapus', 'danger') + '</div>';
     }
-    var book = function (f, i) { return '<div class="rd-book" style="--i:' + Math.min(i, 14) + '">' + cover(f) + tools(f) + '</div>'; };
+    var book = function (f, i) { return '<div class="rd-book" style="--i:' + Math.min(i, 14) + '">' + cover(f) + tools(f) + '<span class="rd-bt" title="' + esc(f.name) + '">' + esc(baseName(f)) + '</span></div>'; };
     var ghost = function (label) { return '<label class="rd-book rd-ghost" data-pick tabindex="0" role="button" title="Unggah dokumen ke rak ini"><span class="rd-plus">' + ic('plus', 1.6) + '</span><em>' + label + '</em><input type="file" multiple hidden data-chg="upload"></label>'; };
     var row = function (inner) { return '<div class="rd-shelf"><div class="rd-shelf-in">' + inner + '<i class="rd-ledge"></i></div></div>'; };
     function chunk(a, n) { var o = [], i; for (i = 0; i < a.length; i += n) o.push(a.slice(i, i + n)); return o; }
@@ -4260,7 +4260,7 @@
         (f.notes ? '<p class="rd-det-notes">' + esc(f.notes) + '</p>' : '') +
         '<div class="rd-det-acts"><button class="rd-btn pri" data-do="read"' + (readable(f) ? '' : ' disabled title="Jenis berkas ini tidak bisa dibaca di browser, silakan unduh"') + '>' + ic('book', 1.8) + 'Baca</button><button class="rd-btn" data-do="dl">' + ic('dl', 1.8) + 'Unduh</button></div>' +
         (readable(f) ? '' : '<p class="rd-det-hint">Jenis berkas ini belum bisa dibaca langsung di browser. Unduh untuk membukanya dengan aplikasi yang sesuai.</p>') +
-        '<div class="rd-det-more"><button data-do="cover">' + ic('img', 1.8) + 'Ubah sampul</button>' + (f.cover ? '<button data-do="nocover">' + ic('x', 1.8) + 'Hapus sampul</button>' : '') + '<button data-do="edit">' + ic('edit', 1.8) + 'Edit keterangan</button></div></div></div>');
+        '<div class="rd-det-more"><button data-do="cover">' + ic('img', 1.8) + 'Ubah sampul</button>' + (f.cover ? '<button data-do="nocover">' + ic('x', 1.8) + 'Hapus sampul</button>' : '') + '<button data-do="edit">' + ic('edit', 1.8) + 'Edit keterangan</button><button data-do="del" class="danger">' + ic('del', 1.8) + 'Hapus</button></div></div></div>');
       document.body.appendChild(ov);
       var rate = ov.querySelector('.rd-rate');
       function drawRate() {
@@ -4285,6 +4285,7 @@
         if (d === 'dl') withBlob(f.id, download);
         if (d === 'cover') pickCover(f, function () { off(); detail(by(D.file, f.id) || f); });
         if (d === 'nocover') { clearCover(f); off(); detail(f); }
+        if (d === 'del') { off(); var db = document.querySelector('.rd-skin [data-act="delfile"][data-id="' + f.id + '"]'); if (db) db.click(); }
         if (d === 'edit') { off(); var eb = document.querySelector('.rd-skin [data-act="edit"][data-e="file"][data-id="' + f.id + '"]'); if (eb) eb.click(); }
       });
       var first = ov.querySelector('[data-do="read"]:not([disabled])') || ov.querySelector('[data-do="dl"]'); if (first) first.focus();
@@ -4964,7 +4965,7 @@
 
   /* ---------- Hitung-naik angka statistik ---------- */
   function countUp(root) {
-    if (reduce) return;
+    if (reduce || window.MOCountUp) return;
     Array.prototype.forEach.call(root.querySelectorAll('.ac-stat b'), function (b) {
       if (b.children.length) return;
       var t = b.textContent.trim(), rp = /^(Rp\s?)(-?[\d.]+)$/.exec(t), pl = /^(-?\d+(?:\.(\d+))?)(%?)$/.exec(t), to, fmt;
@@ -5998,5 +5999,114 @@ window.IC3D={"academic":"<ellipse class=\"sh\" cx=\"50\" cy=\"91.6\" rx=\"35.0\"
   setInterval(function () { if (!document.hidden) render(); }, 2500);
   document.addEventListener('visibilitychange', function () { if (!document.hidden) render(); });
   render(true);
+})();
+;
+/* REVISI 4 — efek angka menghitung naik (count up) untuk seluruh modul.
+   Angka statistik dihitung dari 0 (atau dari nilai sebelumnya) ke nilai akhir, tiap kali muncul / berubah. */
+(function () {
+  'use strict';
+  if (window.MOCountUp) return;
+  window.MOCountUp = true;
+
+  var SEL = [
+    '.tchip b',                                   /* Beranda: Tugas aktif, Agenda, Goal */
+    '.ac-stat b', '.dv-stats b',                  /* Academic, Project */
+    '.tk3-tile b',                                /* Task */
+    '.fn-sum b', '.an-k b',                       /* Finance, Analisis keuangan */
+    '.wo-stat b',                                 /* Work */
+    '.es-stats b',                                /* Organization */
+    '.gq-pop b', '.gq-lvl b',                     /* Goal */
+    '.fn-ban p b', '.cu', '.fn-cats small', '.fn-bud em', '.fn-rc strong',   /* Finance: banner, kategori, persen label, resi */
+    '.bn-big'                                     /* Analytics */
+  ].join(',');
+
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var DUR = 1300;
+  /* teks harus berbentuk: [tanda][Rp ]angka[%|XP|jam|…][ / angka] — selain itu (tanggal, jam, dll) dilewati */
+  var RE = /^([−\-+]?[\s ]?(?:Rp\.?[\s ]?)?)(\d[\d.,]*)((?:[\s ]?(?:%|XP|jam|menit|hari|x))?(?:[\s ]?\/[\s ]?\d[\d.,]*)?)$/;
+  var recent = {};                                /* kunci -> {t, val, at}: cegah animasi ulang saat render ulang cepat */
+
+  function parse(txt) {
+    var m = RE.exec(txt); if (!m) return null;
+    var raw = m[2], v, fmt;
+    if (/^\d{1,3}(\.\d{3})+(,\d+)?$/.test(raw)) {            /* 1.234.567 (format Indonesia) */
+      var dc = (raw.split(',')[1] || '').length;
+      v = parseFloat(raw.replace(/\./g, '').replace(',', '.'));
+      fmt = function (x) { return x.toLocaleString('id-ID', { minimumFractionDigits: dc, maximumFractionDigits: dc }); };
+    } else if (/^\d+,\d+$/.test(raw)) {                      /* 3,5 */
+      var dd = raw.split(',')[1].length; v = parseFloat(raw.replace(',', '.'));
+      fmt = function (x) { return x.toFixed(dd).replace('.', ','); };
+    } else if (/^\d+\.\d+$/.test(raw)) {                     /* 12.5 */
+      var de = raw.split('.')[1].length; v = parseFloat(raw);
+      fmt = function (x) { return x.toFixed(de); };
+    } else if (/^\d+$/.test(raw)) {                          /* 12 */
+      v = parseInt(raw, 10); fmt = function (x) { return String(Math.round(x)); };
+    } else return null;
+    if (!isFinite(v)) return null;
+    return { pre: m[1], suf: m[3], v: v, f: function (x) { return m[1] + fmt(x) + m[3]; } };
+  }
+
+  function keyOf(el) {
+    var root = el.closest('.fn-app,.ac-ov,#today,.app') || document.body, i = 0, n = el;
+    var lab = (el.parentElement && (el.parentElement.textContent || '').replace(el.textContent, '').trim().slice(0, 40)) || '';
+    var all = root.querySelectorAll(SEL); for (i = 0; i < all.length; i++) if (all[i] === el) break;
+    return (root.id || root.className || 'x').toString().slice(0, 30) + '|' + lab + '|' + i;
+  }
+
+  function run(el, p, from) {
+    var t0 = null, to = p.v;
+    el.__cuRun = true;
+    el.textContent = p.f(from);
+    (function step(ts) {
+      if (!el.isConnected) { el.__cuRun = false; return; }
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / DUR), e = 1 - Math.pow(1 - k, 3);
+      if (k < 1) { el.textContent = p.f(from + (to - from) * e); requestAnimationFrame(step); }
+      else { el.__cuRun = false; el.__cuFinal = p.f(to); el.textContent = el.__cuFinal; }
+    })(performance.now());
+  }
+
+  function consider(el) {
+    if (el.__cuRun || el.children.length) return;
+    var txt = el.textContent.trim();
+    if (!txt || txt === el.__cuFinal) return;
+    var p = parse(txt); if (!p) return;
+    el.__cuFinal = txt;
+    if (reduce || Math.abs(p.v) < 1 && p.v === 0) { el.__cuVal = p.v; return; }
+    var from = 0, key = keyOf(el), r = recent[key], now = Date.now();
+    if (el.__cuVal !== undefined) from = el.__cuVal;                       /* elemen sama berganti nilai: hitung dari nilai lama */
+    else if (r && now - r.at < 4000) {                                     /* render ulang cepat */
+      if (r.t === txt) { el.__cuVal = p.v; return; }
+      from = r.val;
+    }
+    el.__cuVal = p.v; recent[key] = { t: txt, val: p.v, at: now };
+    if (from === p.v) return;
+    run(el, p, from);
+  }
+
+  function scan(node) {
+    if (!node || node.nodeType !== 1) { if (node && node.nodeType === 3) node = node.parentElement; else return; }
+    if (!node) return;
+    if (node.matches && node.matches(SEL)) consider(node);
+    if (node.querySelectorAll) { var l = node.querySelectorAll(SEL); for (var i = 0; i < l.length; i++) consider(l[i]); }
+    var up = node.closest && node.closest(SEL); if (up && up !== node) consider(up);
+  }
+
+  function start() {
+    scan(document.body);
+    new MutationObserver(function (ms) {
+      for (var i = 0; i < ms.length; i++) {
+        var m = ms[i];
+        if (m.type === 'characterData') scan(m.target.parentElement);
+        else { if (m.target.nodeType === 1 && m.target.matches && m.target.matches(SEL)) scan(m.target); for (var j = 0; j < m.addedNodes.length; j++) scan(m.addedNodes[j]); }
+      }
+    }).observe(document.body, { childList: true, subtree: true, characterData: true });
+    /* modul yang dibuka lagi (tampil kembali): ulangi hitungan angkanya */
+    document.addEventListener('click', function (e) {
+      if (!e.target.closest || !e.target.closest('a[href^="#"], .nav a, .tchip, .avatar')) return;
+      setTimeout(function () { Object.keys(recent).forEach(function (k) { delete recent[k]; }); document.querySelectorAll(SEL).forEach(function (el) { if (!el.__cuRun) { el.__cuFinal = null; el.__cuVal = undefined; } }); scan(document.body); }, 120);
+    }, true);
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start();
 })();
 ;

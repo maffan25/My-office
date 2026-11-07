@@ -125,7 +125,7 @@
       var b = function (a, ico, lb, cls, e) { return '<button class="' + (cls || '') + '" data-act="' + a + '"' + (e ? ' data-e="' + e + '"' : '') + ' data-id="' + f.id + '" aria-label="' + lb + ' ' + esc(f.name) + '" title="' + lb + '">' + ic(ico, 2) + '</button>'; };
       return '<div class="rd-tools">' + b('dl', 'dl', 'Unduh') + b('cvr', 'img', 'Ubah sampul') + b('edit', 'edit', 'Edit', '', 'file') + b('delfile', 'del', 'Hapus', 'danger') + '</div>';
     }
-    var book = function (f, i) { return '<div class="rd-book" style="--i:' + Math.min(i, 14) + '">' + cover(f) + tools(f) + '</div>'; };
+    var book = function (f, i) { return '<div class="rd-book" style="--i:' + Math.min(i, 14) + '">' + cover(f) + tools(f) + '<span class="rd-bt" title="' + esc(f.name) + '">' + esc(baseName(f)) + '</span></div>'; };
     var ghost = function (label) { return '<label class="rd-book rd-ghost" data-pick tabindex="0" role="button" title="Unggah dokumen ke rak ini"><span class="rd-plus">' + ic('plus', 1.6) + '</span><em>' + label + '</em><input type="file" multiple hidden data-chg="upload"></label>'; };
     var row = function (inner) { return '<div class="rd-shelf"><div class="rd-shelf-in">' + inner + '<i class="rd-ledge"></i></div></div>'; };
     function chunk(a, n) { var o = [], i; for (i = 0; i < a.length; i += n) o.push(a.slice(i, i + n)); return o; }
@@ -268,7 +268,7 @@
         (f.notes ? '<p class="rd-det-notes">' + esc(f.notes) + '</p>' : '') +
         '<div class="rd-det-acts"><button class="rd-btn pri" data-do="read"' + (readable(f) ? '' : ' disabled title="Jenis berkas ini tidak bisa dibaca di browser, silakan unduh"') + '>' + ic('book', 1.8) + 'Baca</button><button class="rd-btn" data-do="dl">' + ic('dl', 1.8) + 'Unduh</button></div>' +
         (readable(f) ? '' : '<p class="rd-det-hint">Jenis berkas ini belum bisa dibaca langsung di browser. Unduh untuk membukanya dengan aplikasi yang sesuai.</p>') +
-        '<div class="rd-det-more"><button data-do="cover">' + ic('img', 1.8) + 'Ubah sampul</button>' + (f.cover ? '<button data-do="nocover">' + ic('x', 1.8) + 'Hapus sampul</button>' : '') + '<button data-do="edit">' + ic('edit', 1.8) + 'Edit keterangan</button></div></div></div>');
+        '<div class="rd-det-more"><button data-do="cover">' + ic('img', 1.8) + 'Ubah sampul</button>' + (f.cover ? '<button data-do="nocover">' + ic('x', 1.8) + 'Hapus sampul</button>' : '') + '<button data-do="edit">' + ic('edit', 1.8) + 'Edit keterangan</button><button data-do="del" class="danger">' + ic('del', 1.8) + 'Hapus</button></div></div></div>');
       document.body.appendChild(ov);
       var rate = ov.querySelector('.rd-rate');
       function drawRate() {
@@ -293,6 +293,7 @@
         if (d === 'dl') withBlob(f.id, download);
         if (d === 'cover') pickCover(f, function () { off(); detail(by(D.file, f.id) || f); });
         if (d === 'nocover') { clearCover(f); off(); detail(f); }
+        if (d === 'del') { off(); var db = document.querySelector('.rd-skin [data-act="delfile"][data-id="' + f.id + '"]'); if (db) db.click(); }
         if (d === 'edit') { off(); var eb = document.querySelector('.rd-skin [data-act="edit"][data-e="file"][data-id="' + f.id + '"]'); if (eb) eb.click(); }
       });
       var first = ov.querySelector('[data-do="read"]:not([disabled])') || ov.querySelector('[data-do="dl"]'); if (first) first.focus();
