@@ -28,49 +28,13 @@
     var r = window.MyOffice && MyOffice.routes && MyOffice.routes[a.getAttribute('href')]; if (r) r();
   });
 
-  /* ---------- Lonceng ---------- */
-  var bell = D.querySelector('.tools button[aria-label="Notifikasi"]'), dot = bell && bell.querySelector('.dot');
-  var pn = D.createElement('aside'); pn.className = 'notif'; pn.id = 'notif'; pn.setAttribute('aria-label', 'Notifikasi');
-  D.body.appendChild(pn);
-
+  /* ---------- Lonceng: dipindah ke revisi5.js (BeresinNotif) ---------- */
   function refresh() {
     var d = data();
     $('tTask').textContent = d.act.length; $('tEv').textContent = d.ev.length; $('tGoal').textContent = d.goals.length;
-    var n = d.due.length + d.ev.length;
-    if (dot) dot.hidden = n === 0;
-    if (bell) bell.setAttribute('aria-label', n ? 'Notifikasi (' + n + ')' : 'Notifikasi');
+    if (window.BeresinNotif) BeresinNotif.refresh();
     return d;
   }
-  function render() {
-    var d = refresh(), h = '';
-    d.due.slice(0, 6).forEach(function (t) {
-      var late = String(t.due).slice(0, 10) < d.td;
-      h += '<li><a href="#task"><span class="nk">✅</span><span class="nt"><b>' + esc(t.title || 'Tugas') + '</b><small>Tugas · tenggat ' + esc(String(t.due).slice(0, 10)) + '</small></span><span class="nw' + (late ? '' : ' ok') + '">' + (late ? 'Terlambat' : 'Hari ini') + '</span></a></li>';
-    });
-    d.ev.slice(0, 6).forEach(function (e) {
-      h += '<li><a href="#calendar"><span class="nk">📅</span><span class="nt"><b>' + esc(e.title || 'Agenda') + '</b><small>Agenda' + (e.startTime ? ' · ' + esc(e.startTime) : '') + '</small></span><span class="nw ok">Hari ini</span></a></li>';
-    });
-    pn.innerHTML = '<h2>Notifikasi <small>' + (d.due.length + d.ev.length) + ' item</small></h2>' +
-      (h ? '<ul>' + h + '</ul>' : '<div class="ne">Semua beres 🎉<br>Tidak ada tugas jatuh tempo atau agenda hari ini.</div>');
-  }
-  function toggle(o) {
-    var open = o === undefined ? !pn.classList.contains('open') : o;
-    if (open) { render(); var p = $('panel'); if (p) p.classList.remove('open'); }
-    pn.classList.toggle('open', open);
-  }
-  // fase capture di window: berjalan sebelum handler "Coming soon" milik academic.js
-  window.addEventListener('click', function (e) {
-    var b = e.target.closest && e.target.closest('.tools button[aria-label^="Notifikasi"]');
-    if (b) { e.stopImmediatePropagation(); e.preventDefault(); toggle(); return; }
-    if (pn.classList.contains('open')) {
-      var a = e.target.closest && e.target.closest('#notif a');
-      if (a) { e.preventDefault(); e.stopImmediatePropagation(); toggle(false); var r = MyOffice.routes && MyOffice.routes[a.getAttribute('href')]; if (r) r(); }
-      else if (!pn.contains(e.target)) toggle(false);
-    }
-  }, true);
-  D.addEventListener('keydown', function (e) { if (e.key === 'Escape') toggle(false); });
-  var th = $('themeBtn'); if (th) th.addEventListener('click', function () { toggle(false); });
-
   // data berubah saat jendela menu ditutup / tab kembali aktif
   new MutationObserver(function () { if (!D.documentElement.classList.contains('win-open')) refresh(); }).observe(D.documentElement, { attributes: true, attributeFilter: ['class'] });
   D.addEventListener('visibilitychange', function () { if (!D.hidden) refresh(); });

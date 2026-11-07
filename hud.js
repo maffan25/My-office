@@ -151,6 +151,7 @@
     var b = document.querySelector('.tools button[aria-label="Notifikasi"]'); if (b) b.setAttribute('aria-expanded', 'false');
   }
   function badge() {
+    return; /* angka lonceng kini dikelola revisi5.js */
     var g = groups(), n = g.late.length + g.today.length, d = document.querySelector('.tools .dot');
     if (!d) return;
     d.classList.add('n'); d.hidden = !n; d.textContent = n > 9 ? '9+' : n; d.setAttribute('aria-label', n + ' pengingat');

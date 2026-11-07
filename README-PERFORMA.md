@@ -36,3 +36,10 @@ bintang pakai sprite 30fps, partikel latar jendela dikurangi di HP, bank soal di
 ## Revisi v2.3
 - revisi5.css (paling akhir): kolom pencarian Document Center presisi (tinggi seragam dengan tab, ikon & teks sejajar, tanpa kotak-dalam); kotak dokumen di Terbaru/Semua dokumen/hasil cari bergradasi off-white lembut (mint, persik, lavender, langit, rose, butter); ikon kalender & jam di dashboard besar tanpa latar, bergaya ikon menu.
 - app.css sudah diperbarui langsung (revisi5 ditambahkan di akhir), sama seperti revisi sebelumnya.
+
+## Revisi v2.4
+- revisi5.js (+ bagian 4–5 di revisi5.css): satu mesin notifikasi untuk lonceng & panel (BeresinNotif). Mesin lonceng lama di v6.js dan hud.js dimatikan agar tidak bentrok.
+- Aturan: tenggat (tugas, to-do, pekerjaan, goal, dll) = terlambat / hari ini / besok; kegiatan & acara berjam = muncul H-1 jam (atau lebih awal bila pengingat Kalender lebih panjang), lalu "Berlangsung"; kegiatan seharian = hari-H (ujian/presentasi/penting juga H-1). Selesai/dibatalkan tidak dihitung.
+- Angka lonceng = jumlah item di panel (1 pengingat → 1). Dihitung ulang saat data 'mo-*' disimpan, saat tab difokuskan, dan tiap 20 detik.
+- Logo: lambang melayang/miring dengan kilau & percikan; tulisan "Beresin" muncul huruf demi huruf dari kiri (dengan kursor), tahan, lalu menghilang dari kiri, berulang. Tempo diatur lewat `--bs-cycle` (siklus) dan `--bs-step` (jeda antar huruf) di revisi5.css.
+- app.js/app.css diperbarui langsung (icons/ tidak ada di zip).

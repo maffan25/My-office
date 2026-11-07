@@ -105,3 +105,114 @@ html:root:root .info b { font-size: 16.5px !important; letter-spacing: -.005em; 
   html:root:root .info .cell:nth-of-type(1) .ic,
   html:root:root .info .cell:nth-of-type(2) .ic { display: block !important; width: 60px !important; height: 60px !important; }
 }
+
+/* ---------- 4. Notifikasi: angka lonceng = jumlah pengingat, panel berkelompok ---------- */
+html:root:root .tools button .dot.n {
+  position: absolute; top: 2px; right: 2px; left: auto;
+  min-width: 20px; height: 20px; box-sizing: border-box; padding: 0 5px;
+  display: grid; place-items: center;
+  border-radius: 10px; border: 2px solid #fff;
+  font: 700 10.5px/1 var(--s-font, 'Inter', system-ui, sans-serif); letter-spacing: 0; color: #fff;
+  background: linear-gradient(145deg, #ff7b8f, #e0264b);
+  box-shadow: 0 5px 10px -3px rgba(224, 38, 75, .6);
+  font-variant-numeric: tabular-nums;
+}
+html:root:root .tools button .dot.n[hidden] { display: none; }
+html:root:root .tools button .dot.bump { animation: nfBump .6s cubic-bezier(.3, 1.8, .5, 1); }
+@keyframes nfBump { 0% { transform: scale(.35); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+html:root:root .tools button.ring { animation: nfRing 1.3s ease-in-out; transform-origin: 50% 10%; }
+@keyframes nfRing {
+  0%, 100% { transform: rotate(0); } 12% { transform: rotate(16deg); } 26% { transform: rotate(-14deg); }
+  40% { transform: rotate(10deg); } 54% { transform: rotate(-7deg); } 68% { transform: rotate(4deg); } 82% { transform: rotate(-2deg); }
+}
+
+html:root:root .notif { width: 360px; padding: 16px 14px 14px; }
+html:root:root .notif ul { margin: 0; padding: 0; gap: 7px; }
+html:root:root .notif li { animation: nfIn .38s cubic-bezier(.2, .7, .2, 1) both; animation-delay: calc(var(--i, 0) * 35ms); }
+@keyframes nfIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+html:root:root .notif .nf-g {
+  display: flex; align-items: center; justify-content: space-between;
+  margin: 14px 2px 8px; font: 700 10.5px/1 var(--s-font, 'Inter', system-ui, sans-serif);
+  letter-spacing: .09em; text-transform: uppercase; opacity: .92;
+}
+html:root:root .notif h2 + .nf-g { margin-top: 4px; }
+html:root:root .notif .nf-g i {
+  font-style: normal; min-width: 20px; height: 20px; padding: 0 6px; box-sizing: border-box;
+  display: grid; place-items: center; border-radius: 10px; color: #fff; font-size: 11px;
+}
+html:root:root .notif .nf-g.c-soon i { background: #f08c00; }
+html:root:root .notif .nf-g.c-late i { background: #e0264b; }
+html:root:root .notif .nf-g.c-today i { background: #3b82f6; }
+html:root:root .notif .nf-g.c-tmr i { background: #8b5cf6; }
+html:root:root .notif .nf-g.c-soon { color: #b36a00; }
+html:root:root .notif .nf-g.c-late { color: #c0203f; }
+html:root:root .notif .nf-g.c-today { color: #2352b8; }
+html:root:root .notif .nf-g.c-tmr { color: #6a3fc4; }
+
+html:root:root .notif .nw.c-now   { background: #d6f5e6; color: #12794f; }
+html:root:root .notif .nw.c-soon  { background: #fff0d1; color: #a85d00; }
+html:root:root .notif .nw.c-late  { background: #ffe0e6; color: #c0203f; }
+html:root:root .notif .nw.c-today { background: #e1ecff; color: #2352b8; }
+html:root:root .notif .nw.c-tmr   { background: #ece6ff; color: #6a3fc4; }
+html:root:root .notif .nt b { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html:root:root .notif .nt small { display: block; opacity: .7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+html:root:root .notif .nw.c-now::before { content: ""; display: inline-block; width: 6px; height: 6px; margin-right: 5px; border-radius: 50%; background: #12a36a; animation: nfPulse 1.4s ease-in-out infinite; }
+@keyframes nfPulse { 50% { transform: scale(1.7); opacity: .35; } }
+
+/* ---------- 5. Logo Beresin bergerak + tulisan mengetik berulang ---------- */
+/* Atur tempo di sini: siklus penuh, jeda antar huruf */
+.brand { --bs-cycle: 7.2s; --bs-step: .17s; }
+
+/* lambang: melayang lembut, miring, kilau melintas, percikan berkedip */
+.brand svg.bs-live { animation: bsFloat var(--bs-cycle) ease-in-out infinite; transform-origin: 50% 60%; }
+@keyframes bsFloat {
+  0%   { transform: translateY(0) rotate(0) scale(1); }
+  8%   { transform: translateY(-3px) rotate(-6deg) scale(1.08); }
+  16%  { transform: translateY(0) rotate(3deg) scale(.97); }
+  24%  { transform: translateY(0) rotate(0) scale(1); }
+  50%  { transform: translateY(-2.5px) rotate(-2.5deg) scale(1.02); }
+  75%  { transform: translateY(0) rotate(2deg) scale(1); }
+  100% { transform: translateY(0) rotate(0) scale(1); }
+}
+.brand .bs-shine { animation: bsShine var(--bs-cycle) ease-in-out infinite; }
+@keyframes bsShine { 0%, 38% { transform: translateX(0); } 56%, 100% { transform: translateX(185px); } }
+.brand .bs-spark { transform-box: fill-box; transform-origin: center; opacity: 0; animation: bsSpark var(--bs-cycle) ease-in-out infinite; }
+.brand .bs-spark.s2 { animation-delay: calc(var(--bs-cycle) * .5); }
+@keyframes bsSpark { 0%, 40% { opacity: 0; transform: scale(.2) rotate(0); } 48% { opacity: 1; transform: scale(1.15) rotate(40deg); } 58%, 100% { opacity: 0; transform: scale(.2) rotate(90deg); } }
+
+/* tulisan: muncul dari kiri huruf demi huruf, tahan, lalu menghilang dari kiri; ulang terus */
+.brand .brand-t { display: inline-flex; align-items: baseline; white-space: nowrap; }
+.brand .bl {
+  position: relative; display: inline-block; font: inherit; letter-spacing: inherit; color: inherit;
+  opacity: 0;
+  animation: bsType var(--bs-cycle) cubic-bezier(.2, .7, .2, 1) infinite both;
+  animation-delay: calc(var(--i) * var(--bs-step));
+}
+@keyframes bsType {
+  0%   { opacity: 0; transform: translateX(-9px) scale(.92); }
+  3%   { opacity: 1; transform: none; }
+  70%  { opacity: 1; transform: none; }
+  74%  { opacity: 0; transform: translateX(-9px) scale(.92); }
+  100% { opacity: 0; transform: translateX(-9px) scale(.92); }
+}
+/* kursor mengetik: menempel di huruf yang baru muncul; huruf terakhir menahan kursor lebih lama */
+.brand .bl::after {
+  content: ""; position: absolute; right: -1px; top: 14%; width: 2px; height: 72%;
+  border-radius: 1px; background: currentColor; opacity: 0;
+  animation: bsCaret var(--bs-cycle) steps(1, end) infinite both;
+  animation-delay: calc(var(--i) * var(--bs-step));
+}
+@keyframes bsCaret { 0% { opacity: 1; } 2.6% { opacity: 1; } 2.7%, 100% { opacity: 0; } }
+.brand .bl:last-child::after { animation-name: bsCaretEnd; }
+@keyframes bsCaretEnd { 0%, 6% { opacity: 1; } 8%, 10% { opacity: 0; } 12%, 14% { opacity: 1; } 16%, 18% { opacity: 0; } 19%, 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .brand svg.bs-live, .brand .bs-shine, .brand .bs-spark { animation: none; }
+  .brand .bs-spark { opacity: 0; }
+  .brand .bl { animation: none; opacity: 1; transform: none; }
+  .brand .bl::after { display: none; }
+}
+
+/* panel turun sedikit supaya tombol lonceng tetap terlihat */
+html:root:root .notif { top: max(86px, calc(var(--safe-t, 0px) + 78px)); max-height: calc(100dvh - 108px); }
+@media (max-width: 640px) { html:root:root .notif { right: 12px; left: 12px; width: auto; } }
