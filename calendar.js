@@ -73,8 +73,8 @@
       });
       return out;
     }
-    var evAll = function () { return D.ev.concat(AXE); };
-    var eact = function (e) { return e.ax ? 'data-act="goacad" data-t="' + e.ax + '"' : 'data-act="edit" data-e="ev" data-id="' + esc(e.id) + '"'; };
+    var evAll = function () { return (D.ev || []).concat(AXE, K.taskEvents ? K.taskEvents() : []); };
+    var eact = function (e) { return e.ax ? 'data-act="goacad" data-t="' + e.ax + '"' : e.tk ? 'data-act="gotask"' : 'data-act="edit" data-e="ev" data-id="' + esc(e.id) + '"'; };
     var kindOf = function (e) {
       if (e.kind === 'biasa') return '';
       if (KD[e.kind]) return e.kind;
@@ -225,7 +225,7 @@
     }
     function vCal() {
       AXE = AX();
-      TK = (ls('mo-task-v1').task || []).filter(function (t) { return t.due && t.status !== 'Archived'; });
+      TK = (ls('mo-task-v1').task || []).filter(function (t) { return t.due && t.status !== 'Archived' && t.kind !== 'event' && !t.parentId; });
       var a = st.d || today(), v = st.v || 'Monthly', ttl = '', body;
       if (v === 'Monthly') {
         var mi = monthInfo(a), last = addD(mi.first, mi.len - 1);
