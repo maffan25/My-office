@@ -630,16 +630,36 @@
   var link = function (v) { return /^https?:\/\//i.test(v || '') ? '<a href="' + esc(v) + '" target="_blank" rel="noopener">' + esc(v.replace(/^https?:\/\//i, '').slice(0, 40)) + '</a>' : esc(v); };
 
   /* ---------- Dashboard ---------- */
+  /* warna sampul per mata kuliah: [pekat, muda] */
+  var CV = [['#d29512', '#fff0c2'], ['#2f7d6d', '#d6efe7'], ['#4a5fc1', '#dde4ff'], ['#c4566a', '#ffdfe4'], ['#7b5bc4', '#e9e0ff'], ['#d4752c', '#ffe4cd'], ['#5b9a3a', '#e0f2d0']];
+  var cvOf = function (c) { var i = D.course.indexOf(c); return CV[(i < 0 ? 0 : i) % CV.length]; };
+  function ring(p) {
+    var C = 2 * Math.PI * 17;
+    return '<span class="dv-ring" role="img" aria-label="Tugas selesai ' + p + ' persen"><svg viewBox="0 0 44 44" aria-hidden="true"><circle class="bg" cx="22" cy="22" r="17"/><circle class="fg" cx="22" cy="22" r="17" stroke-dasharray="' + C.toFixed(1) + '" stroke-dashoffset="' + (C * (1 - p / 100)).toFixed(1) + '"/></svg><b>' + p + '<small>%</small></b></span>';
+  }
+  /* selisih hari kalender (bukan jam) agar "Besok" benar walau tenggatnya pukul 23.59 */
+  function rel(dl) {
+    if (!dl) return { u: 'none', t: 'Tanpa tenggat', n: 99 };
+    var d = new Date(dl); if (isNaN(d)) return { u: 'none', t: 'Tanpa tenggat', n: 99 };
+    var a = new Date(); a.setHours(0, 0, 0, 0); var b = new Date(d); b.setHours(0, 0, 0, 0);
+    var n = Math.round((b - a) / 864e5);
+    if (d < new Date()) return { u: 'hot', t: 'Terlambat', n: -1 };
+    if (n === 0) return { u: 'hot', t: 'Hari ini', n: 0 };
+    if (n === 1) return { u: 'hot', t: 'Besok', n: 1 };
+    return { u: n <= 3 ? 'warm' : 'cool', t: n + ' hari lagi', n: n };
+  }
+  var clock = function (v) { return v && String(v).length > 10 ? String(v).slice(11, 16).replace(':', '.') : ''; };
   function cCard(c, manage) {
-    var p = prog(c), f = finalScore(c), L = letter(f), done = p.n > 0 && p.p === 100;
-    var lab = done ? 'Selesai 🎉' : L ? 'Nilai ' + L.l + ' · ' + fmt(f) : p.n ? 'Sedang berjalan' : 'Belum ada tugas';
+    var p = prog(c), f = finalScore(c), L = letter(f), done = p.n > 0 && p.p === 100, v = cvOf(c);
+    var lab = done ? 'Semua tugas selesai' : L ? 'Nilai ' + L.l + ' · ' + fmt(f) : p.n ? 'Sedang berjalan' : 'Belum ada tugas';
     var lc = done || L ? 'ok' : p.n ? 'blue' : 'mute';
-    return '<div class="ad-cc' + (done ? ' fin' : '') + '" role="button" tabindex="0" data-act="edit" data-e="course" data-id="' + c.id + '" aria-label="Edit ' + esc(c.name) + '">' +
-      '<div class="ad-cct">' + tile(c) + '<div><b>' + esc(c.name) + '</b><small>' + esc(c.lecturer || 'Dosen belum diisi') + '</small></div></div>' +
-      '<div class="ad-lv ' + lc + '">' + lab + '</div>' +
-      '<div class="ad-c3" title="SKS · tugas selesai · jam belajar"><span>' + ic('book') + esc(c.sks || 0) + ' SKS</span><span>' + ic('check') + p.d + '/' + p.n + '</span><span>' + ic('clock') + hrs(c.id) + '</span></div>' +
-      '<div class="ad-pbar" role="progressbar" aria-valuenow="' + p.p + '" aria-valuemin="0" aria-valuemax="100"><i style="width:' + p.p + '%"></i></div>' +
-      '<div class="ad-pt">Selesai: <b>' + p.p + '%</b></div>' + (manage ? btns('course', c.id) : '') + '</div>';
+    return '<div class="ad-cc dv-cv' + (done ? ' fin' : '') + '" style="--cv:' + v[0] + ';--cl:' + v[1] + '" role="button" tabindex="0" data-act="edit" data-e="course" data-id="' + c.id + '" aria-label="Edit ' + esc(c.name) + '">' +
+      '<div class="dv-cap">' + tile(c) + '<span class="dv-code">' + esc(c.code || 'Tanpa kode') + '</span><span class="dv-sks">' + esc(c.sks || 0) + ' SKS</span></div>' +
+      '<div class="dv-cb"><div class="dv-nm"><b>' + esc(c.name) + '</b><small>' + esc(c.lecturer || 'Dosen belum diisi') + '</small></div>' +
+      '<div class="dv-st">' + ring(p.p) + '<div class="dv-sx"><div class="ad-lv ' + lc + '">' + lab + '</div>' +
+      '<div class="dv-mt" title="Tugas selesai · jam belajar"><span>' + ic('check') + p.d + '/' + p.n + ' tugas</span><span>' + ic('clock') + hrs(c.id) + '</span></div></div></div>' +
+      (c.schedule ? '<div class="dv-sc">' + ic('cal') + '<span>' + esc(c.schedule) + '</span></div>' : '') +
+      (manage ? btns('course', c.id) : '') + '</div></div>';
   }
   function cTabs() {
     return '<div class="ad-t2"><div>' + ['Semua', 'Aktif', 'Selesai'].map(function (x) { return '<button class="t" data-act="cf" data-v="' + x + '" aria-pressed="' + (x === cf) + '">' + x + '</button>'; }).join('') + '</div>' +
@@ -649,20 +669,43 @@
   var PRI = { Tinggi: ['hi', 'up'], Sedang: ['mid', 'flat'], Rendah: ['lo', 'down'] };
   var PRIO = { Tinggi: 0, Sedang: 1, Rendah: 2 };
 
+  /* panel fokus: tugas paling dekat + ringkasan angka */
+  function focusPanel() {
+    var P = pending().sort(function (a, b) { return (a.deadline || '9').localeCompare(b.deadline || '9'); }), t = P[0], late = D.task.filter(isLate).length, td = today();
+    var ex = D.exam.filter(function (e) { return e.date && !e.done && e.date.slice(0, 10) >= td; }).sort(function (a, b) { return a.date.localeCompare(b.date); })[0];
+    var exn = ex ? Math.round((new Date(ex.date.slice(0, 10)) - new Date(td)) / 864e5) : null;
+    var wk = new Date(); wk.setDate(wk.getDate() - 6); var w0 = dstr(wk.getFullYear(), wk.getMonth(), wk.getDate());
+    var mins = D.study.filter(function (s) { return s.date >= w0; }).reduce(function (a, s) { return a + (+s.minutes || 0); }, 0);
+    var stats = '<div class="dv-stats"><div><b>' + P.length + '</b><small>Tugas aktif</small></div><div' + (late ? ' class="hot"' : '') + '><b>' + late + '</b><small>Terlambat</small></div>' +
+      '<div><b>' + (exn == null ? '—' : exn === 0 ? 'Hari ini' : 'H-' + exn) + '</b><small>' + (ex ? esc(ex.type) + ' terdekat' : 'Ujian terdekat') + '</small></div><div><b>' + (Math.round(mins / 6) / 10) + 'j</b><small>Belajar 7 hari</small></div></div>';
+    var main;
+    if (!D.course.length) main = '<div class="dv-fm"><h3>Mulai dari mata kuliah pertamamu</h3><p>Tambahkan mata kuliah, lalu catat tugas dan ujiannya di sini.</p><div class="dv-fb"><button class="dv-go" data-act="add" data-e="course">' + ic('plus') + 'Tambah mata kuliah</button></div></div>';
+    else if (!t) main = '<div class="dv-fm"><h3>Semua tugas sudah beres</h3><p>Tidak ada tenggat yang menunggu. Waktu yang pas untuk mengulang materi.</p><div class="dv-fb"><button class="dv-go" data-act="add" data-e="task">' + ic('plus') + 'Catat tugas baru</button></div></div>';
+    else {
+      var r = rel(t.deadline), c = by(D.course, t.courseId);
+      main = '<div class="dv-fm"><div class="dv-cd ' + r.u + '"><span>' + r.t + '</span>' + (t.deadline ? '<small>' + fdate(t.deadline, 'd') + (clock(t.deadline) ? ', ' + clock(t.deadline) : '') + '</small>' : '') + '</div>' +
+        '<h3>' + esc(t.title) + '</h3><p>' + esc(c ? c.name : '—') + ' · ' + esc(t.type) + '</p>' +
+        '<div class="dv-fb"><button class="dv-go" data-act="done" data-id="' + t.id + '">' + ic('check') + 'Tandai selesai</button><button class="dv-gh" data-act="edit" data-e="task" data-id="' + t.id + '">Ubah jadwal</button></div></div>';
+    }
+    return '<section class="dv-hero" aria-label="Fokus berikutnya">' + main + stats + '</section>';
+  }
+
   function vDash() {
-    var h = warn(), L = courseList();
-    h += '<div class="ad-sh"><h2 class="ad-h">Mata Kuliah</h2></div>' + cTabs();
-    h += '<div class="ad-cg">' + L.slice(0, 3).map(function (c) { return cCard(c); }).join('') + (L.length < 3 ? addCard : '') + '</div>';
+    var h = warn(), L = courseList(), sks = L.reduce(function (a, c) { return a + (+c.sks || 0); }, 0);
+    h += focusPanel();
+    h += '<div class="ad-sh"><h2 class="ad-h">Mata Kuliah</h2><span class="dv-sub">' + L.length + ' mata kuliah · ' + sks + ' SKS</span></div>' + cTabs();
+    h += '<div class="ad-cg dv-rail">' + L.slice(0, 3).map(function (c) { return cCard(c); }).join('') + (L.length < 3 ? addCard : '') + '</div>';
 
     var up = pending().sort(function (a, b) { return (a.deadline || '9').localeCompare(b.deadline || '9'); });
     h += '<div class="ad-sh"><h2 class="ad-h sm">Tugas Mendatang</h2>' + (up.length > 3 ? '<button class="ad-more" data-act="tab" data-t="task">Lihat semua (' + up.length + ')</button>' : '') + '</div>';
-    h += up.length ? up.slice(0, 3).map(function (t) {
-      var c = by(D.course, t.courseId);
-      return '<div class="ad-as">' + (c ? tile(c, 'big') : '<i class="ad-tile big" style="background:' + PALETTE[0] + '">' + ic('task') + '</i>') +
+    h += up.length ? '<div class="dv-tl">' + up.slice(0, 3).map(function (t) {
+      var c = by(D.course, t.courseId), r = rel(t.deadline), d = t.deadline ? new Date(t.deadline) : null, ok = d && !isNaN(d);
+      return '<div class="dv-ti ' + r.u + '"><div class="dv-dt">' + (ok ? '<b>' + d.getDate() + '</b><small>' + d.toLocaleDateString('id-ID', { month: 'short' }) + '</small>' : '<b>—</b><small>&nbsp;</small>') + '</div>' +
+        '<div class="dv-tb">' + (c ? tile(c) : '<i class="ad-tile" style="background:' + PALETTE[0] + '">' + ic('task') + '</i>') +
         '<div class="ad-tt"><b>' + esc(t.title) + '</b><small>' + esc(cname(t.courseId)) + ' · ' + esc(t.type) + '</small></div>' +
-        '<div class="ad-mm"><small>Tenggat</small><b>' + fshort(t.deadline) + '</b></div><div class="ad-mm"><small>Sisa waktu</small><b>' + left(t.deadline) + '</b></div>' +
-        '<div class="ad-bt"><button class="ad-bo" data-act="edit" data-e="task" data-id="' + t.id + '">Ubah jadwal</button><button class="ad-bg" data-act="done" data-id="' + t.id + '">Tandai selesai</button></div></div>';
-    }).join('') : '<div class="ad-none">' + (D.course.length ? 'Semua tugas sudah beres. Santai dulu ☕' : 'Tambahkan mata kuliah dulu, lalu catat tugasnya.') + '</div>';
+        '<span class="dv-pill ' + r.u + '">' + r.t + (clock(t.deadline) && r.n >= 0 && r.n <= 1 ? ' · ' + clock(t.deadline) : '') + '</span>' +
+        '<div class="dv-ac"><button class="ad-bo" data-act="edit" data-e="task" data-id="' + t.id + '">Ubah jadwal</button><button class="ad-bg" data-act="done" data-id="' + t.id + '">Tandai selesai</button></div></div></div>';
+    }).join('') + '</div>' : '<div class="ad-none">' + (D.course.length ? 'Semua tugas sudah beres. Santai dulu ☕' : 'Tambahkan mata kuliah dulu, lalu catat tugasnya.') + '</div>';
 
     var wk = new Date(); wk.setDate(wk.getDate() + 7); var lim = dstr(wk.getFullYear(), wk.getMonth(), wk.getDate()), td = today();
     var ht = pending().filter(function (t) {
@@ -672,14 +715,13 @@
     h += '<div class="ad-sh"><h2 class="ad-h sm">Tugas Prioritas</h2><div class="ad-rg"><select id="acRng" class="ad-sel" aria-label="Rentang waktu">' +
       ['Hari ini', 'Minggu ini', 'Semua'].map(function (x) { return '<option' + (x === rng ? ' selected' : '') + '>' + x + '</option>'; }).join('') +
       '</select><button class="ad-addl" data-act="add" data-e="task">Tambah ' + ic('plus') + '</button></div></div>';
-    h += ht.length ? '<div class="ad-hg">' + ht.slice(0, 4).map(function (t, i) {
-      var pr = PRI[t.priority] || PRI.Sedang, c = by(D.course, t.courseId), navy = (i === 0 || i === 3);
-      return '<div class="ad-ht ' + (navy ? 'navy' : 'yel') + '"><div class="ad-htt"><h4 data-act="edit" data-e="task" data-id="' + t.id + '" role="button" tabindex="0">' + esc(t.title) + '</h4>' +
-        '<span class="ad-pri ' + pr[0] + '">' + esc(t.priority || 'Sedang') + ' ' + ic(pr[1]) + '</span></div>' +
+    h += ht.length ? '<div class="dv-pg">' + ht.slice(0, 4).map(function (t) {
+      var pr = PRI[t.priority] || PRI.Sedang, c = by(D.course, t.courseId), v = c ? cvOf(c) : CV[0];
+      return '<div class="dv-pc ' + pr[0] + '" style="--cv:' + v[0] + '"><div class="dv-ph"><span class="ad-pri ' + pr[0] + '">' + esc(t.priority || 'Sedang') + ' ' + ic(pr[1]) + '</span>' +
+        '<button class="ad-chk" data-act="done" data-id="' + t.id + '" aria-label="Tandai selesai" title="Tandai selesai">' + ic('check') + '</button></div>' +
+        '<h4 data-act="edit" data-e="task" data-id="' + t.id + '" role="button" tabindex="0">' + esc(t.title) + '</h4>' +
         '<p>' + esc(t.desc || t.notes || 'Belum ada deskripsi untuk tugas ini.') + '</p>' +
-        '<div class="ln">' + esc(c ? c.name : '—') + '</div>' +
-        '<div class="ft"><div class="due">' + ic('cal') + '<span>Tenggat: ' + fdate(t.deadline, 'd') + (isLate(t) ? ' · terlambat' : '') + '</span></div>' +
-        '<button class="ad-chk" data-act="done" data-id="' + t.id + '" aria-label="Tandai selesai" title="Tandai selesai">' + ic('check') + '</button></div></div>';
+        '<div class="dv-pf"><span class="dv-cn"><i></i>' + esc(c ? c.name : '—') + '</span><span class="dv-due">' + ic('cal') + fdate(t.deadline, 'd') + (isLate(t) ? ' · terlambat' : '') + '</span></div></div>';
     }).join('') + '</div>' + (ht.length > 4 ? '<p class="ad-sm" style="margin-top:10px">+' + (ht.length - 4) + ' tugas lain di rentang ini. <button class="ad-more" data-act="tab" data-t="task" style="text-decoration:underline">Buka semua tugas</button></p>' : '')
       : '<div class="ad-none">Tidak ada tugas di rentang “' + esc(rng) + '” 🎉</div>';
     return h;
@@ -2215,7 +2257,9 @@
       '<g fill="#fff" opacity=".9"><rect x="14" y="58" width="16" height="16" rx="3"/><rect x="52" y="58" width="16" height="16" rx="3"/><rect x="90" y="58" width="16" height="16" rx="3"/><rect x="14" y="90" width="16" height="16" rx="3"/><rect x="90" y="90" width="16" height="16" rx="3"/><rect x="46" y="112" width="28" height="38" rx="3"/><rect x="42" y="14" width="14" height="14" rx="3"/><rect x="64" y="14" width="14" height="14" rx="3"/></g>' +
       '<path d="M60 0V-30" stroke="#fff" stroke-width="4"/><path d="M60-30l30 9-30 9Z" fill="#ffd24a"/></g></svg>';
   }
-  function art(o, i) { return o.img ? '<img class="es-img" src="' + esc(o.img) + '" alt="" draggable="false">' : scene(i); }
+  /* gambar ditampilkan utuh (contain) di atas salinan buram dirinya sendiri, jadi tidak pernah terpotong dan tidak ada ruang kosong */
+  function fit(src) { var u = esc(src); return '<span class="es-fit"><img class="es-bg" src="' + u + '" alt="" aria-hidden="true" draggable="false"><img class="es-img" src="' + u + '" alt="" draggable="false"></span>'; }
+  function art(o, i) { return o.img ? fit(o.img) : scene(i); }
 
   /* ---------- kerangka ---------- */
   function build() {
@@ -2271,7 +2315,7 @@
       '<div class="es-meta">' + I.ppl + '<span>' + cnt(o.id, 'meeting') + ' rapat · ' + cnt(o.id, 'odoc') + ' dokumen' + (b.P ? ' · sisa ' + rp(b.P - b.A) : '') + '</span></div>' +
       (o.desc ? '<p class="es-desc">' + esc(o.desc) + '</p>' : '') +
       '<div class="es-btns"><button class="es-buy" data-a="open" data-id="' + o.id + '">' + I.open + '<span>Buka</span></button><button class="es-ghost" data-a="oedit" data-id="' + o.id + '">✎ Edit kartu</button><button class="es-ghost dng" data-a="odel" data-id="' + o.id + '">Hapus</button></div></div>' +
-      '<div class="es-dots" role="tablist" aria-label="Pilih organisasi">' + L.map(function (x, k) { return '<button data-a="pick" data-i="' + k + '" aria-selected="' + (k === i) + '" aria-label="' + esc(x.name) + '"></button>'; }).join('') + '</div></div>' + grid;
+      (L.length > 1 ? '<div class="es-dots" role="tablist" aria-label="Pilih organisasi">' + L.map(function (x, k) { return '<button data-a="pick" data-i="' + k + '" aria-selected="' + (k === i) + '" aria-label="' + esc(x.name) + '"></button>'; }).join('') + '</div>' : '') + '</div>' + grid;
   }
   function pick(i) { var n = filtered().length; if (!n) return; S.idx = ((i % n) + n) % n; render(); }
   function bindHero(h) {
@@ -2353,7 +2397,7 @@
     var f = w.querySelector('form'), more = false;
     function sync() {
       var pv = w.querySelector('[data-pv]'); pv.style.setProperty('--c', m.color);
-      pv.innerHTML = '<span class="es-thumb">' + (m.img ? '<img class="es-img" src="' + esc(m.img) + '" alt="">' : scene(idx)) + '</span><span class="es-cap">' + esc(f.elements.name.value || 'Nama organisasi') + '</span>';
+      pv.innerHTML = '<span class="es-thumb">' + (m.img ? fit(m.img) : scene(idx)) + '</span><span class="es-cap">' + esc(f.elements.name.value || 'Nama organisasi') + '</span>';
       [].forEach.call(w.querySelectorAll('.es-sw button'), function (b) { b.classList.toggle('on', b.dataset.c === m.color); });
     }
     sync();

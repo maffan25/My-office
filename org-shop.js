@@ -44,7 +44,9 @@
       '<g fill="#fff" opacity=".9"><rect x="14" y="58" width="16" height="16" rx="3"/><rect x="52" y="58" width="16" height="16" rx="3"/><rect x="90" y="58" width="16" height="16" rx="3"/><rect x="14" y="90" width="16" height="16" rx="3"/><rect x="90" y="90" width="16" height="16" rx="3"/><rect x="46" y="112" width="28" height="38" rx="3"/><rect x="42" y="14" width="14" height="14" rx="3"/><rect x="64" y="14" width="14" height="14" rx="3"/></g>' +
       '<path d="M60 0V-30" stroke="#fff" stroke-width="4"/><path d="M60-30l30 9-30 9Z" fill="#ffd24a"/></g></svg>';
   }
-  function art(o, i) { return o.img ? '<img class="es-img" src="' + esc(o.img) + '" alt="" draggable="false">' : scene(i); }
+  /* gambar ditampilkan utuh (contain) di atas salinan buram dirinya sendiri, jadi tidak pernah terpotong dan tidak ada ruang kosong */
+  function fit(src) { var u = esc(src); return '<span class="es-fit"><img class="es-bg" src="' + u + '" alt="" aria-hidden="true" draggable="false"><img class="es-img" src="' + u + '" alt="" draggable="false"></span>'; }
+  function art(o, i) { return o.img ? fit(o.img) : scene(i); }
 
   /* ---------- kerangka ---------- */
   function build() {
@@ -100,7 +102,7 @@
       '<div class="es-meta">' + I.ppl + '<span>' + cnt(o.id, 'meeting') + ' rapat · ' + cnt(o.id, 'odoc') + ' dokumen' + (b.P ? ' · sisa ' + rp(b.P - b.A) : '') + '</span></div>' +
       (o.desc ? '<p class="es-desc">' + esc(o.desc) + '</p>' : '') +
       '<div class="es-btns"><button class="es-buy" data-a="open" data-id="' + o.id + '">' + I.open + '<span>Buka</span></button><button class="es-ghost" data-a="oedit" data-id="' + o.id + '">✎ Edit kartu</button><button class="es-ghost dng" data-a="odel" data-id="' + o.id + '">Hapus</button></div></div>' +
-      '<div class="es-dots" role="tablist" aria-label="Pilih organisasi">' + L.map(function (x, k) { return '<button data-a="pick" data-i="' + k + '" aria-selected="' + (k === i) + '" aria-label="' + esc(x.name) + '"></button>'; }).join('') + '</div></div>' + grid;
+      (L.length > 1 ? '<div class="es-dots" role="tablist" aria-label="Pilih organisasi">' + L.map(function (x, k) { return '<button data-a="pick" data-i="' + k + '" aria-selected="' + (k === i) + '" aria-label="' + esc(x.name) + '"></button>'; }).join('') + '</div>' : '') + '</div>' + grid;
   }
   function pick(i) { var n = filtered().length; if (!n) return; S.idx = ((i % n) + n) % n; render(); }
   function bindHero(h) {
@@ -182,7 +184,7 @@
     var f = w.querySelector('form'), more = false;
     function sync() {
       var pv = w.querySelector('[data-pv]'); pv.style.setProperty('--c', m.color);
-      pv.innerHTML = '<span class="es-thumb">' + (m.img ? '<img class="es-img" src="' + esc(m.img) + '" alt="">' : scene(idx)) + '</span><span class="es-cap">' + esc(f.elements.name.value || 'Nama organisasi') + '</span>';
+      pv.innerHTML = '<span class="es-thumb">' + (m.img ? fit(m.img) : scene(idx)) + '</span><span class="es-cap">' + esc(f.elements.name.value || 'Nama organisasi') + '</span>';
       [].forEach.call(w.querySelectorAll('.es-sw button'), function (b) { b.classList.toggle('on', b.dataset.c === m.color); });
     }
     sync();

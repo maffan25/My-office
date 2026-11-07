@@ -15,3 +15,9 @@ bintang pakai sprite 30fps, partikel latar jendela dikurangi di HP, bank soal di
 - Edit gambar/gerak di icons-live.js (bentuk) dan icons-live.css (gerak), lalu `python3 build.py`.
 ## Kalender
 - cal-polish.css: badge jenis kegiatan (teks putih/cokelat tua di atas gradasi) dan tombol "Kembali ke hari ini" bergaya pil gradasi dengan ikon.
+
+## Revisi v1.3
+- redesign.css (dimuat paling akhir): tampilan Academic baru + perbaikan gambar & penanda pilihan di Organization.
+- Academic: panel fokus (tugas terdekat + angka ringkas), sampul mata kuliah dengan cincin progres, timeline tenggat, kartu prioritas. Logika di academic.js (vDash, cCard).
+- Organization: gambar ditampilkan utuh (contain di atas salinan buram), tanpa bingkai hijau tebal; kartu terpilih cukup terangkat dengan halo tipis. Logika di org-shop.js (fit, art).
+- Jalankan `python3 build.py` setelah mengedit file sumber.
