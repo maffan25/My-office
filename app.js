@@ -2340,7 +2340,7 @@
     var grid = '<div class="es-grid">' + L.map(function (x, k) {
       var c = brandOf(x, D.org.indexOf(x)), isNew = x === D.org[D.org.length - 1] && D.org.length > 1;
       return '<button class="es-card' + (k === i ? ' sel' : '') + '" data-a="pick" data-i="' + k + '" style="--c:' + c + ';--ci:' + ink(c) + '" aria-pressed="' + (k === i) + '"><span class="es-thumb">' + art(x, D.org.indexOf(x)) + '</span><span class="es-cap">' + esc(x.name) + '</span>' + (isNew ? '<em>BARU</em>' : '') + '</button>';
-    }).join('') + '<button class="es-card add" data-a="oadd"><span class="es-thumb"><i>+</i></span><span class="es-cap">Tambah organisasi</span></button></div>';
+    }).join('') + '<button class="es-card add" data-a="oadd"><span class="es-thumb"><i>+</i><span class="es-cap">Tambah organisasi</span></span></button></div>';
     if (!o) return '<div class="es-hero empty"><div class="es-txt"><h1>' + (D.org.length ? 'Tidak ada hasil' : 'Belum ada organisasi') + '</h1><p class="es-desc">' + (D.org.length ? 'Coba kata kunci lain.' : 'Tambahkan organisasi pertama kamu untuk mulai mencatat rapat, anggaran, dan dokumen.') + '</p></div></div>' + grid;
     var c = brandOf(o, D.org.indexOf(o)), b = bsum(o.id), ed = edgeOf(o, D.org.indexOf(o));
     return '<div class="es-hero" style="--c:' + c + ';--ci:' + ink(c) + ';--edge:' + ed + '"><div class="es-art">' + art(o, D.org.indexOf(o)) + '</div>' +
@@ -2884,7 +2884,7 @@
     el.textContent = '0' + suf;
     var step = function (ts) {
       if (t0 === null) t0 = ts;
-      var k = Math.min(1, (ts - t0) / 900), e = 1 - Math.pow(1 - k, 3);
+      var k = Math.min(1, (ts - t0) / 2600), e = 1 - Math.pow(1 - k, 2);
       el.textContent = Math.round(to * e) + suf;
       if (k < 1) requestAnimationFrame(step);
     };
@@ -4041,20 +4041,26 @@
     go: '<path d="M5 12h14M12 5l7 7-7 7"/>',
     chev: '<path d="m9 18 6-6-6-6"/>',
     search: '<circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.3-4.3"/>',
-    plus: '<path d="M12 5v14M5 12h14"/>'
+    plus: '<path d="M12 5v14M5 12h14"/>',
+    img: '<rect width="18" height="18" x="3" y="3" rx="2.5"/><circle cx="9" cy="9" r="1.8"/><path d="m21 15-3.1-3.1a2 2 0 0 0-2.8 0L6 21"/>',
+    book: '<path d="M2 4.5A1.5 1.5 0 0 1 3.5 3H9a3 3 0 0 1 3 3v15a2.5 2.5 0 0 0-2.5-2.5H3.5A1.5 1.5 0 0 1 2 17z"/><path d="M22 4.5A1.5 1.5 0 0 0 20.5 3H15a3 3 0 0 0-3 3v15a2.5 2.5 0 0 1 2.5-2.5h6a1.5 1.5 0 0 0 1.5-1.5z"/>',
+    zin: '<circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.3-4.3M11 8v6M8 11h6"/>',
+    zout: '<circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.3-4.3M8 11h6"/>',
+    x: '<path d="M18 6 6 18M6 6l12 12"/>'
   };
   var ic = function (n, w) { return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (w || 1.7) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + IC[n] + '</svg>'; };
   var LOGO = '<svg class="rd-owl" viewBox="0 0 64 30" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 11 11 3l7 5M57 11 53 3l-7 5"/><circle cx="20" cy="19" r="9"/><circle cx="44" cy="19" r="9"/><path d="M29 18.5c1.8-1.6 4.2-1.6 6 0"/><circle cx="20" cy="19" r="3" fill="currentColor" stroke="none"/><circle cx="44" cy="19" r="3" fill="currentColor" stroke="none"/></svg>';
 
   /* ---------- Thumbnail gambar (dibaca dari IndexedDB, di-cache) ---------- */
   var thumbs = {}, vis = [];
-  var thumbable = function (f) { return /^image\/(png|jpe?g|webp|gif|avif)$/.test(f.type || '') && f.size < 12e6; };
+  var thumbable = function (f) { return !!f.cover || (/^image\/(png|jpe?g|webp|gif|avif)$/.test(f.type || '') && f.size < 12e6); };
+  var coverKey = function (f) { return f.cover ? 'cv-' + f.id : f.id; };
   /* Sampul dibuat dari versi KECIL gambar (maks. 360px), bukan berkas aslinya yang bisa belasan MB.
      Didekode terkecil lewat createImageBitmap, diproses satu per satu agar halaman tidak tersendat. */
   var tq = [], tbusy = false;
   function mkThumb(b) {
     if (!window.createImageBitmap) return Promise.resolve(b);
-    return createImageBitmap(b, { resizeWidth: 360, resizeQuality: 'medium' }).then(function (bm) {
+    return createImageBitmap(b, { resizeWidth: 520, resizeQuality: 'medium' }).then(function (bm) {
       var c = document.createElement('canvas'); c.width = bm.width; c.height = bm.height;
       c.getContext('2d').drawImage(bm, 0, 0); if (bm.close) bm.close();
       return new Promise(function (res) { c.toBlob(function (t) { res(t || b); }, 'image/webp', .82); });
@@ -4063,10 +4069,10 @@
   function pumpThumbs() {
     if (tbusy || !tq.length) return; tbusy = true;
     var f = tq.shift();
-    get(f.id).then(function (b) { return b ? mkThumb(b) : null; }).then(function (t) {
+    get(coverKey(f)).then(function (b) { return b ? mkThumb(b) : null; }).then(function (t) {
       if (!t || !(f.id in thumbs)) return;
       var u = URL.createObjectURL(t); thumbs[f.id] = u;
-      Array.prototype.forEach.call(document.querySelectorAll('.rd-cover[data-id="' + f.id + '"]'), function (n) { n.style.setProperty('--img', "url('" + u + "')"); n.classList.add('has-img'); });
+      Array.prototype.forEach.call(document.querySelectorAll('.rd-cover[data-id="' + f.id + '"],.rd-cover[data-fid="' + f.id + '"]'), function (n) { n.style.setProperty('--img', "url('" + u + "')"); n.classList.add('has-img'); });
     }).catch(function () { delete thumbs[f.id]; }).then(function () { tbusy = false; setTimeout(pumpThumbs, 30); });
   }
   function fetchThumbs() {
@@ -4104,12 +4110,12 @@
       vis.push(f);
       var tip = f.name + '\n' + size(f.size) + ' · ' + fd(f.added) + (f.tags ? '\n#' + tagList(f).join(' #') : '') + (f.notes ? '\n' + f.notes : '');
       return '<button class="rd-cover k-' + k + ' p' + pat + (img ? ' has-img' : '') + (extra ? ' ' + extra : '') + '" style="--c1:' + p[0] + ';--c2:' + p[1] + (img ? ";--img:url('" + img + "')" : '') + '" data-act="view" data-id="' + f.id + '" title="' + esc(tip) + '" aria-label="Buka ' + esc(f.name) + '">' +
-        '<i class="rd-art"></i><i class="rd-ext">' + esc(extOf(f)) + '</i><b class="rd-name">' + esc(baseName(f)) + '</b>' +
-        (k === 'txt' && f.idx ? '<span class="rd-snip">' + esc(f.idx.slice(0, 200)) + '</span>' : '') + '</button>';
+        '<i class="rd-art"></i><i class="rd-ext">' + esc(extOf(f)) + '</i>' + (f.rating ? '<i class="rd-rb">★ ' + f.rating + '</i>' : '') + '<b class="rd-name">' + esc(baseName(f)) + '</b>' +
+        (k === 'txt' && f.idx && !f.cover ? '<span class="rd-snip">' + esc(f.idx.slice(0, 200)) + '</span>' : '') + '</button>';
     }
     function tools(f) {
       var b = function (a, ico, lb, cls, e) { return '<button class="' + (cls || '') + '" data-act="' + a + '"' + (e ? ' data-e="' + e + '"' : '') + ' data-id="' + f.id + '" aria-label="' + lb + ' ' + esc(f.name) + '" title="' + lb + '">' + ic(ico, 2) + '</button>'; };
-      return '<div class="rd-tools">' + b('dl', 'dl', 'Unduh') + b('edit', 'edit', 'Edit', '', 'file') + b('delfile', 'del', 'Hapus', 'danger') + '</div>';
+      return '<div class="rd-tools">' + b('dl', 'dl', 'Unduh') + b('cvr', 'img', 'Ubah sampul') + b('edit', 'edit', 'Edit', '', 'file') + b('delfile', 'del', 'Hapus', 'danger') + '</div>';
     }
     var book = function (f, i) { return '<div class="rd-book" style="--i:' + Math.min(i, 14) + '">' + cover(f) + tools(f) + '</div>'; };
     var ghost = function (label) { return '<label class="rd-book rd-ghost" data-pick tabindex="0" role="button" title="Unggah dokumen ke rak ini"><span class="rd-plus">' + ic('plus', 1.6) + '</span><em>' + label + '</em><input type="file" multiple hidden data-chg="upload"></label>'; };
@@ -4120,7 +4126,7 @@
     function shelf(title, sub, files, o) {
       o = o || {};
       var head = '<div class="rd-sh"><h3>' + esc(title) + (sub ? '<small>' + esc(sub) + '</small>' : '') + '</h3><div class="rd-sh-acts">' +
-        (o.folder ? '<button class="rd-ib" data-act="edit" data-e="folder" data-id="' + o.folder.id + '" aria-label="Ubah nama atau letak rak ' + esc(o.folder.name) + '" title="Edit rak">' + ic('edit', 1.8) + '</button><button class="rd-ib danger" data-act="delfolder" data-id="' + o.folder.id + '" aria-label="Hapus rak ' + esc(o.folder.name) + '" title="Hapus rak">' + ic('del', 1.8) + '</button>' : '') +
+        (o.folder ? '<button class="rd-ib" data-act="fcv" data-id="' + o.folder.id + '" aria-label="Ubah sampul rak ' + esc(o.folder.name) + '" title="Ubah sampul rak">' + ic('img', 1.8) + '</button>' + (o.folder.cover ? '<button class="rd-ib" data-act="fcvx" data-id="' + o.folder.id + '" aria-label="Hapus sampul rak ' + esc(o.folder.name) + '" title="Hapus sampul rak">' + ic('x', 1.8) + '</button>' : '') + '<button class="rd-ib" data-act="edit" data-e="folder" data-id="' + o.folder.id + '" aria-label="Ubah nama atau letak rak ' + esc(o.folder.name) + '" title="Edit rak">' + ic('edit', 1.8) + '</button><button class="rd-ib danger" data-act="delfolder" data-id="' + o.folder.id + '" aria-label="Hapus rak ' + esc(o.folder.name) + '" title="Hapus rak">' + ic('del', 1.8) + '</button>' : '') +
         (o.open ? '<button class="rd-more" data-act="cd" data-id="' + o.open + '">' + (o.more || 'Buka rak') + ic('go', 1.8) + '</button>' : '') + '</div></div>';
       var rows = chunk(files, PER_ROW), i = 0, body = '';
       if (!rows.length) rows = [[]];
@@ -4154,15 +4160,20 @@
 
     /* ----- Grid (Semua / Terbaru / hasil cari) ----- */
     function folderCover(f) {
-      return '<button class="rd-cover k-fold p' + (hash(f.name) % 4) + '" style="--c1:#2fd0b4;--c2:#0b8f9c" data-act="cd" data-id="' + f.id + '" title="' + esc(pstr(f.id)) + '" aria-label="Buka rak ' + esc(f.name) + '"><i class="rd-art"></i><i class="rd-ext">RAK</i><b class="rd-name">' + esc(f.name) + '</b><span class="rd-fico">' + ic('folder', 1.5) + '</span></button>';
+      var img = thumbs[f.id]; if (f.cover) vis.push(f);
+      return '<button class="rd-cover k-fold p' + (hash(f.name) % 4) + (img ? ' has-img' : '') + '" data-fid="' + f.id + '" style="--c1:#2fd0b4;--c2:#0b8f9c' + (img ? ";--img:url('" + img + "')" : '') + '" data-act="cd" data-id="' + f.id + '" title="' + esc(pstr(f.id)) + '" aria-label="Buka rak ' + esc(f.name) + '"><i class="rd-art"></i><i class="rd-ext">RAK</i><b class="rd-name">' + esc(f.name) + '</b><span class="rd-fico">' + ic('folder', 1.5) + '</span></button>';
     }
+    function stars(n) { var o = '', i; for (i = 1; i <= 5; i++) o += '<i class="' + (i <= n ? 'on' : '') + '">★</i>'; return o; }
     function card(f, i) {
       var tg = tagList(f);
-      return '<div class="rd-card" style="--i:' + Math.min(i, 14) + '"><div class="rd-book">' + cover(f) + tools(f) + '</div><div class="rd-cap"><b title="' + esc(f.name) + '">' + esc(f.name) + '</b><small>' + size(f.size) + ' · ' + fd(f.added) + '</small>' +
-        '<small class="loc">' + esc(pstr(f.folderId)) + '</small>' + (tg.length ? '<small class="tg">#' + tg.map(esc).join(' #') + '</small>' : '') + '</div></div>';
+      return '<div class="rd-card" style="--i:' + Math.min(i, 14) + '"><div class="rd-book">' + cover(f) + tools(f) + '</div><div class="rd-cap"><b title="' + esc(f.name) + '">' + esc(f.name) + '</b>' +
+        '<span class="rd-cm"><em>' + esc(extOf(f)) + '</em>' + size(f.size) + '</span><span class="rd-cm dt">' + fd(f.added) + '</span>' +
+        '<span class="rd-cl" title="' + esc(pstr(f.folderId)) + '">' + ic('folder', 1.8) + '<span>' + esc(pstr(f.folderId)) + '</span></span>' +
+        '<span class="rd-cs' + (f.rating ? '' : ' none') + '" aria-label="Rating ' + (f.rating || 0) + ' dari 5">' + stars(f.rating || 0) + '</span>' +
+        (tg.length ? '<span class="rd-ct">' + tg.slice(0, 2).map(function (t) { return '<i>#' + esc(t) + '</i>'; }).join('') + (tg.length > 2 ? '<i>+' + (tg.length - 2) + '</i>' : '') + '</span>' : '') + '</div></div>';
     }
     function gridView(title, note, files, folders, none) {
-      var i = 0, g = (folders || []).map(function (f) { return '<div class="rd-card"><div class="rd-book">' + folderCover(f) + '</div><div class="rd-cap"><b>' + esc(f.name) + '</b><small>' + itemCount(f.id) + ' dokumen</small><small class="loc">' + esc(pstr(f.parentId)) + '</small></div></div>'; }).join('') +
+      var i = 0, g = (folders || []).map(function (f) { return '<div class="rd-card"><div class="rd-book">' + folderCover(f) + '</div><div class="rd-cap"><b>' + esc(f.name) + '</b><span class="rd-cm"><em>RAK</em>' + itemCount(f.id) + ' dokumen</span><span class="rd-cl" title="' + esc(pstr(f.parentId)) + '">' + ic('folder', 1.8) + '<span>' + esc(pstr(f.parentId)) + '</span></span></div></div>'; }).join('') +
         files.map(function (f) { return card(f, i++); }).join('');
       return '<section class="rd-sec"><div class="rd-sh"><h3>' + esc(title) + '<small>' + esc(note) + '</small></h3></div>' + (g ? '<div class="rd-grid">' + g + '</div>' : '<div class="rd-none">' + none + '</div>') + '</section>';
     }
@@ -4211,23 +4222,166 @@
       return html;
     }
 
-    function viewer(f, blob) {
-      var url = URL.createObjectURL(blob), t = f.type || blob.type || '';
-      var done = function (b) {
-        var m = el2('ac-ov ac-ov2 ' + SKIN, '<div class="ac-win vw"><header><div><h2 style="font-size:20px">' + esc(f.name) + '</h2><p>' + size(f.size) + ' · ' + esc(t || 'berkas') + '</p></div><button class="ac-x" data-x aria-label="Tutup">×</button></header><div class="ac-body">' + b + '</div><div class="ac-foot"><a class="ac-btn" href="' + url + '" target="_blank" rel="noopener">Buka di tab baru</a><a class="ac-btn pri" href="' + url + '" download="' + esc(f.name) + '">Unduh</a></div></div>');
-        document.body.appendChild(m);
-        var cx = m.querySelector('.ac-x'); if (cx) cx.focus();
-        var off = function () { m.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 60000); };
-        m.addEventListener('mousedown', function (e) { if (e.target === m) off(); });
-        m.addEventListener('click', function (e) { if (e.target.closest && e.target.closest('[data-x]')) off(); });
-        m.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); off(); } });
-      };
-      if (/^image\//.test(t)) done('<img src="' + url + '" alt="">');
-      else if (/pdf/.test(t)) done('<iframe src="' + url + '" title="' + esc(f.name) + '"></iframe><p class="ac-hint" style="margin-top:8px">Jika PDF tidak tampil di perangkat ini, gunakan "Buka di tab baru" atau "Unduh".</p>');
-      else if (/^video\//.test(t)) done('<video src="' + url + '" controls style="width:100%;max-height:68dvh"></video>');
-      else if (/^audio\//.test(t)) done('<audio src="' + url + '" controls style="width:100%"></audio>');
-      else if (/^text\//.test(t) || /\.(txt|md|csv|json)$/i.test(f.name)) blob.text().then(function (x) { done('<pre>' + esc(x.slice(0, 200000)) + '</pre>'); });
-      else done(empty('Jenis berkas ini tidak bisa dipratinjau di browser. Gunakan "Unduh" untuk membukanya dengan aplikasi yang sesuai.'));
+    /* ----- Sampul kustom: gambar dikecilkan lalu disimpan di IndexedDB (kunci cv-<id>) ----- */
+    function mkCover(file) {
+      if (!window.createImageBitmap) return Promise.resolve(file);
+      return createImageBitmap(file, { resizeWidth: 640, resizeQuality: 'high' }).then(function (bm) {
+        var c = document.createElement('canvas'); c.width = bm.width; c.height = bm.height;
+        c.getContext('2d').drawImage(bm, 0, 0); if (bm.close) bm.close();
+        return new Promise(function (res) { c.toBlob(function (t) { res(t || file); }, 'image/webp', .9); });
+      }).catch(function () { return file; });
+    }
+    function setCover(o, file) {
+      if (!file) return Promise.resolve();
+      if (!/^image\//.test(file.type || '')) { MO.msg('Bukan gambar', 'Pilih berkas gambar (JPG, PNG, atau WEBP) untuk sampul.'); return Promise.resolve(); }
+      return mkCover(file).then(function (b) { return put('cv-' + o.id, b); }).then(function () {
+        o.cover = Date.now(); dropThumb(o.id); app.save(); app.render(); MO.msg('Sampul diubah', 'Sampul baru sudah dipasang.');
+      }).catch(function () { MO.msg('Gagal', 'Sampul tidak dapat disimpan di browser ini.'); });
+    }
+    function clearCover(o) { rmb('cv-' + o.id); delete o.cover; dropThumb(o.id); app.save(); app.render(); }
+    function pickCover(o, done) {
+      var i = document.createElement('input'); i.type = 'file'; i.accept = 'image/*'; i.style.display = 'none'; document.body.appendChild(i);
+      i.addEventListener('change', function () { var f = i.files && i.files[0]; i.remove(); if (f) setCover(o, f).then(done); });
+      i.addEventListener('cancel', function () { i.remove(); });
+      i.click();
+    }
+
+    /* ----- Halaman keterangan: sampul besar, info, rating, tombol Baca & Unduh ----- */
+    var kindName = { pdf: 'Dokumen PDF', doc: 'Dokumen Word', xls: 'Lembar kerja', ppt: 'Presentasi', img: 'Gambar', av: 'Audio / video', txt: 'Teks', zip: 'Arsip', oth: 'Berkas' };
+    var readable = function (f) { var k = kind(f); return k === 'pdf' || k === 'img' || k === 'txt' || k === 'av'; };
+    function detail(f) {
+      var k = kind(f), p = PAL[k], tg = tagList(f), cur = f.rating || 0, urls = [];
+      var ov = el2('ac-ov ac-ov2 ' + SKIN + ' rd-det-ov', '<div class="rd-det" role="dialog" aria-modal="true" aria-label="Keterangan ' + esc(f.name) + '"><button class="rd-det-x" data-x aria-label="Tutup">' + ic('x', 2) + '</button>' +
+        '<div class="rd-det-cv"><div class="rd-book"><div class="rd-cover k-' + k + ' p' + (hash(f.name) % 4) + '" style="--c1:' + p[0] + ';--c2:' + p[1] + '"><i class="rd-art"></i><i class="rd-ext">' + esc(extOf(f)) + '</i><b class="rd-name">' + esc(baseName(f)) + '</b></div></div></div>' +
+        '<div class="rd-det-bd"><h2 class="rd-det-t">' + esc(f.name) + '</h2><p class="rd-det-sub">' + kindName[k] + ' · ' + size(f.size) + '</p>' +
+        '<div class="rd-rate" role="radiogroup" aria-label="Rating dokumen"></div>' +
+        '<dl class="rd-meta"><div><dt>Jenis</dt><dd>' + esc(extOf(f)) + '</dd></div><div><dt>Ukuran</dt><dd>' + size(f.size) + '</dd></div><div><dt>Diunggah</dt><dd>' + fd(f.added) + '</dd></div><div><dt>Letak</dt><dd title="' + esc(pstr(f.folderId)) + '">' + esc(pstr(f.folderId)) + '</dd></div></dl>' +
+        (tg.length ? '<div class="rd-det-tags">' + tg.map(function (t) { return '<i>#' + esc(t) + '</i>'; }).join('') + '</div>' : '') +
+        (f.notes ? '<p class="rd-det-notes">' + esc(f.notes) + '</p>' : '') +
+        '<div class="rd-det-acts"><button class="rd-btn pri" data-do="read"' + (readable(f) ? '' : ' disabled title="Jenis berkas ini tidak bisa dibaca di browser, silakan unduh"') + '>' + ic('book', 1.8) + 'Baca</button><button class="rd-btn" data-do="dl">' + ic('dl', 1.8) + 'Unduh</button></div>' +
+        (readable(f) ? '' : '<p class="rd-det-hint">Jenis berkas ini belum bisa dibaca langsung di browser. Unduh untuk membukanya dengan aplikasi yang sesuai.</p>') +
+        '<div class="rd-det-more"><button data-do="cover">' + ic('img', 1.8) + 'Ubah sampul</button>' + (f.cover ? '<button data-do="nocover">' + ic('x', 1.8) + 'Hapus sampul</button>' : '') + '<button data-do="edit">' + ic('edit', 1.8) + 'Edit keterangan</button></div></div></div>');
+      document.body.appendChild(ov);
+      var rate = ov.querySelector('.rd-rate');
+      function drawRate() {
+        var h = '', i; for (i = 1; i <= 5; i++) h += '<button role="radio" aria-checked="' + (i === cur) + '" class="' + (i <= cur ? 'on' : '') + '" data-n="' + i + '" aria-label="' + i + ' bintang">★</button>';
+        rate.innerHTML = h + '<span>' + (cur ? cur + ' / 5' : 'Belum dinilai') + '</span>';
+      }
+      drawRate();
+      /* sampul sebenarnya (gambar kustom, atau gambar itu sendiri) dimuat belakangan */
+      var cv = ov.querySelector('.rd-cover');
+      if (f.cover || k === 'img') get(f.cover ? 'cv-' + f.id : f.id).then(function (b) {
+        if (!b || !ov.isConnected) return; var u = URL.createObjectURL(b); urls.push(u); cv.style.setProperty('--img', "url('" + u + "')"); cv.classList.add('has-img');
+      }).catch(function () { });
+      var off = function () { ov.remove(); urls.forEach(function (u) { URL.revokeObjectURL(u); }); };
+      ov.addEventListener('mousedown', function (e) { if (e.target === ov) off(); });
+      ov.addEventListener('keydown', function (e) { if (e.key === 'Escape') { e.stopPropagation(); off(); } });
+      ov.addEventListener('click', function (e) {
+        var t = e.target.closest && e.target.closest('button'); if (!t) return;
+        if (t.hasAttribute('data-x')) return off();
+        if (t.dataset.n) { var n = +t.dataset.n; cur = cur === n ? 0 : n; f.rating = cur; if (!cur) delete f.rating; app.save(); drawRate(); app.render(); return; }
+        var d = t.dataset.do; if (!d) return;
+        if (d === 'read') withBlob(f.id, reader);
+        if (d === 'dl') withBlob(f.id, download);
+        if (d === 'cover') pickCover(f, function () { off(); detail(by(D.file, f.id) || f); });
+        if (d === 'nocover') { clearCover(f); off(); detail(f); }
+        if (d === 'edit') { off(); var eb = document.querySelector('.rd-skin [data-act="edit"][data-e="file"][data-id="' + f.id + '"]'); if (eb) eb.click(); }
+      });
+      var first = ov.querySelector('[data-do="read"]:not([disabled])') || ov.querySelector('[data-do="dl"]'); if (first) first.focus();
+    }
+
+    /* ----- Pembaca di dalam aplikasi (tanpa tab baru) dengan zoom in / out ----- */
+    var pdfLib = null;
+    function loadPdfJs() {
+      if (pdfLib) return pdfLib;
+      var base = document.baseURI;
+      return (pdfLib = import(new URL('pdfjs/pdf.min.mjs', base).href).then(function (m) {
+        m.GlobalWorkerOptions.workerSrc = new URL('pdfjs/pdf.worker.min.mjs', base).href; return m;
+      }).catch(function (e) { pdfLib = null; throw e; }));
+    }
+    function reader(f, blob) {
+      var k = kind(f), t = f.type || blob.type || '', url = URL.createObjectURL(blob), z = 1, ZMIN = .5, ZMAX = 4, apply = function () { }, cleanup = [];
+      var ov = el2('ac-ov ac-ov2 ' + SKIN + ' rd-rdr-ov', '<div class="rd-rdr" role="dialog" aria-modal="true" aria-label="Membaca ' + esc(f.name) + '">' +
+        '<header class="rd-rdr-h"><div class="rd-rdr-ti"><b title="' + esc(f.name) + '">' + esc(f.name) + '</b><small class="rd-rdr-pg"></small></div>' +
+        '<div class="rd-zoom" role="group" aria-label="Zoom"><button data-z="out" aria-label="Perkecil" title="Perkecil (−)">' + ic('zout', 1.9) + '</button><button class="pct" data-z="fit" aria-label="Kembali ke ukuran awal" title="Ukuran awal (0)">100%</button><button data-z="in" aria-label="Perbesar" title="Perbesar (+)">' + ic('zin', 1.9) + '</button></div>' +
+        '<button class="rd-rdr-b" data-do="dl" title="Unduh">' + ic('dl', 1.9) + '<span>Unduh</span></button><button class="rd-rdr-b x" data-x aria-label="Tutup pembaca" title="Tutup">' + ic('x', 2) + '</button></header>' +
+        '<div class="rd-rdr-body" tabindex="0"><div class="rd-rdr-doc"></div></div></div>');
+      document.body.appendChild(ov);
+      var body = ov.querySelector('.rd-rdr-body'), doc = ov.querySelector('.rd-rdr-doc'), pct = ov.querySelector('.pct'), pgl = ov.querySelector('.rd-rdr-pg');
+      var setZ = function (v) { z = Math.max(ZMIN, Math.min(ZMAX, Math.round(v * 100) / 100)); pct.textContent = Math.round(z * 100) + '%'; apply(); };
+      var off = function () { cleanup.forEach(function (fn) { try { fn(); } catch (e) { } }); ov.remove(); setTimeout(function () { URL.revokeObjectURL(url); }, 3000); };
+      ov.addEventListener('click', function (e) {
+        var b = e.target.closest && e.target.closest('button'); if (!b) return;
+        if (b.hasAttribute('data-x')) return off();
+        if (b.dataset.do === 'dl') return download(f, blob);
+        if (b.dataset.z === 'in') setZ(z + .25); if (b.dataset.z === 'out') setZ(z - .25); if (b.dataset.z === 'fit') setZ(1);
+      });
+      ov.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape') { e.stopPropagation(); off(); }
+        else if (e.key === '+' || e.key === '=') { e.preventDefault(); setZ(z + .25); }
+        else if (e.key === '-' || e.key === '_') { e.preventDefault(); setZ(z - .25); }
+        else if (e.key === '0') { e.preventDefault(); setZ(1); }
+      });
+      body.addEventListener('wheel', function (e) { if (e.ctrlKey || e.metaKey) { e.preventDefault(); setZ(z + (e.deltaY < 0 ? .15 : -.15)); } }, { passive: false });
+      body.focus();
+
+      if (k === 'img') {
+        doc.innerHTML = '<img class="rd-rdr-img" src="' + url + '" alt="' + esc(f.name) + '" draggable="false">';
+        apply = function () { doc.firstChild.style.width = (z * 100) + '%'; };
+      } else if (/^video\//.test(t)) { doc.innerHTML = '<video src="' + url + '" controls style="width:100%;max-height:78dvh;border-radius:14px;background:#000"></video>'; ov.querySelector('.rd-zoom').style.display = 'none'; }
+      else if (/^audio\//.test(t)) { doc.innerHTML = '<audio src="' + url + '" controls style="width:100%"></audio>'; ov.querySelector('.rd-zoom').style.display = 'none'; }
+      else if (k === 'txt') {
+        blob.text().then(function (x) { doc.innerHTML = '<pre class="rd-rdr-txt">' + esc(x.slice(0, 400000)) + '</pre>'; apply(); });
+        apply = function () { var p = doc.querySelector('pre'); if (p) p.style.fontSize = (14 * z) + 'px'; };
+      } else if (k === 'pdf') {
+        doc.innerHTML = '<div class="rd-rdr-load">Memuat dokumen…</div>';
+        blob.arrayBuffer().then(function (buf) { return loadPdfJs().then(function (lib) { return lib.getDocument({ data: buf }).promise; }); })
+          .then(function (pdf) { if (!ov.isConnected) { pdf.destroy(); return; } cleanup.push(function () { pdf.destroy(); }); renderPdf(pdf); })
+          .catch(function () { pdfFallback(); });
+      } else { doc.innerHTML = '<div class="rd-rdr-load">Jenis berkas ini tidak bisa dibaca di browser. Gunakan tombol Unduh.</div>'; ov.querySelector('.rd-zoom').style.display = 'none'; }
+
+      /* PDF: tiap halaman digambar ke kanvas saat terlihat; zoom menggambar ulang dengan ketajaman penuh */
+      function renderPdf(pdf) {
+        doc.innerHTML = ''; doc.classList.add('pdf');
+        var pages = [], io, dpr = Math.min(2, window.devicePixelRatio || 1), n = pdf.numPages, timer = 0;
+        var baseW = function () { return Math.min(body.clientWidth - 36, 940); };
+        pgl.textContent = 'Halaman 1 dari ' + n;
+        io = new IntersectionObserver(function (es) { es.forEach(function (e) { var p = e.target.__p; p.vis = e.isIntersecting; if (p.vis) draw(p); }); }, { root: body, rootMargin: '700px 0px' });
+        cleanup.push(function () { io.disconnect(); clearTimeout(timer); pages.forEach(function (p) { if (p.task) p.task.cancel(); }); });
+        function size1(p) { var w = baseW() * z; p.box.style.width = w + 'px'; p.box.style.height = (w * p.h / p.w) + 'px'; }
+        function draw(p) {
+          var w = baseW() * z, key = Math.round(w);
+          if (p.done === key) return; if (p.task) { p.task.cancel(); p.task = null; }
+          var vp = p.page.getViewport({ scale: w / p.w * dpr }), c = p.cv || (p.cv = document.createElement('canvas'));
+          var tmp = document.createElement('canvas'); tmp.width = Math.floor(vp.width); tmp.height = Math.floor(vp.height);
+          p.task = p.page.render({ canvasContext: tmp.getContext('2d'), viewport: vp });
+          p.task.promise.then(function () {
+            p.task = null; p.done = key; c.width = tmp.width; c.height = tmp.height; c.getContext('2d').drawImage(tmp, 0, 0);
+            c.style.width = '100%'; c.style.height = '100%'; if (!c.parentNode) p.box.appendChild(c); p.box.classList.add('ok');
+          }).catch(function () { });
+        }
+        apply = function () { pages.forEach(function (p) { size1(p); }); clearTimeout(timer); timer = setTimeout(function () { pages.forEach(function (p) { if (p.vis) draw(p); }); }, 140); };
+        var chain = Promise.resolve(), i;
+        function add(no) {
+          return pdf.getPage(no).then(function (pg) {
+            var v = pg.getViewport({ scale: 1 }), box = document.createElement('div'); box.className = 'rd-pg'; box.setAttribute('data-no', no);
+            var p = { page: pg, w: v.width, h: v.height, box: box, vis: false }; box.__p = p; pages.push(p); size1(p); doc.appendChild(box); io.observe(box);
+          });
+        }
+        for (i = 1; i <= n; i++) (function (no) { chain = chain.then(function () { return ov.isConnected ? add(no) : null; }); })(i);
+        body.addEventListener('scroll', function () {
+          var mid = body.scrollTop + body.clientHeight * .35, cur = 1; pages.forEach(function (p) { if (p.box.offsetTop <= mid) cur = +p.box.getAttribute('data-no'); });
+          pgl.textContent = 'Halaman ' + cur + ' dari ' + n;
+        }, { passive: true });
+        var rz = function () { apply(); }; window.addEventListener('resize', rz); cleanup.push(function () { window.removeEventListener('resize', rz); });
+      }
+      /* Cadangan bila pdf.js tidak bisa dimuat (mis. dibuka langsung dari file://): penampil PDF bawaan browser, tetap di dalam halaman ini */
+      function pdfFallback() {
+        doc.innerHTML = '<div class="rd-rdr-fb"><iframe src="' + url + '#toolbar=0&navpanes=0" title="' + esc(f.name) + '"></iframe></div>';
+        var fr = doc.firstChild; pgl.textContent = '';
+        apply = function () { fr.style.transform = 'scale(' + z + ')'; fr.style.width = (100 / z) + '%'; fr.style.height = (100 / z) + '%'; };
+        apply();
+      }
     }
     var el2 = K.el;
     function download(f, blob) { var u = URL.createObjectURL(blob), a = document.createElement('a'); a.href = u; a.download = f.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(function () { URL.revokeObjectURL(u); }, 10000); }
@@ -4243,7 +4397,10 @@
           var ov = ev && ev.target.closest('.ac-ov'), x = ov && ov.querySelector('[data-act="close"]');
           if (x) x.click(); setTimeout(function () { if (MO.routes['#settings']) MO.routes['#settings'](); }, 60);
         }
-        if (a === 'view') { D.last = { id: d.id, t: Date.now() }; withBlob(d.id, viewer); }
+        if (a === 'view') { var vf = by(D.file, d.id); if (vf) { D.last = { id: d.id, t: Date.now() }; detail(vf); } }
+        if (a === 'cvr') { var cf = by(D.file, d.id); if (cf) pickCover(cf); }
+        if (a === 'fcv') { var cfo = by(D.folder, d.id); if (cfo) pickCover(cfo); }
+        if (a === 'fcvx') { var cfx = by(D.folder, d.id); if (cfx) clearCover(cfx); }
         if (a === 'dl') withBlob(d.id, download);
         if (a === 'upload') {
           var fs = Array.prototype.slice.call(t.files || []); t.value = ''; if (!fs.length) return;
@@ -4258,11 +4415,12 @@
           })).then(function (ms) { ms.forEach(function (m) { D.file.push(m); }); app.save(); app.render(); MO.msg('Selesai', ms.length + ' dokumen tersimpan'); })
             .catch(function () { MO.msg('Gagal mengunggah', 'Penyimpanan browser penuh atau diblokir.'); });
         }
-        if (a === 'delfile') { var f = by(D.file, d.id); if (f && confirm('Hapus "' + f.name + '" dari Document Center?')) { rmb(f.id); dropThumb(f.id); if (D.last && D.last.id === f.id) D.last = null; D.file = D.file.filter(function (x) { return x.id !== f.id; }); } }
+        if (a === 'delfile') { var f = by(D.file, d.id); if (f && confirm('Hapus "' + f.name + '" dari Document Center?')) { rmb(f.id); rmb('cv-' + f.id); dropThumb(f.id); if (D.last && D.last.id === f.id) D.last = null; D.file = D.file.filter(function (x) { return x.id !== f.id; }); } }
         if (a === 'delfolder') {
           var ids = kids(d.id), fl = D.file.filter(function (x) { return ids.indexOf(x.folderId) > -1; });
           if (confirm('Hapus folder ini beserta ' + (ids.length - 1) + ' subfolder dan ' + fl.length + ' dokumen di dalamnya?')) {
-            fl.forEach(function (x) { rmb(x.id); dropThumb(x.id); if (D.last && D.last.id === x.id) D.last = null; }); D.file = D.file.filter(function (x) { return ids.indexOf(x.folderId) < 0; }); D.folder = D.folder.filter(function (x) { return ids.indexOf(x.id) < 0; });
+            fl.forEach(function (x) { rmb(x.id); rmb('cv-' + x.id); dropThumb(x.id); if (D.last && D.last.id === x.id) D.last = null; }); D.file = D.file.filter(function (x) { return ids.indexOf(x.folderId) < 0; }); D.folder = D.folder.filter(function (x) { return ids.indexOf(x.id) < 0; });
+            ids.forEach(function (i) { rmb('cv-' + i); dropThumb(i); });
             if (ids.indexOf(st.f) > -1) st.f = '';
           }
         }
@@ -4813,11 +4971,11 @@
       if (rp) { to = +rp[2].replace(/\./g, ''); fmt = function (v) { return rp[1] + Math.round(v).toLocaleString('id-ID'); }; }
       else if (pl) { to = parseFloat(pl[1]); var d = pl[2] ? pl[2].length : 0; fmt = function (v) { return v.toFixed(d) + pl[3]; }; }
       else return;
-      if (!isFinite(to) || Math.abs(to) < 2) return;
-      var t0 = null, dur = 850;
+      if (!isFinite(to) || Math.abs(to) < 1) return;
+      var t0 = null, dur = 2600;
       (function step(ts) {
         if (t0 === null) t0 = ts;
-        var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 2);
         b.textContent = p < 1 ? fmt(to * e) : t;
         if (p < 1 && b.isConnected) requestAnimationFrame(step);
       })(performance.now());

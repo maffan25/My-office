@@ -362,7 +362,7 @@
     el.textContent = '0' + suf;
     var step = function (ts) {
       if (t0 === null) t0 = ts;
-      var k = Math.min(1, (ts - t0) / 900), e = 1 - Math.pow(1 - k, 3);
+      var k = Math.min(1, (ts - t0) / 2600), e = 1 - Math.pow(1 - k, 2);
       el.textContent = Math.round(to * e) + suf;
       if (k < 1) requestAnimationFrame(step);
     };

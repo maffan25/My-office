@@ -127,7 +127,7 @@
     var grid = '<div class="es-grid">' + L.map(function (x, k) {
       var c = brandOf(x, D.org.indexOf(x)), isNew = x === D.org[D.org.length - 1] && D.org.length > 1;
       return '<button class="es-card' + (k === i ? ' sel' : '') + '" data-a="pick" data-i="' + k + '" style="--c:' + c + ';--ci:' + ink(c) + '" aria-pressed="' + (k === i) + '"><span class="es-thumb">' + art(x, D.org.indexOf(x)) + '</span><span class="es-cap">' + esc(x.name) + '</span>' + (isNew ? '<em>BARU</em>' : '') + '</button>';
-    }).join('') + '<button class="es-card add" data-a="oadd"><span class="es-thumb"><i>+</i></span><span class="es-cap">Tambah organisasi</span></button></div>';
+    }).join('') + '<button class="es-card add" data-a="oadd"><span class="es-thumb"><i>+</i><span class="es-cap">Tambah organisasi</span></span></button></div>';
     if (!o) return '<div class="es-hero empty"><div class="es-txt"><h1>' + (D.org.length ? 'Tidak ada hasil' : 'Belum ada organisasi') + '</h1><p class="es-desc">' + (D.org.length ? 'Coba kata kunci lain.' : 'Tambahkan organisasi pertama kamu untuk mulai mencatat rapat, anggaran, dan dokumen.') + '</p></div></div>' + grid;
     var c = brandOf(o, D.org.indexOf(o)), b = bsum(o.id), ed = edgeOf(o, D.org.indexOf(o));
     return '<div class="es-hero" style="--c:' + c + ';--ci:' + ink(c) + ';--edge:' + ed + '"><div class="es-art">' + art(o, D.org.indexOf(o)) + '</div>' +

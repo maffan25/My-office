@@ -21,3 +21,8 @@ bintang pakai sprite 30fps, partikel latar jendela dikurangi di HP, bank soal di
 - Academic: panel fokus (tugas terdekat + angka ringkas), sampul mata kuliah dengan cincin progres, timeline tenggat, kartu prioritas. Logika di academic.js (vDash, cCard).
 - Organization: gambar ditampilkan utuh (contain di atas salinan buram), tanpa bingkai hijau tebal; kartu terpilih cukup terangkat dengan halo tipis. Logika di org-shop.js (fit, art).
 - Jalankan `python3 build.py` setelah mengedit file sumber.
+
+## Revisi v2.1
+- revisi3.css (paling akhir): kotak tambah organisasi presisi, tab Task rata tengah, centang tunggal, pensil Finance, teks Goal, kartu Document Center, tampilan PC lebih besar.
+- documents.js: sampul kustom (dokumen & rak), rating, halaman keterangan, pembaca dalam aplikasi (pdf.js di folder pdfjs/, perlu dibuka lewat http/Vercel; dari file:// memakai penampil bawaan).
+- Catatan: folder icons/ tidak ada di zip, jadi app.js/app.css diperbarui langsung (bukan lewat build.py). Jika icons/ dikembalikan, build.py tetap bisa dipakai.

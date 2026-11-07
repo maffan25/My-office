@@ -141,11 +141,11 @@
       if (rp) { to = +rp[2].replace(/\./g, ''); fmt = function (v) { return rp[1] + Math.round(v).toLocaleString('id-ID'); }; }
       else if (pl) { to = parseFloat(pl[1]); var d = pl[2] ? pl[2].length : 0; fmt = function (v) { return v.toFixed(d) + pl[3]; }; }
       else return;
-      if (!isFinite(to) || Math.abs(to) < 2) return;
-      var t0 = null, dur = 850;
+      if (!isFinite(to) || Math.abs(to) < 1) return;
+      var t0 = null, dur = 2600;
       (function step(ts) {
         if (t0 === null) t0 = ts;
-        var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+        var p = Math.min(1, (ts - t0) / dur), e = 1 - Math.pow(1 - p, 2);
         b.textContent = p < 1 ? fmt(to * e) : t;
         if (p < 1 && b.isConnected) requestAnimationFrame(step);
       })(performance.now());
